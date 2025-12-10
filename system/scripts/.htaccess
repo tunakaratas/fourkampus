@@ -1,0 +1,8 @@
+# System Scripts - Web Erişimini Engelle
+# Bu klasördeki scriptler sadece CLI'den çalıştırılabilir
+
+<FilesMatch "\.php$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+

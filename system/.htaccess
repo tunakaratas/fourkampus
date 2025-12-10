@@ -1,0 +1,11 @@
+# System Directory - Web Erişimini Engelle
+# Bu klasör web'den erişilemez olmalı
+
+Order Deny,Allow
+Deny from all
+
+# Sadece localhost'tan erişime izin ver (development için)
+# Production'da bu satırları kaldırın
+# Allow from 127.0.0.1
+# Allow from ::1
+

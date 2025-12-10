@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniFour - Üniversite Topluluklarınız İçin Tek Çözüm</title>
+    <meta name="description" content="Topluluğunuzu profesyonelce yönetin. Etkinlik planlama, üye takibi, bildirimler ve daha fazlası tek platformda. 2026 Eylül'e kadar ücretsiz! Üyelik sistemi ile başlayın.">
+    <meta name="keywords" content="üniversite topluluğu, topluluk yönetimi, etkinlik yönetimi, üye takibi, ücretsiz web sitesi, üyelik sistemi, profesyonel plan">
+    <meta name="author" content="UniFour">
+    <meta property="og:title" content="UniFour - Üniversite Topluluklarınız İçin Tek Çözüm">
+    <meta property="og:description" content="Topluluğunuzu profesyonelce yönetin. 2026 Eylül'e kadar ücretsiz! Üyelik sistemi ile başlayın.">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Layered Header */
+        .header-container {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            z-index: 1001 !important;
+            background: #0f172a !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+            transition: transform 0.3s ease-in-out !important;
+            transform: translateY(0) !important;
+        }
+        
+        .header-top-layer.header-top-hidden {
+            transform: translateY(0) !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        .header-top-social-btn {
+    color: rgba(255, 255, 255, 0.9) !important;
+    text-decoration: none !important;
+    font-size: 1rem !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    transition: all 0.2s !important;
+}
+
+.header-top-social-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px) !important;
+    color: white !important;
+}        
+        .header-top-layer {
+            background: #0f172a !important;
+            color: white !important;
+            padding: 0.75rem 0 !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out !important;
+        }
+        
+        .header-top-content {
+            max-width: 1920px !important;
+            margin: 0 auto !important;
+            padding: 0 clamp(1rem, 3vw, 2rem) 0 clamp(3rem, 10vw, 6rem) !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+        
+        .header-top-left {
+            display: flex !important;
+            align-items: center !important;
+            gap: 1rem !important;
+        }
+        
+        .header-top-link {
+            color: rgba(255, 255, 255, 0.95) !important;
+            text-decoration: none !important;
+            font-size: 0.875rem !important;
+            font-weight: 500 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+        }
+        
+        .header-top-right {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+        }
+        
+        .header-top-btn {
+            padding: 0.375rem 0.75rem !important;
+            border-radius: 0.5rem !important;
+            font-size: 0.75rem !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.375rem !important;
+            white-space: nowrap !important;
+            transition: all 0.2s !important;
+        }
+        
+        .header-top-btn i {
+            font-size: 0.75rem !important;
+        }
+        
+        .register-btn {
+            background: #6366f1 !important;
+            color: white !important;
+            border: 1px solid #6366f1 !important;
+        }
+        
+        .register-btn:hover {
+            background: #4f46e5 !important;
+            border-color: #4f46e5 !important;
+        }
+        
+        .portal-btn {
+            background: #6366f1 !important;
+            color: white !important;
+            border: 1px solid #6366f1 !important;
+        }
+        
+        .portal-btn:hover {
+            background: #4f46e5 !important;
+            border-color: #4f46e5 !important;
+        }
+        
+        .admin-btn {
+            background: #6366f1 !important;
+            color: white !important;
+            border: 1px solid #6366f1 !important;
+        }
+        
+        .admin-btn:hover {
+            background: #4f46e5 !important;
+            border-color: #4f46e5 !important;
+        }
+        
+        .header-bottom-layer {
+            background: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            padding: 1rem 0 !important;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
+        }
+        
+        .header-bottom-content {
+            max-width: 1920px !important;
+            margin: 0 auto !important;
+            padding: 0 clamp(3rem, 10vw, 6rem) !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            gap: 4rem !important;
+        }
+        
+        .header-logo {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.75rem !important;
+            font-size: 1.5rem !important;
+            font-weight: 800 !important;
+            color: var(--primary-color, #6366f1) !important;
+            text-decoration: none !important;
+            flex-shrink: 0 !important;
+            white-space: nowrap !important;
+        }
+        
+        .header-logo-img {
+            width: 40px !important;
+            height: 40px !important;
+            object-fit: contain !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .header-nav-menu {
+            display: flex !important;
+            list-style: none !important;
+            gap: 3rem !important;
+            align-items: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .header-nav-menu a {
+            color: var(--text-primary, #1e293b) !important;
+            text-decoration: none !important;
+            font-weight: 500 !important;
+            font-size: 0.9375rem !important;
+            transition: color 0.2s !important;
+            position: relative !important;
+            padding: 0.5rem 0 !important;
+        }
+        
+        .header-nav-menu a:hover {
+            color: var(--primary-color, #6366f1) !important;
+        }
+        
+        .header-nav-menu a::after {
+            content: '' !important;
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 0 !important;
+            height: 2px !important;
+            background: var(--primary-color, #6366f1) !important;
+            transition: width 0.3s !important;
+        }
+        
+        .header-nav-menu a:hover::after {
+            width: 100% !important;
+        }
+        
+        .header-nav-menu li {
+            list-style: none !important;
+        }
+        
+        .dark-mode-toggle {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 40px !important;
+            height: 40px !important;
+            background: rgba(99, 102, 241, 0.1) !important;
+            border: 1px solid rgba(99, 102, 241, 0.2) !important;
+            border-radius: 12px !important;
+            color: var(--primary-color, #6366f1) !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            margin-left: 1rem !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .dark-mode-toggle:hover {
+            background: rgba(99, 102, 241, 0.2) !important;
+            border-color: rgba(99, 102, 241, 0.3) !important;
+            transform: scale(1.05) !important;
+        }
+        
+        .dark-mode-toggle i {
+            font-size: 1.1rem !important;
+        }
+        
+        body.dark-mode .dark-mode-toggle {
+            background: rgba(139, 92, 246, 0.2) !important;
+            border-color: rgba(139, 92, 246, 0.3) !important;
+            color: #8b5cf6 !important;
+        }
+        
+        @media (max-width: 768px) {
+            .dark-mode-toggle {
+                margin-left: 0.5rem !important;
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 10px !important;
+            }
+        }
+
+        .mobile-menu-meta,
+        .mobile-menu-footer {
+            display: none !important;
+        }
+        
+        .mobile-menu-badge {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            background: rgba(99, 102, 241, 0.12) !important;
+            color: var(--primary-color, #6366f1) !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            padding: 0.35rem 0.75rem !important;
+            border-radius: 999px !important;
+            font-size: 0.75rem !important;
+        }
+        
+        .mobile-menu-meta-content p {
+            margin: 0.75rem 0 0 0 !important;
+            color: #0f172a !important;
+            font-size: 0.95rem !important;
+            line-height: 1.5 !important;
+        }
+        
+        .mobile-menu-divider {
+            width: 100% !important;
+            height: 1px !important;
+            background: rgba(15, 23, 42, 0.08) !important;
+            margin: 1.5rem 0 !important;
+        }
+        
+        .mobile-menu-contact {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.35rem !important;
+            color: #0f172a !important;
+            font-weight: 600 !important;
+        }
+        
+        .mobile-menu-contact i {
+            margin-right: 0.5rem !important;
+            color: var(--primary-color, #6366f1) !important;
+        }
+        
+        .mobile-menu-cta {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+            margin-top: 1rem !important;
+        }
+        
+        .header-nav-item {
+            position: relative !important;
+        }
+
+        .header-nav-item.has-dropdown::after {
+            content: '' !important;
+            position: absolute !important;
+            top: 100% !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 18px !important;
+            pointer-events: auto !important;
+        }
+        
+        .nav-link {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 0.35rem !important;
+            white-space: nowrap !important;
+        }
+        
+        .nav-link i {
+            font-size: 0.75rem !important;
+            transition: transform 0.2s ease !important;
+        }
+        
+        .header-nav-item.dropdown-hover > .nav-link i,
+        .header-nav-item.dropdown-open > .nav-link i {
+            transform: rotate(-180deg) !important;
+        }
+        
+        .header-dropdown {
+            position: absolute !important;
+            top: calc(100% + 0.25rem) !important;
+            left: 0 !important;
+            min-width: 260px !important;
+            max-width: min(420px, 92vw) !important;
+            background: #ffffff !important;
+            border-radius: 1rem !important;
+            border: 1px solid rgba(15, 23, 42, 0.08) !important;
+            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.12) !important;
+            padding: 1.25rem !important;
+            display: grid !important;
+            gap: 1rem !important;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translateY(12px) !important;
+            transition: opacity 0.2s ease, transform 0.2s ease !important;
+            z-index: 1002 !important;
+        }
+        
+        .header-nav-item.dropdown-hover .header-dropdown {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            transform: translateY(0) !important;
+        }
+
+        .header-nav-item.has-dropdown:nth-last-child(-n + 2) .header-dropdown {
+            left: auto !important;
+            right: 0 !important;
+        }
+        
+        .dropdown-group-title {
+            font-size: 0.75rem !important;
+            letter-spacing: 0.08em !important;
+            text-transform: uppercase !important;
+            color: #94a3b8 !important;
+            margin-bottom: 0.35rem !important;
+            font-weight: 600 !important;
+        }
+        
+        .dropdown-link {
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.5rem !important;
+            padding: 0.35rem 0 !important;
+            color: var(--text-primary, #0f172a) !important;
+            font-size: 0.9rem !important;
+            text-decoration: none !important;
+            position: relative !important;
+            transition: color 0.2s ease !important;
+        }
+        
+        .dropdown-link::before {
+            content: '' !important;
+            width: 6px !important;
+            height: 6px !important;
+            border-radius: 999px !important;
+            background: rgba(99, 102, 241, 0.3) !important;
+            display: inline-block !important;
+        }
+        
+        .dropdown-link:hover,
+        .dropdown-link.active {
+            color: var(--primary-color, #6366f1) !important;
+        }
+        
+        .dropdown-link:hover::before,
+        .dropdown-link.active::before {
+            background: var(--primary-color, #6366f1) !important;
+        }
+        
+        .nav-toggle {
+            display: none !important;
+            flex-direction: column !important;
+            gap: 5px !important;
+            background: none !important;
+            border: none !important;
+            cursor: pointer !important;
+            padding: 5px !important;
+        }
+        
+        .nav-toggle span {
+            width: 25px !important;
+            height: 3px !important;
+            background: var(--text-primary, #1e293b) !important;
+            border-radius: 2px !important;
+            transition: all 0.3s !important;
+        }
+        
+        @media (min-width: 769px) {
+            .header-nav-item:hover .header-dropdown,
+            .header-nav-item:focus-within .header-dropdown {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: translateY(0) !important;
+            }
+
+            .header-nav-item:hover > .nav-link i,
+            .header-nav-item:focus-within > .nav-link i {
+                transform: rotate(-180deg) !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header-top-content,
+            .header-bottom-content {
+                padding: 0 clamp(1.5rem, 4vw, 3rem) !important;
+            }
+            
+            .header-top-btn span {
+                display: none !important;
+            }
+            
+            /* Mobile Menu Overlay - Kapatma için koyu alan */
+            .mobile-menu-overlay {
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: rgba(15, 23, 42, 0.6) !important;
+                backdrop-filter: blur(4px) !important;
+                -webkit-backdrop-filter: blur(4px) !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transition: opacity 0.3s ease !important;
+                z-index: 999 !important;
+                cursor: pointer !important;
+            }
+            
+            .mobile-menu-overlay.active {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+            
+            .header-nav-menu {
+                position: fixed !important;
+                top: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                transform: translateX(100%) !important;
+                flex-direction: column !important;
+                background: linear-gradient(180deg, #ffffff 0%, #f8fafc 45%, #eef2ff 100%) !important;
+                width: 85% !important;
+                max-width: 320px !important;
+                padding: 7rem clamp(1.5rem, 6vw, 3rem) 2.5rem !important;
+                margin: 0 !important;
+                box-shadow: -4px 0 30px rgba(15, 23, 42, 0.25) !important;
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                gap: 1.5rem !important;
+                z-index: 1000 !important;
+                height: 100vh !important;
+                overflow-y: auto !important;
+                display: flex !important;
+            }
+            
+            .header-nav-menu.active {
+                transform: translateX(0) !important;
+            }
+            
+            .nav-toggle {
+                display: flex !important;
+            }
+            
+            .header-nav-item {
+                width: 100% !important;
+            }
+            
+            .header-dropdown {
+                position: static !important;
+                transform: none !important;
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                max-height: 0 !important;
+                overflow: hidden !important;
+                transition: max-height 0.3s ease !important;
+                background: transparent !important;
+                margin-top: 0.5rem !important;
+                border-radius: 0 !important;
+            }
+            
+            .header-nav-item.dropdown-open .header-dropdown {
+                max-height: 800px !important;
+                padding: 0.5rem 0 0.5rem 1rem !important;
+            }
+            
+            .header-nav-item.dropdown-open .dropdown-group {
+                margin-bottom: 1rem !important;
+            }
+            
+            .header-nav-item.dropdown-open .dropdown-group-title {
+                font-size: 0.7rem !important;
+                margin-bottom: 0.5rem !important;
+                color: #64748b !important;
+            }
+            
+            .header-nav-item.dropdown-open .dropdown-link {
+                padding: 0.5rem 0 !important;
+                font-size: 0.9rem !important;
+                color: #1e293b !important;
+            }
+            
+            .header-nav-item.dropdown-open .dropdown-link::before {
+                width: 4px !important;
+                height: 4px !important;
+                margin-right: 0.5rem !important;
+            }
+            
+            .nav-link i {
+                transition: transform 0.2s ease !important;
+            }
+            
+            .header-nav-item.dropdown-open > .nav-link i {
+                transform: rotate(-180deg) !important;
+            }
+
+            .mobile-menu-meta {
+                display: block !important;
+                padding: 0 !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .mobile-menu-footer {
+                display: flex !important;
+                flex-direction: column !important;
+                padding: 1.5rem 0 0 0 !important;
+                margin-top: auto !important;
+                border-top: 1px solid rgba(15, 23, 42, 0.1) !important;
+                width: 100% !important;
+            }
+            
+            .mobile-menu-contact {
+                margin-bottom: 1.25rem !important;
+            }
+            
+            .mobile-menu-contact p {
+                font-size: 0.9rem !important;
+                color: #475569 !important;
+                margin: 0.5rem 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 0.5rem !important;
+            }
+            
+            .mobile-menu-cta {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 0.75rem !important;
+            }
+            
+            .mobile-menu-cta .btn {
+                width: 100% !important;
+                text-align: center !important;
+                padding: 0.875rem 1.5rem !important;
+                font-size: 0.95rem !important;
+                font-weight: 600 !important;
+                border-radius: 0.75rem !important;
+            }
+        }
+
+        [data-scroll-target] {
+            scroll-margin-top: clamp(120px, 14vh, 200px) !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Layered Header -->
+    <div class="header-container">
+        <!-- Top Layer -->
+        <div class="header-top-layer">
+            <div class="header-top-content">
+                <div class="header-top-left">
+                    <a href="https://instagram.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://x.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                        <i class="fab fa-x"></i>
+                    </a>
+                    <a href="https://linkedin.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
+
+                </div>
+                <div class="header-top-right">
+                    <a href="register.php" class="header-top-btn register-btn">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Kayıt Ol</span>
+                    </a>
+                    <a href="../public/index.php" target="_blank"  rel="noopener noreferrer" class="header-top-btn portal-btn">
+                        <i class="fas fa-globe"></i>
+                        <span>Portal</span>
+                    </a>
+                    <a href="../admin-login.php" target="_blank" rel="noopener noreferrer" class="header-top-btn admin-btn">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Layer -->
+        <div class="header-bottom-layer">
+            <div class="header-bottom-content">
+                <a href="#" class="header-logo">
+                    <img src="../nobackground_logo.png" alt="UniFour" class="header-logo-img">
+                    <span>UniFour</span>
+                </a>
+                <!-- Mobile Menu Overlay -->
+                <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+                <ul class="header-nav-menu">
+                    <li class="mobile-menu-meta">
+                        <div class="mobile-menu-meta-content">
+                            <div class="mobile-menu-badge">UniFour</div>
+                            <p>Topluluk yönetimini tek panelde toplayın. Tüm modüllere 2026 Eylül'e kadar ücretsiz erişim.</p>
+                        </div>
+                        <div class="mobile-menu-divider"></div>
+                    </li>
+                    <li class="header-nav-item has-dropdown" data-group="solutions">
+                        <a href="#cozumler" class="nav-link" data-dropdown-toggle aria-expanded="false">
+                            <span>Çözümler</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </a>
+                        <div class="header-dropdown">
+                            <div class="dropdown-group">
+                                <p class="dropdown-group-title">Genel Akış</p>
+                                <a href="#hero" data-anchor-target="hero" class="dropdown-link">Neden UniFour?</a>
+                                <a href="#cozumler" data-anchor-target="cozumler" class="dropdown-link">Sorunlar & Çözümler</a>
+                                <a href="#referanslar" data-anchor-target="referanslar" class="dropdown-link">Topluluk Yorumları</a>
+                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">Hemen Başlayın</a>
+                            </div>
+                            <div class="dropdown-group">
+                                <p class="dropdown-group-title">Destek</p>
+                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">İletişim & Destek</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="header-nav-item has-dropdown" data-group="features">
+                        <a href="#ozellikler" class="nav-link" data-dropdown-toggle aria-expanded="false">
+                            <span>Özellikler</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </a>
+                        <div class="header-dropdown">
+                            <div class="dropdown-group">
+                                <p class="dropdown-group-title">Çekirdek Modüller</p>
+                                <a href="#feature-etkinlik" data-anchor-target="feature-etkinlik" class="dropdown-link">Etkinlik Yönetimi</a>
+                                <a href="#feature-uyelik" data-anchor-target="feature-uyelik" class="dropdown-link">Üyelik Sistemi</a>
+                                <a href="#feature-bildirim" data-anchor-target="feature-bildirim" class="dropdown-link">Bildirim Merkezi</a>
+                                <a href="#feature-anket" data-anchor-target="feature-anket" class="dropdown-link">Anket & Geri Bildirim</a>
+                            </div>
+                            <div class="dropdown-group">
+                                <p class="dropdown-group-title">Genişleyen Yetkinlikler</p>
+                                <a href="#feature-yonetim" data-anchor-target="feature-yonetim" class="dropdown-link">Yönetim Kurulu</a>
+                                <a href="#feature-platform" data-anchor-target="feature-platform" class="dropdown-link">Çoklu Platform</a>
+                                <a href="#feature-sms" data-anchor-target="feature-sms" class="dropdown-link">SMS & Premium</a>
+                                <a href="#feature-portal" data-anchor-target="feature-portal" class="dropdown-link">Public Portal</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="header-nav-item has-dropdown" data-group="screens">
+                        <a href="#ekranlar" class="nav-link" data-dropdown-toggle aria-expanded="false">
+                            <span>Ekranlar</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </a>
+                        <div class="header-dropdown">
+                            <div class="dropdown-group">
+                                <p class="dropdown-group-title">Web Paneli</p>
+                                <a href="#screen-dashboard" data-anchor-target="screen-dashboard" class="dropdown-link">Kontrol Paneli</a>
+                                <a href="#screen-events" data-anchor-target="screen-events" class="dropdown-link">Etkinlik Görünümü</a>
+                                <a href="#screen-members" data-anchor-target="screen-members" class="dropdown-link">Üye Yönetimi</a>
+                            </div>
+                            <div class="dropdown-group">
+                                <p class="dropdown-group-title">İşlevsel Görünümler</p>
+                                <a href="#screen-notifications" data-anchor-target="screen-notifications" class="dropdown-link">Bildirimler</a>
+                                <a href="#screen-surveys" data-anchor-target="screen-surveys" class="dropdown-link">Anketler</a>
+                                <a href="#screen-portal" data-anchor-target="screen-portal" class="dropdown-link">Public Portal</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="header-nav-item has-dropdown" data-group="pricing">
+                        <a href="#fiyatlandirma" class="nav-link" data-dropdown-toggle aria-expanded="false">
+                            <span>Fiyatlandırma</span>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                        </a>
+                        <div class="header-dropdown">
+                            <div class="dropdown-group">
+                                <p class="dropdown-group-title">Planlar & Ekstralar</p>
+                                <a href="#fiyatlandirma" data-anchor-target="fiyatlandirma" class="dropdown-link">Ücretlendirme</a>
+                                <a href="#paket-icerik" data-anchor-target="paket-icerik" class="dropdown-link">Pakete Dahil</a>
+                            </div>
+                            <div class="dropdown-group">
+                                <p class="dropdown-group-title">Harekete Geçin</p>
+                                <a href="#fiyatlandirma" data-anchor-target="fiyatlandirma" class="dropdown-link">Kampanya</a>
+                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">Satış ile Konuş</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="mobile-menu-footer">
+                        <div class="mobile-menu-divider"></div>
+                        <div class="mobile-menu-contact">
+                            <p><i class="fas fa-envelope"></i> info@unifour.com</p>
+                            <p><i class="fas fa-phone"></i> +90 533 544 59 83</p>
+                        </div>
+                        <div class="mobile-menu-cta">
+                            <a href="register.php" class="btn btn-primary">Ücretsiz Başla</a>
+                            <a href="#iletisim" class="btn btn-secondary" data-anchor-target="iletisim">Satış ile Konuş</a>
+                        </div>
+                    </li>
+                </ul>
+                <button class="dark-mode-toggle" id="darkModeToggle" aria-label="Dark mode toggle">
+                    <i class="fas fa-moon" id="darkModeIcon"></i>
+                </button>
+                <button class="nav-toggle" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero" data-scroll-target="hero">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <i class="fas fa-star"></i>
+                    <span>2026 Eylül'e Kadar Ücretsiz</span>
+                </div>
+                <h1 class="hero-title">
+                    Topluluğunuzu Yönetmek<br>
+                    <span class="gradient-text">Artık Çok Kolay</span>
+                </h1>
+                <p class="hero-description">
+                    Excel tabloları, WhatsApp grupları ve dağınık sistemlerden kurtulun. Tüm topluluk işlerinizi tek bir platformda yönetin. Üyelik sistemi, ücretsiz web siteniz ve email adreslerinizle birlikte. 2026 Eylül'e kadar tamamen ücretsiz!
+                </p>
+                <div class="hero-buttons">
+                    <a href="#iletisim" class="btn btn-primary btn-hero-cta">
+                        <span>Ücretsiz Başla</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                    <a href="#ekranlar" class="btn btn-secondary">Nasıl Çalışır?</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="158">0</div>
+                        <div class="stat-label">Aktif Topluluk</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="25000">0</div>
+                        <div class="stat-label">Toplam Üye</div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-number" data-count="6000">0</div>
+                        <div class="stat-label">Etkinlik</div>
+                    </div>
+                </div>
+                <div class="hero-trust">
+                    <div class="trust-users">
+                        <div class="user-avatars">
+                            <div class="avatar avatar-1">A</div>
+                            <div class="avatar avatar-2">E</div>
+                            <div class="avatar avatar-3">K</div>
+                            <div class="avatar avatar-4">S</div>
+                            <div class="avatar-more">+99</div>
+                        </div>
+                        <div class="trust-text">
+                            <strong>150+ topluluk</strong> UniFour kullanıyor
+                        </div>
+                    </div>
+                    <div class="trust-badges">
+                        <span><i class="fas fa-check-circle"></i> Üyelik Sistemi</span>
+                        <span><i class="fas fa-check-circle"></i> Ücretsiz Web Sitesi</span>
+                        <span><i class="fas fa-check-circle"></i> Ücretsiz Email</span>
+                        <span><i class="fas fa-check-circle"></i> 7/24 Destek</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+    </section>
+
+    <!-- Problems & Solutions -->
+    <section id="cozumler" class="problems-solutions" data-scroll-target="cozumler">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Sorunlarınız, Çözümlerimiz</h2>
+                <p class="section-description">Topluluk yönetiminde yaşadığınız tüm sorunlar için hazır çözümler</p>
+            </div>
+            <div class="problems-grid">
+                <div class="problem-card">
+                    <div class="problem-icon"><i class="fas fa-calendar-times"></i></div>
+                    <h3>Etkinlikleri Takip Etmek Zor</h3>
+                    <p>Excel tablolarında kayboluyor, kimin geldiğini bilmiyorsunuz</p>
+                    <div class="solution">
+                        <strong>Çözüm</strong>
+                        <p>Tüm etkinlikleriniz tek yerde, katılımcılar otomatik takip ediliyor</p>
+                    </div>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon"><i class="fas fa-comments"></i></div>
+                    <h3>WhatsApp'ta Mesajlar Kayboluyor</h3>
+                    <p>Önemli duyurular grup mesajlarında kaybolup gidiyor</p>
+                    <div class="solution">
+                        <strong>Çözüm</strong>
+                        <p>Profesyonel email bildirimleri, herkes mesajınızı görüyor</p>
+                    </div>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon"><i class="fas fa-users"></i></div>
+                    <h3>Üye Bilgileri Dağınık</h3>
+                    <p>Üye listeleri farklı yerlerde, güncel bilgilere ulaşamıyorsunuz</p>
+                    <div class="solution">
+                        <strong>Çözüm</strong>
+                        <p>Tüm üyeler tek sistemde, anında arama ve filtreleme</p>
+                    </div>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon"><i class="fas fa-globe"></i></div>
+                    <h3>Web Sitesi Yok veya Pahalı</h3>
+                    <p>Topluluğunuzun profesyonel bir web sitesi yok</p>
+                    <div class="solution">
+                        <strong>Çözüm</strong>
+                        <p>Ücretsiz web sitesi pakete dahil, özel domain ile kullanın</p>
+                    </div>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon"><i class="fas fa-envelope"></i></div>
+                    <h3>Profesyonel Email Adresi Yok</h3>
+                    <p>Gmail ile iletişim kurmak profesyonel görünmüyor</p>
+                    <div class="solution">
+                        <strong>Çözüm</strong>
+                        <p>Topluluğunuz için ücretsiz email adresleri (SMS hariç)</p>
+                    </div>
+                </div>
+                <div class="problem-card">
+                    <div class="problem-icon"><i class="fas fa-chart-bar"></i></div>
+                    <h3>Anket Yapmak Zor</h3>
+                    <p>Google Forms karmaşık, sonuçları analiz etmek zor</p>
+                    <div class="solution">
+                        <strong>Çözüm</strong>
+                        <p>Kolay anket oluşturma, otomatik sonuç analizi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="ozellikler" class="features" data-scroll-target="ozellikler">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Her İhtiyacınız İçin Özellikler</h2>
+                <p class="section-description">Topluluk yönetiminde ihtiyacınız olan her şey tek platformda</p>
+            </div>
+
+            <div class="features-showcase">
+                <!-- Feature 1 -->
+                <div class="feature-showcase-item" id="feature-etkinlik" data-scroll-target="feature-etkinlik">
+                    <div class="feature-showcase-content">
+                        <div class="feature-number">01</div>
+                        <h3 class="feature-title-large">Etkinliklerinizi Kolayca Yönetin</h3>
+                        <p class="feature-description-large">
+                            Etkinlik oluşturmak artık dakikalar sürüyor. Tarih, saat, konum bilgilerini ekleyin, görsel ve videolarınızı yükleyin. Katılımcılar otomatik olarak takip ediliyor.
+                        </p>
+                        <ul class="feature-benefits">
+                            <li><i class="fas fa-check"></i> Tek tıkla etkinlik oluşturma</li>
+                            <li><i class="fas fa-check"></i> Görsel ve video desteği</li>
+                            <li><i class="fas fa-check"></i> Otomatik katılımcı takibi</li>
+                            <li><i class="fas fa-check"></i> Kapasite yönetimi</li>
+                            <li><i class="fas fa-check"></i> Ücretli/ücretsiz etkinlik desteği</li>
+                        </ul>
+                    </div>
+                    <div class="feature-showcase-visual">
+                        <iframe src="preview/events.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <div class="visual-overlay">
+                            <div class="visual-label">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Etkinlik Yönetimi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-showcase-item reverse" id="feature-uyelik" data-scroll-target="feature-uyelik">
+                    <div class="feature-showcase-content">
+                        <div class="feature-number">02</div>
+                        <h3 class="feature-title-large">Gelişmiş Üyelik Sistemi</h3>
+                        <p class="feature-description-large">
+                            Profesyonel üyelik sistemi ile tüm üyelerinizi tek yerde yönetin. Üye kayıtları, onay süreçleri, üyelik durumları ve daha fazlası. Toplu işlemlerle zaman kazanın.
+                        </p>
+                        <ul class="feature-benefits">
+                            <li><i class="fas fa-check"></i> Otomatik üyelik kayıt sistemi</li>
+                            <li><i class="fas fa-check"></i> Detaylı üye profilleri ve durumları</li>
+                            <li><i class="fas fa-check"></i> Hızlı arama ve filtreleme</li>
+                            <li><i class="fas fa-check"></i> Toplu üye işlemleri</li>
+                            <li><i class="fas fa-check"></i> Üye istatistikleri ve raporları</li>
+                            <li><i class="fas fa-check"></i> Güvenli veri saklama</li>
+                        </ul>
+                    </div>
+                    <div class="feature-showcase-visual">
+                        <iframe src="preview/members.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <div class="visual-overlay">
+                            <div class="visual-label">
+                                <i class="fas fa-users"></i>
+                                <span>Üyelik Sistemi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-showcase-item" id="feature-bildirim" data-scroll-target="feature-bildirim">
+                    <div class="feature-showcase-content">
+                        <div class="feature-number">03</div>
+                        <h3 class="feature-title-large">Herkesi Anında Bilgilendirin</h3>
+                        <p class="feature-description-large">
+                            Önemli duyurularınızı email ile gönderin. Toplu mesaj gönderimi ile tüm üyelere tek seferde ulaşın. Gönderim geçmişinizi takip edin.
+                        </p>
+                        <ul class="feature-benefits">
+                            <li><i class="fas fa-check"></i> Profesyonel email bildirimleri</li>
+                            <li><i class="fas fa-check"></i> Toplu mesaj gönderimi</li>
+                            <li><i class="fas fa-check"></i> Kişiselleştirilmiş mesajlar</li>
+                            <li><i class="fas fa-check"></i> Gönderim raporları</li>
+                            <li><i class="fas fa-check"></i> Mesaj şablonları</li>
+                        </ul>
+                    </div>
+                    <div class="feature-showcase-visual">
+                        <iframe src="preview/notifications.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <div class="visual-overlay">
+                            <div class="visual-label">
+                                <i class="fas fa-bell"></i>
+                                <span>Bildirim Sistemi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-showcase-item reverse" id="feature-anket" data-scroll-target="feature-anket">
+                    <div class="feature-showcase-content">
+                        <div class="feature-number">04</div>
+                        <h3 class="feature-title-large">Anketlerle Görüş Toplayın</h3>
+                        <p class="feature-description-large">
+                            Üyelerinizin görüşlerini kolayca toplayın. Etkinliklerinize bağlı anketler oluşturun veya bağımsız anketler yapın. Sonuçları anında görün.
+                        </p>
+                        <ul class="feature-benefits">
+                            <li><i class="fas fa-check"></i> Kolay anket oluşturma</li>
+                            <li><i class="fas fa-check"></i> Çoklu soru tipleri</li>
+                            <li><i class="fas fa-check"></i> Anket sonuçları görüntüleme</li>
+                            <li><i class="fas fa-check"></i> Otomatik analiz</li>
+                            <li><i class="fas fa-check"></i> Paylaşım linkleri</li>
+                        </ul>
+                    </div>
+                    <div class="feature-showcase-visual">
+                        <iframe src="preview/surveys.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <div class="visual-overlay">
+                            <div class="visual-label">
+                                <i class="fas fa-poll"></i>
+                                <span>Anket Yönetimi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-showcase-item" id="feature-yonetim" data-scroll-target="feature-yonetim">
+                    <div class="feature-showcase-content">
+                        <div class="feature-number">05</div>
+                        <h3 class="feature-title-large">Yönetim Kurulunuzu Tanıtın</h3>
+                        <p class="feature-description-large">
+                            Yönetim kurulu üyelerinizi profesyonelce tanıtın. Fotoğrafları, rolleri ve iletişim bilgilerini ekleyin. Halka açık profil sayfasında gösterin.
+                        </p>
+                        <ul class="feature-benefits">
+                            <li><i class="fas fa-check"></i> Profesyonel profil sayfaları</li>
+                            <li><i class="fas fa-check"></i> Fotoğraf ve biyografi</li>
+                            <li><i class="fas fa-check"></i> Rol yönetimi</li>
+                            <li><i class="fas fa-check"></i> İletişim bilgileri</li>
+                            <li><i class="fas fa-check"></i> Halka açık görünüm</li>
+                        </ul>
+                    </div>
+                    <div class="feature-showcase-visual">
+                        <iframe src="preview/dashboard.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <div class="visual-overlay">
+                            <div class="visual-label">
+                                <i class="fas fa-user-tie"></i>
+                                <span>Yönetim Kurulu</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-showcase-item reverse access-everywhere" id="feature-platform" data-scroll-target="feature-platform">
+                    <div class="feature-showcase-content">
+                        <div class="feature-number">06</div>
+                        <div class="access-badge">
+                            <span class="badge-dot"></span>
+                            <span class="badge-text">Çoklu Platform</span>
+                        </div>
+                        <h3 class="feature-title-large access-title">Her Yerden Erişin</h3>
+                        <p class="feature-description-large access-lead">
+                            UniFour hem web’de hem de native uygulamalarla yanınızda. Masaüstünüzde plan yapın, telefonunuzdan yönetin, tüm ekip senkron kalsın.
+                        </p>
+
+                        <div class="access-tabs" role="tablist" aria-label="Platform seçimi">
+                            <button id="tab-ios" class="access-tab active" data-platform="ios" type="button">
+                                <i class="fab fa-apple"></i>
+                                <span>iOS (SwiftUI)</span>
+                            </button>
+                            <button id="tab-android" class="access-tab" data-platform="android" type="button">
+                                <i class="fab fa-android"></i>
+                                <span>Android (Jetpack)</span>
+                            </button>
+                            <button id="tab-web" class="access-tab" data-platform="web" type="button">
+                                <i class="fas fa-laptop"></i>
+                                <span>Web Portal</span>
+                            </button>
+                        </div>
+
+                        <div class="access-info">
+                            <div class="access-stats">
+                                <div class="access-stat">
+                                    <div class="stat-icon gradient-purple"><i class="fas fa-bolt"></i></div>
+                                    <div>
+                                        <p class="stat-label">Gerçek Zamanlı</p>
+                                        <p class="stat-value">0.4 sn Senkron</p>
+                                    </div>
+                                </div>
+                                <div class="access-stat">
+                                    <div class="stat-icon gradient-blue"><i class="fas fa-bell"></i></div>
+                                    <div>
+                                        <p class="stat-label">Bildirim</p>
+                                        <p class="stat-value">Push · Email · SMS</p>
+                                    </div>
+                                </div>
+                                <div class="access-stat">
+                                    <div class="stat-icon gradient-green"><i class="fas fa-shield-alt"></i></div>
+                                    <div>
+                                        <p class="stat-label">Güvenlik</p>
+                                        <p class="stat-value">Face ID / Touch ID</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <ul class="feature-benefits access-benefits">
+                                <li><i class="fas fa-check"></i> Native deneyim: SwiftUI &amp; Jetpack Compose</li>
+                                <li><i class="fas fa-check"></i> Offline mod, tekrar çevrimde otomatik senkron</li>
+                                <li><i class="fas fa-check"></i> Rol bazlı erişim ve gerçek zamanlı bildirimler</li>
+                                <li><i class="fas fa-check"></i> Web &amp; mobil arayüzler arasında kesintisiz geçiş</li>
+                            </ul>
+                        </div>
+
+                        <div class="access-cta">
+                            <a href="#iletisim" class="access-button primary">
+                                <span>TestFlight Daveti İste</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                            <a href="#iletisim" class="access-button ghost">
+                                <i class="fab fa-android"></i>
+                                <span>Android Ön Kaydı Aç</span>
+                            </a>
+                        </div>
+
+                        <p class="access-footnote">
+                            <i class="fas fa-lock"></i>
+                            Verileriniz TLS 1.3 ile şifrelenir, SOC 2 uyumlu altyapıda güvenle saklanır.
+                        </p>
+                    </div>
+
+                    <div class="feature-showcase-visual access-visual">
+                        <div class="device-preview ios active" data-platform="ios">
+                            <div class="device-shadow"></div>
+                            <div class="device-frame ios">
+                                <div class="device-notch"></div>
+                                <iframe src="preview/mobile.php?platform=ios" frameborder="0" scrolling="no"></iframe>
+                            </div>
+                            <div class="device-meta">
+                                <span><i class="fab fa-apple"></i> SwiftUI</span>
+                                <span><i class="fas fa-sync-alt"></i> 0.4 sn</span>
+                                <span><i class="fas fa-mobile-alt"></i> Dark / Light</span>
+                            </div>
+                        </div>
+
+                        <div class="device-preview android" data-platform="android">
+                            <div class="device-shadow"></div>
+                            <div class="device-frame android">
+                                <iframe src="preview/mobile.php?platform=android" frameborder="0" scrolling="no"></iframe>
+                            </div>
+                            <div class="device-meta">
+                                <span><i class="fab fa-android"></i> Jetpack Compose</span>
+                                <span><i class="fas fa-wifi"></i> Offline Ready</span>
+                                <span><i class="fas fa-language"></i> Çoklu Dil</span>
+                            </div>
+                        </div>
+
+                        <div class="device-preview web" data-platform="web">
+                            <div class="desktop-frame">
+                                <div class="desktop-bar">
+                                    <span class="dot red"></span>
+                                    <span class="dot yellow"></span>
+                                    <span class="dot green"></span>
+                                    <span class="url">portal.UniFour.app</span>
+                                </div>
+                                <iframe src="preview/dashboard.php" frameborder="0" scrolling="no"></iframe>
+                            </div>
+                            <div class="device-meta">
+                                <span><i class="fas fa-desktop"></i> Tarayıcı Destekli</span>
+                                <span><i class="fas fa-share-alt"></i> Paylaşımlı Erişim</span>
+                                <span><i class="fas fa-cloud"></i> Anlık Yedekleme</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 7 -->
+                <div class="feature-showcase-item" id="feature-sms" data-scroll-target="feature-sms">
+                    <div class="feature-showcase-content">
+                        <div class="feature-number">07</div>
+                        <h3 class="feature-title-large">
+                            SMS ile Üyelerinize Ulaşın
+                            <span class="feature-premium-badge">
+                                <i class="fas fa-crown"></i>
+                                Premium
+                            </span>
+                        </h3>
+                        <p class="feature-description-large">
+                            Email bildirimlerine ek olarak SMS gönderimi ile üyelerinize anında ulaşın. Toplu SMS gönderimi, kişiselleştirilmiş mesajlar ve gönderim raporları. Email bildirimleri ücretsizdir.
+                        </p>
+                        <ul class="feature-benefits">
+                            <li><i class="fas fa-check"></i> Toplu SMS gönderimi</li>
+                            <li><i class="fas fa-check"></i> Kişiselleştirilmiş mesajlar</li>
+                            <li><i class="fas fa-check"></i> Gönderim raporları ve durum takibi</li>
+                            <li><i class="fas fa-check"></i> Etkinlik katılımcılarına otomatik SMS</li>
+                            <li><i class="fas fa-check"></i> Karakter sayacı ve mesaj optimizasyonu</li>
+                        </ul>
+                        <div class="feature-premium-note">
+                            <p>
+                                <i class="fas fa-info-circle"></i>
+                                <span><strong>Not:</strong> SMS gönderimi premium pakete dahildir ve ekstra ücretlidir. Her SMS için operatör tarifesine göre ücretlendirme yapılır. Email bildirimleri ücretsizdir ve sınırsızdır.</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="feature-showcase-visual">
+                        <iframe src="preview/messages.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <div class="visual-overlay">
+                            <div class="visual-label">
+                                <i class="fas fa-sms"></i>
+                                <span>SMS Gönderim Sistemi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature 8 - Public Portal -->
+                <div class="feature-showcase-item reverse" id="feature-portal" data-scroll-target="feature-portal">
+                    <div class="feature-showcase-content">
+                        <div class="feature-number">08</div>
+                        <h3 class="feature-title-large">Herkese Açık Topluluk Portalı</h3>
+                        <p class="feature-description-large">
+                            Tüm topluluklarınızı tek bir portalda sergileyin. Herkes toplulukları keşfedebilir, arayabilir ve filtreleyebilir. Detaylı bilgilere erişmek için giriş yapılması gerekir. Modern, mobil-first tasarım ile profesyonel bir görünüm.
+                        </p>
+                        <ul class="feature-benefits">
+                            <li><i class="fas fa-check"></i> Herkese açık topluluk listesi</li>
+                            <li><i class="fas fa-check"></i> Gelişmiş arama ve filtreleme</li>
+                            <li><i class="fas fa-check"></i> Genel istatistikler (topluluk, üye, etkinlik sayıları)</li>
+                            <li><i class="fas fa-check"></i> Topluluk detay sayfaları (giriş gerektirir)</li>
+                            <li><i class="fas fa-check"></i> Modern, mobil-first tasarım</li>
+                            <li><i class="fas fa-check"></i> Etkinlik ve kampanya görüntüleme</li>
+                            <li><i class="fas fa-check"></i> Kullanıcı dostu arayüz</li>
+                        </ul>
+                    </div>
+                    <div class="feature-showcase-visual">
+                        <iframe src="preview/public.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <div class="visual-overlay">
+                            <div class="visual-label">
+                                <i class="fas fa-globe"></i>
+                                <span>Public Portal</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Screenshots Section -->
+    <section id="ekranlar" class="screenshots" data-scroll-target="ekranlar">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nasıl Görünüyor?</h2>
+                <p class="section-description">UniFour'in arayüzünden kısa bir tur</p>
+            </div>
+            <div class="screenshots-grid">
+                <div class="screenshot-item" id="screen-dashboard" data-scroll-target="screen-dashboard">
+                    <iframe src="preview/dashboard.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <div class="screenshot-overlay">
+                        <div class="screenshot-label">
+                            <i class="fas fa-desktop"></i>
+                            <span>Ana Kontrol Paneli</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="screenshot-item" id="screen-events" data-scroll-target="screen-events">
+                    <iframe src="preview/events.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <div class="screenshot-overlay">
+                        <div class="screenshot-label">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Etkinlik Yönetimi</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="screenshot-item" id="screen-members" data-scroll-target="screen-members">
+                    <iframe src="preview/members.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <div class="screenshot-overlay">
+                        <div class="screenshot-label">
+                            <i class="fas fa-users"></i>
+                            <span>Üye Yönetimi</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="screenshot-item" id="screen-notifications" data-scroll-target="screen-notifications">
+                    <iframe src="preview/notifications.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <div class="screenshot-overlay">
+                        <div class="screenshot-label">
+                            <i class="fas fa-bell"></i>
+                            <span>Bildirim Sistemi</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="screenshot-item" id="screen-surveys" data-scroll-target="screen-surveys">
+                    <iframe src="preview/surveys.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <div class="screenshot-overlay">
+                        <div class="screenshot-label">
+                            <i class="fas fa-poll"></i>
+                            <span>Anket Yönetimi</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="screenshot-item" id="screen-portal" data-scroll-target="screen-portal">
+                    <iframe src="preview/public.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <div class="screenshot-overlay">
+                        <div class="screenshot-label">
+                            <i class="fas fa-globe"></i>
+                            <span>Public Portal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="fiyatlandirma" class="pricing" data-scroll-target="fiyatlandirma">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Basit ve Şeffaf Fiyatlandırma</h2>
+                <p class="section-description">İhtiyacınıza uygun paketi seçin, hemen başlayın</p>
+            </div>
+            <div class="pricing-wrapper">
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Standart</h3>
+                        <div class="pricing-price">
+                            <span class="price-amount">ÜCRETSİZ</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Pano, etkinlik ve üye yönetimi</li>
+                        <li><i class="fas fa-check"></i> Yönetim kurulu & görev atamaları</li>
+                        <li><i class="fas fa-check"></i> Market: en fazla 2 ürün yayınlama</li>
+                        <li><i class="fas fa-check"></i> Kampanyalar: 3 aktif kampanya limiti</li>
+                        <li><i class="fas fa-check"></i> Mail merkezlerini sınırsız kullanabilirsiniz</li>
+                        <li><i class="fas fa-check"></i> Temel bildirimler ve otomatik yedekleme</li>
+                        <li><i class="fas fa-check"></i> Standart destek (mesai saatlerinde)</li>
+                    </ul>
+                    <a href="register.php" class="btn btn-secondary btn-block" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Ücretsiz Başla</a>
+                </div>
+                <div class="pricing-card featured">
+                    <div class="pricing-badge">Popüler</div>
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Profesyonel</h3>
+                        <div class="pricing-price">
+                            <span class="price-amount">₺250</span>
+                            <span class="price-period">/ay</span>
+                        </div>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Tüm Standart özellikler</li>
+                        <li><i class="fas fa-check"></i> Market: sınırsız ürün & varyantlar</li>
+                        <li><i class="fas fa-check"></i> Kampanyalar: sınırsız aktif kampanya</li>
+                        <li><i class="fas fa-check"></i> Raporlar & Analitik + AI önerileri</li>
+                        <li><i class="fas fa-check"></i> Öncelikli destek (24 saat içinde dönüş)</li>
+                    </ul>
+                    <a href="register.php" class="btn btn-primary btn-block" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Hemen Başla</a>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-header">
+                        <h3 class="pricing-title">Business</h3>
+                        <div class="pricing-price">
+                            <span class="price-amount">₺500</span>
+                            <span class="price-period">/ay</span>
+            </div>
+                        <p class="pricing-sms-gift"><i class="fas fa-gift"></i> +500 SMS/ay hediye</p>
+                    </div>
+                    <ul class="pricing-features">
+                        <li><i class="fas fa-check"></i> Tüm Profesyonel özellikler</li>
+                        <li><i class="fas fa-check"></i> Her ay 500 SMS hediyesi + NetGSM entegrasyonu</li>
+                        <li><i class="fas fa-check"></i> SMS ve Mail merkezlerinde canlı gönderim</li>
+                        <li><i class="fas fa-check"></i> Finans & muhasebe entegrasyonları</li>
+                        <li><i class="fas fa-check"></i> Gelişmiş analitik, AI içgörü ve KPI raporları</li>
+                        <li><i class="fas fa-check"></i> Kampanya & pazar yeri premium araçları</li>
+                        <li><i class="fas fa-check"></i> Özel entegrasyonlar, SSO ve müşteri temsilcisi</li>
+                        <li><i class="fas fa-check"></i> 7/24 öncelikli destek ve SLA</li>
+                    </ul>
+                    <a href="register.php" class="btn btn-secondary btn-block" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Hemen Başla</a>
+                </div>
+            </div>
+            <div class="pricing-note" id="pricingNote">
+                <p><i class="fas fa-info-circle"></i> <strong>Önemli:</strong> Tüm paketler 12 aylık abonelik için gösterilmiştir. Daha kısa süreli paketler için lütfen iletişime geçin.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Package Includes Section -->
+    <section id="paket-icerik" class="package-includes" data-scroll-target="paket-icerik">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Pakete Dahil Olan Her Şey</h2>
+                <p class="section-description">UniFour ile birlikte gelen tüm hizmetler</p>
+            </div>
+            <div class="includes-grid">
+                <div class="include-item">
+                    <div class="include-icon-wrapper">
+                    <div class="include-icon"><i class="fas fa-globe"></i></div>
+                    </div>
+                    <h3>Ücretsiz Web Sitesi</h3>
+                    <p>Topluluğunuz için özel web sitesi tahsis edilir. Özel domain ile kullanabilirsiniz.</p>
+                </div>
+                <div class="include-item">
+                    <div class="include-icon-wrapper">
+                    <div class="include-icon"><i class="fas fa-envelope"></i></div>
+                    </div>
+                    <h3>Ücretsiz Email</h3>
+                    <p>Topluluğunuz için profesyonel email adresleri. SMS hariç tüm iletişim kanalları dahil.</p>
+                </div>
+                <div class="include-item">
+                    <div class="include-icon-wrapper">
+                    <div class="include-icon"><i class="fas fa-cloud"></i></div>
+                    </div>
+                    <h3>Bulut Hosting</h3>
+                    <p>Hızlı ve güvenilir bulut sunucu altyapısı. 99.9% uptime garantisi.</p>
+                </div>
+                <div class="include-item">
+                    <div class="include-icon-wrapper">
+                    <div class="include-icon"><i class="fas fa-lock"></i></div>
+                    </div>
+                    <h3>SSL Sertifikası</h3>
+                    <p>Güvenli bağlantı için ücretsiz SSL sertifikası. Verileriniz şifrelenir.</p>
+                </div>
+                <div class="include-item">
+                    <div class="include-icon-wrapper">
+                    <div class="include-icon"><i class="fas fa-sync-alt"></i></div>
+                    </div>
+                    <h3>Otomatik Yedekleme</h3>
+                    <p>Günlük otomatik yedekleme sistemi. Verileriniz her zaman güvende.</p>
+                </div>
+                <div class="include-item">
+                    <div class="include-icon-wrapper">
+                    <div class="include-icon"><i class="fas fa-tools"></i></div>
+                    </div>
+                    <h3>Teknik Destek</h3>
+                    <p>7/24 teknik destek hizmeti. Sorunlarınız hızlıca çözülür.</p>
+                </div>
+                <div class="include-item">
+                    <div class="include-icon-wrapper">
+                    <div class="include-icon"><i class="fas fa-book"></i></div>
+                    </div>
+                    <h3>Eğitim ve Dokümantasyon</h3>
+                    <p>Kapsamlı kullanım kılavuzu ve video eğitimler. Ekibiniz hızlıca öğrenir.</p>
+                </div>
+                <div class="include-item">
+                    <div class="include-icon-wrapper">
+                    <div class="include-icon"><i class="fas fa-rocket"></i></div>
+                    </div>
+                    <h3>Güncellemeler</h3>
+                    <p>Yeni özellikler ve güvenlik güncellemeleri otomatik olarak uygulanır.</p>
+                </div>
+            </div>
+            <div class="note-box">
+                <p><i class="fas fa-exclamation-circle"></i> <strong>Önemli:</strong> SMS gönderimi pakete dahil değildir. Email bildirimleri tamamen ücretsizdir ve sınırsızdır.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof Section -->
+    <section id="referanslar" class="social-proof" data-scroll-target="referanslar">
+        <div class="container">
+            <div class="proof-content">
+                <h2>Binlerce Topluluk UniFour'e Güveniyor</h2>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">AY</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Ahmet Yılmaz</div>
+                                <div class="testimonial-role">Teknoloji Topluluğu Başkanı</div>
+                            </div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">"UniFour sayesinde etkinlik yönetimi artık çok kolay. Üye takibi ve bildirimler otomatik, zaman kazandık!"</p>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">MK</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Mehmet Kaya</div>
+                                <div class="testimonial-role">Girişimcilik Kulübü</div>
+                            </div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">"Ücretsiz web sitesi ve email adresleri harika! Profesyonel görünüyoruz ve maliyet sıfır."</p>
+                    </div>
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">SK</div>
+                            <div class="testimonial-info">
+                                <div class="testimonial-name">Selin Demir</div>
+                                <div class="testimonial-role">Sanat Topluluğu</div>
+                            </div>
+                            <div class="testimonial-rating">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="testimonial-text">"Anket sistemi mükemmel çalışıyor. Üyelerimizin görüşlerini kolayca topluyoruz."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="iletisim" class="contact" data-scroll-target="iletisim">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Hemen Başlayın</h2>
+                <p class="section-description">Formu doldurun, size en kısa sürede dönüş yapalım</p>
+            </div>
+            <div class="contact-wrapper">
+                <div class="contact-info">
+                    <h3>Bize Ulaşın</h3>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div>
+                            <strong>Email</strong>
+                            <p>info@UniFour.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div>
+                            <strong>Telefon</strong>
+                            <p>+90 533 544 59 83</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                        <div>
+                            <strong>Çalışma Saatleri</strong>
+                            <p>Pazartesi - Cuma: 09:00 - 18:00</p>
+                        </div>
+                    </div>
+                    <div class="contact-benefits">
+                        <h4>Neden UniFour?</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> 2026 Eylül'e kadar ücretsiz</li>
+                            <li><i class="fas fa-check"></i> Ücretsiz web sitesi</li>
+                            <li><i class="fas fa-check"></i> Ücretsiz email adresleri</li>
+                            <li><i class="fas fa-check"></i> 7/24 teknik destek</li>
+                            <li><i class="fas fa-check"></i> Kolay kullanım</li>
+                        </ul>
+                    </div>
+                </div>
+                <form class="contact-form" id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Ad Soyad *</label>
+                        <input type="text" id="name" name="name" required placeholder="Adınız ve soyadınız">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required placeholder="email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefon</label>
+                        <input type="tel" id="phone" name="phone" placeholder="05XX XXX XX XX">
+                    </div>
+                    <div class="form-group">
+                        <label for="community">Topluluk Adı</label>
+                        <input type="text" id="community" name="community" placeholder="Topluluğunuzun adı">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mesajınız *</label>
+                        <textarea id="message" name="message" rows="5" required placeholder="UniFour hakkında sorularınız veya özel istekleriniz..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Gönder</button>
+                    <p class="form-note">Formu göndererek gizlilik politikamızı kabul etmiş olursunuz.</p>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners Section -->
+    <section id="ortaklar" class="partners-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">İşbirliği Ortaklarımız</h2>
+                <p class="section-description">UniFour'ü destekleyen değerli ortaklarımız</p>
+            </div>
+            <div class="partners-grid" id="partnersGrid">
+                <!-- Partner logoları buraya dinamik olarak eklenecek -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-privacy-notice">
+            <p>Formu göndererek gizlilik politikamızı kabul etmiş olursunuz.</p>
+        </div>
+        <div class="footer-decorative-shapes"></div>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <div class="footer-logo-large">
+                        <img src="../nobackground_logo.png" alt="UniFour" class="footer-logo-large-img">
+                    </div>
+                    <div class="footer-logo">
+                        <span class="logo-text">UniFour</span>
+                    </div>
+                    <p class="footer-description">
+                        Üniversite toplulukları için modern ve güvenli yönetim sistemi. 
+                        2026 Eylül'e kadar tamamen ücretsiz, ücretsiz web sitesi ve email adresleri dahil. Üyelik sistemi ile profesyonel yönetim.
+                    </p>
+                    <div class="footer-social">
+                        <a href="https://instagram.com/uni.panel" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://x.com/uni.panel" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="X (Twitter)">
+                            <i class="fab fa-x-twitter"></i>
+                        </a>
+                        <a href="https://linkedin.com/company/uni.panel" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://github.com/unifour" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Hızlı Linkler</h4>
+                    <ul>
+                        <li><a href="#cozumler"><i class="fas fa-chevron-right"></i> Çözümler</a></li>
+                        <li><a href="#ozellikler"><i class="fas fa-chevron-right"></i> Özellikler</a></li>
+                        <li><a href="#ekranlar"><i class="fas fa-chevron-right"></i> Ekranlar</a></li>
+                        <li><a href="#fiyatlandirma"><i class="fas fa-chevron-right"></i> Fiyatlandırma</a></li>
+                        <li><a href="#iletisim"><i class="fas fa-chevron-right"></i> İletişim</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Özellikler</h4>
+                    <ul>
+                        <li><a href="#ozellikler"><i class="fas fa-chevron-right"></i> Etkinlik Yönetimi</a></li>
+                        <li><a href="#ozellikler"><i class="fas fa-chevron-right"></i> Üye Yönetimi</a></li>
+                        <li><a href="#ozellikler"><i class="fas fa-chevron-right"></i> Bildirim Sistemi</a></li>
+                        <li><a href="#ozellikler"><i class="fas fa-chevron-right"></i> Anket Sistemi</a></li>
+                        <li><a href="register.php"><i class="fas fa-chevron-right"></i> Kayıt Ol</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>İletişim & Destek</h4>
+                    <ul>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <a href="mailto:info@unifour.com">info@unifour.com</a>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone"></i>
+                            <a href="tel:+905335445983">+90 533 544 59 83</a>
+                        </li>
+                        <li>
+                            <i class="fas fa-clock"></i>
+                            <span>Pzt-Cuma: 09:00-18:00</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-headset"></i>
+                            <span>7/24 Teknik Destek</span>
+                        </li>
+                    </ul>
+                    <div class="footer-badges">
+                        <div class="footer-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Güvenli</span>
+                        </div>
+                        <div class="footer-badge">
+                            <i class="fas fa-bolt"></i>
+                            <span>Hızlı</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-copyright">
+                    <p class="copyright-main">&copy; 2025 <span class="copyright-brand">UniFour</span></p>
+                    <p class="copyright-sub">Four Software tarafından geliştirilmiştir</p>
+                    <p class="copyright-rights">Tüm hakları saklıdır.</p>
+                </div>
+                <div class="footer-legal-links">
+                    <a href="privacy-policy.php">
+                        <i class="fas fa-shield-alt"></i> Gizlilik Politikası
+                    </a>
+                    <a href="terms-of-service.php">
+                        <i class="fas fa-file-contract"></i> Kullanım Koşulları
+                    </a>
+                    <a href="distance-sales-contract.php">
+                        <i class="fas fa-shopping-cart"></i> Mesafeli Satış
+                    </a>
+                    <a href="pre-information-form.php">
+                        <i class="fas fa-info-circle"></i> Ön Bilgilendirme
+                    </a>
+                    <a href="cancellation-refund.php">
+                        <i class="fas fa-undo-alt"></i> İptal & İade
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

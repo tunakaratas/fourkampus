@@ -1,0 +1,56 @@
+# API Directory .htaccess
+# Bu dosya API endpoint'lerinin düzgün çalışması için gerekli
+
+# PHP Ayarları
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 50M
+    php_value post_max_size 50M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_value upload_max_filesize 50M
+    php_value post_max_size 50M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
+</IfModule>
+
+# DirectoryIndex'i devre dışı bırak (PHP dosyalarını direkt çalıştır)
+DirectoryIndex disabled
+
+# Tüm PHP dosyalarına erişime izin ver
+<FilesMatch "\.php$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# CORS Headers (Apache 2.4+)
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+    Header always set Access-Control-Max-Age "3600"
+</IfModule>
+
+# OPTIONS request için özel işleme
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+</IfModule>
+
+# Güvenlik: Hassas dosyalara erişimi engelle
+<FilesMatch "\.(sqlite|log|md|txt|bak|backup)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Index dosyalarını gizle
+Options -Indexes
+
+# Error handling
+ErrorDocument 404 /unipanel/api/error.php
+

@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Database files
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# Logs
+logs/
+*.log
+
+# Storage (uploaded files - keep structure but ignore content)
+storage/
+!storage/.gitkeep
+
+# Environment files
+.env
+.env.local
+auth.json
+
+# Config files with secrets
+config/credentials.php
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build files
+dist/
+build/
+
+# Swift/Kotlin projects (mobil uygulamalar sunucuya gerekmez)
+unipanel_swift/
+unifour_kotlin/
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+
+# Zip files
+*.zip
+
+# Backup files
+*.bak
+*.backup
