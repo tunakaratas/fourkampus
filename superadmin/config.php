@@ -78,7 +78,7 @@ return [
 
     // Security Settings
     'security' => [
-        'allowed_ips' => array_filter(array_map('trim', explode(',', superadmin_config_env('SUPERADMIN_ALLOWED_IPS', false, '127.0.0.1,::1')))),
+        'allowed_ips' => [], // IP kontrolü devre dışı - tüm IP'lerden erişim serbest
         'session_lifetime' => (int) superadmin_config_env('SUPERADMIN_SESSION_LIFETIME', false, 60 * 60 * 24 * 7),
         'idle_timeout' => (int) superadmin_config_env('SUPERADMIN_IDLE_TIMEOUT', false, 60 * 60 * 24 * 7),
     ]
