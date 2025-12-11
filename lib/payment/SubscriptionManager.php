@@ -318,6 +318,9 @@ class SubscriptionManager {
      * Abonelik bilgilerini al - En yüksek tier'ı önceliklendir
      */
     public function getSubscription() {
+        // Tabloyu garantile
+        $this->createSubscriptionTable();
+        
         // Önce aktif profesyonel/business aboneliği kontrol et
         $stmt = $this->db->prepare("
             SELECT * FROM subscriptions 
@@ -335,6 +338,10 @@ class SubscriptionManager {
                 created_at DESC
             LIMIT 1
         ");
+        if ($stmt === false) {
+            error_log("SubscriptionManager: prepare() failed - " . $this->db->lastErrorMsg());
+            return null;
+        }
         $stmt->bindValue(1, $this->communityId, \SQLITE3_TEXT);
         $result = $stmt->execute();
         $paid_subscription = $result->fetchArray(\SQLITE3_ASSOC);
@@ -353,6 +360,10 @@ class SubscriptionManager {
             ORDER BY created_at DESC 
             LIMIT 1
         ");
+        if ($standard_stmt === false) {
+            error_log("SubscriptionManager: standard prepare() failed - " . $this->db->lastErrorMsg());
+            return null;
+        }
         $standard_stmt->bindValue(1, $this->communityId, \SQLITE3_TEXT);
         $standard_result = $standard_stmt->execute();
         $standard_subscription = $standard_result->fetchArray(\SQLITE3_ASSOC);
