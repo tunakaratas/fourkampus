@@ -45,13 +45,16 @@ if ($method === 'GET') {
         exit;
     }
     
-    // QR kod içeriği oluştur - Gerçek URL'ler kullan
-    $qrContent = '';
+    // QR kod içeriği oluştur - Swift uygulaması için deep link formatı
+    $deepLink = '';
+    $webUrl = '';
     $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
     
     if ($type === 'community') {
-        // Gerçek topluluk URL'i
-        $qrContent = $baseUrl . "/communities/" . urlencode($id) . "/";
+        // Deep link: unifour://community/{community_id}
+        $deepLink = 'unifour://community/' . urlencode($id);
+        // Web URL'i de ekle (fallback için)
+        $webUrl = $baseUrl . "/communities/" . urlencode($id) . "/";
     } elseif ($type === 'event') {
         if (empty($communityId)) {
             http_response_code(400);
@@ -61,8 +64,10 @@ if ($method === 'GET') {
             ]);
             exit;
         }
-        // Gerçek etkinlik URL'i
-        $qrContent = $baseUrl . "/communities/" . urlencode($communityId) . "/?view=events&event_id=" . urlencode($id);
+        // Deep link: unifour://event/{community_id}/{event_id}
+        $deepLink = 'unifour://event/' . urlencode($communityId) . '/' . urlencode($id);
+        // Web URL'i de ekle (fallback için)
+        $webUrl = $baseUrl . "/communities/" . urlencode($communityId) . "/?view=events&event_id=" . urlencode($id);
     } elseif ($type === 'url') {
         // Direkt URL parametresi
         $url = $_GET['url'] ?? '';
@@ -74,7 +79,8 @@ if ($method === 'GET') {
             ]);
             exit;
         }
-        $qrContent = urldecode($url);
+        $deepLink = urldecode($url);
+        $webUrl = urldecode($url);
     } else {
         http_response_code(400);
         echo json_encode([
@@ -83,6 +89,9 @@ if ($method === 'GET') {
         ]);
         exit;
     }
+    
+    // QR kod içeriği olarak deep link kullan (Swift uygulaması bunu yakalayacak)
+    $qrContent = $deepLink;
     
     // QR kod URL'i oluştur
     $qrUrl = generateQRCodeSVG($qrContent, $size);
@@ -94,6 +103,8 @@ if ($method === 'GET') {
             'qr_url' => $qrUrl,
             'qr_base64' => $qrBase64,
             'content' => $qrContent,
+            'deep_link' => $deepLink,
+            'web_url' => $webUrl,
             'type' => $type,
             'id' => $id
         ]

@@ -143,13 +143,24 @@ function get_all_communities($useCache = true) {
                 $campaign_count = (int)$campaign_result;
             }
             
+            // Base URL
+            $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+            
+            // QR kod deep link
+            $qr_deep_link = 'unifour://community/' . urlencode($dir);
+            
+            // QR kod API URL'i
+            $qr_code_url = $baseUrl . '/api/qr_code.php?type=community&id=' . urlencode($dir);
+            
             $communities[] = [
                 'id' => $dir,
                 'name' => $settings['club_name'] ?? ucwords(str_replace('_', ' ', $dir)),
                 'description' => $settings['club_description'] ?? '',
                 'member_count' => (int)$member_count,
                 'event_count' => (int)$event_count,
-                'campaign_count' => (int)$campaign_count
+                'campaign_count' => (int)$campaign_count,
+                'qr_deep_link' => $qr_deep_link,
+                'qr_code_url' => $qr_code_url
             ];
             
             // Bağlantıyı pool'a geri ver
@@ -469,6 +480,15 @@ try {
                 }
             }
             
+            // Base URL
+            $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+            
+            // QR kod deep link
+            $qr_deep_link = 'unifour://community/' . urlencode($community['id']);
+            
+            // QR kod API URL'i
+            $qr_code_url = $baseUrl . '/api/qr_code.php?type=community&id=' . urlencode($community['id']);
+            
             $formatted_communities[] = [
                 'id' => $community['id'],
                 'name' => $community['name'],
@@ -488,7 +508,9 @@ try {
                 'website' => $website,
                 'social_links' => $social_links,
                 'status' => 'active',
-                'university' => $university
+                'university' => $university,
+                'qr_deep_link' => $qr_deep_link,
+                'qr_code_url' => $qr_code_url
             ];
         }
         
@@ -577,6 +599,15 @@ try {
             // Bağlantıyı pool'a geri ver
             ConnectionPool::releaseConnection($db_path, $poolId, true);
             
+            // Base URL
+            $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+            
+            // QR kod deep link
+            $qr_deep_link = 'unifour://community/' . urlencode($community_id);
+            
+            // QR kod API URL'i
+            $qr_code_url = $baseUrl . '/api/qr_code.php?type=community&id=' . urlencode($community_id);
+            
             $community = [
                 'id' => $community_id,
                 'name' => $community_data['name'] ?? $community_id,
@@ -600,7 +631,9 @@ try {
                 'linkedin' => $settings['linkedin'] ?? null,
                 'facebook' => $settings['facebook'] ?? null
             ] : null),
-            'status' => 'active'
+            'status' => 'active',
+            'qr_deep_link' => $qr_deep_link,
+            'qr_code_url' => $qr_code_url
         ];
         
         sendResponse(true, $community);
@@ -737,6 +770,15 @@ try {
             $board_count = 0;
         }
         
+        // Base URL
+        $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+        
+        // QR kod deep link
+        $qr_deep_link = 'unifour://community/' . urlencode($community['id']);
+        
+        // QR kod API URL'i
+        $qr_code_url = $baseUrl . '/api/qr_code.php?type=community&id=' . urlencode($community['id']);
+        
         $formatted_communities[] = [
             'id' => $community['id'],
             'name' => $community['name'],
@@ -756,7 +798,9 @@ try {
             'website' => $website,
             'social_links' => $social_links,
             'status' => 'active',
-            'university' => $university
+            'university' => $university,
+            'qr_deep_link' => $qr_deep_link,
+            'qr_code_url' => $qr_code_url
         ];
     }
     

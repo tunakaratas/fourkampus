@@ -256,6 +256,18 @@ try {
             $registered_count = 0;
         }
         
+        // Base URL
+        $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+        
+        // Takvim URL'i (.ics dosyası)
+        $calendar_url = $baseUrl . '/api/calendar.php?event_id=' . urlencode($event_id) . '&community_id=' . urlencode($community_id);
+        
+        // QR kod deep link
+        $qr_deep_link = 'unifour://event/' . urlencode($community_id) . '/' . urlencode($event_id);
+        
+        // QR kod API URL'i
+        $qr_code_url = $baseUrl . '/api/qr_code.php?type=event&id=' . urlencode($event_id) . '&community_id=' . urlencode($community_id);
+        
         $event = [
             'id' => (string)$row['id'],
             'title' => $row['title'] ?? '',
@@ -287,7 +299,10 @@ try {
             'cost' => isset($row['cost']) ? (float)$row['cost'] : null,
             'currency' => $row['currency'] ?? 'TRY',
             'has_survey' => $has_survey,
-            'status' => $row['status'] ?? 'upcoming'
+            'status' => $row['status'] ?? 'upcoming',
+            'calendar_url' => $calendar_url,
+            'qr_deep_link' => $qr_deep_link,
+            'qr_code_url' => $qr_code_url
         ];
         
         // Bağlantıyı pool'a geri ver
@@ -395,6 +410,18 @@ try {
                 $video_path = '/communities/' . $community_id . '/' . $row['video_path'];
             }
             
+            // Base URL
+            $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+            
+            // Takvim URL'i (.ics dosyası)
+            $calendar_url = $baseUrl . '/api/calendar.php?event_id=' . urlencode($row['id']) . '&community_id=' . urlencode($community_id);
+            
+            // QR kod deep link
+            $qr_deep_link = 'unifour://event/' . urlencode($community_id) . '/' . urlencode($row['id']);
+            
+            // QR kod API URL'i
+            $qr_code_url = $baseUrl . '/api/qr_code.php?type=event&id=' . urlencode($row['id']) . '&community_id=' . urlencode($community_id);
+            
             $all_events[] = [
                 'id' => (string)$row['id'],
                 'title' => $row['title'] ?? '',
@@ -426,7 +453,10 @@ try {
                 'cost' => isset($row['cost']) ? (float)$row['cost'] : null,
                 'currency' => $row['currency'] ?? 'TRY',
                 'has_survey' => $has_survey,
-                'status' => $row['status'] ?? 'upcoming'
+                'status' => $row['status'] ?? 'upcoming',
+                'calendar_url' => $calendar_url,
+                'qr_deep_link' => $qr_deep_link,
+                'qr_code_url' => $qr_code_url
             ];
         }
         
@@ -553,6 +583,18 @@ try {
                         $video_path = '/communities/' . $community['id'] . '/' . $row['video_path'];
                     }
                     
+                    // Base URL
+                    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+                    
+                    // Takvim URL'i (.ics dosyası)
+                    $calendar_url = $baseUrl . '/api/calendar.php?event_id=' . urlencode($row['id']) . '&community_id=' . urlencode($community['id']);
+                    
+                    // QR kod deep link
+                    $qr_deep_link = 'unifour://event/' . urlencode($community['id']) . '/' . urlencode($row['id']);
+                    
+                    // QR kod API URL'i
+                    $qr_code_url = $baseUrl . '/api/qr_code.php?type=event&id=' . urlencode($row['id']) . '&community_id=' . urlencode($community['id']);
+                    
                     $all_events[] = [
                         'id' => (string)$row['id'],
                         'title' => $row['title'] ?? '',
@@ -584,7 +626,10 @@ try {
                         'cost' => isset($row['cost']) ? (float)$row['cost'] : null,
                         'currency' => $row['currency'] ?? 'TRY',
                         'has_survey' => $has_survey,
-                        'status' => $row['status'] ?? 'upcoming'
+                        'status' => $row['status'] ?? 'upcoming',
+                        'calendar_url' => $calendar_url,
+                        'qr_deep_link' => $qr_deep_link,
+                        'qr_code_url' => $qr_code_url
                     ];
                 }
                 
