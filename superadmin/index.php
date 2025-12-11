@@ -1263,6 +1263,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                                     }
                                     
                                     $success = "Topluluk başarıyla oluşturuldu: " . $community_name . " | Topluluk Kodu: <strong>" . $community_code . "</strong>";
+                                    // Sayfayı yenile ki yeni topluluk listede görünsün
+                                    header("Refresh: 2; url=" . $_SERVER['PHP_SELF'] . "?view=communities");
                                 }
                             }
                         }
@@ -1460,7 +1462,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                         $update_stmt->execute();
                         $db->close();
                         
+                        // Cache temizle
+                        try {
+                            require_once __DIR__ . '/../lib/core/Cache.php';
+                            $cache = \UniPanel\Core\Cache::getInstance(__DIR__ . '/../system/cache');
+                            $cache->delete('all_communities_list_v2');
+                            $cache->delete('all_communities_list_v3');
+                            $cacheFiles = glob(__DIR__ . '/../system/cache/all_communities_list_*.cache');
+                            foreach ($cacheFiles as $cacheFile) {
+                                @unlink($cacheFile);
+                            }
+                        } catch (Exception $e) {
+                            error_log("Cache temizleme hatası: " . $e->getMessage());
+                        }
+                        
                         $success = "Topluluk talebi onaylandı ve topluluk başarıyla aktifleştirildi!";
+                        // Sayfayı yenile ki yeni topluluk listede görünsün
+                        header("Refresh: 2; url=" . $_SERVER['PHP_SELF'] . "?view=communities");
                     } elseif (is_dir($community_path) && file_exists($db_path)) {
                         // Hem klasör hem veritabanı varsa, zaten oluşturulmuş
                         $db->close();
@@ -1583,7 +1601,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                                         $update_stmt->execute();
                                         $db->close();
                                         
+                                        // Cache temizle
+                                        try {
+                                            require_once __DIR__ . '/../lib/core/Cache.php';
+                                            $cache = \UniPanel\Core\Cache::getInstance(__DIR__ . '/../system/cache');
+                                            $cache->delete('all_communities_list_v2');
+                                            $cache->delete('all_communities_list_v3');
+                                            $cacheFiles = glob(__DIR__ . '/../system/cache/all_communities_list_*.cache');
+                                            foreach ($cacheFiles as $cacheFile) {
+                                                @unlink($cacheFile);
+                                            }
+                                        } catch (Exception $e) {
+                                            error_log("Cache temizleme hatası: " . $e->getMessage());
+                                        }
+                                        
                                         $success = "Topluluk talebi onaylandı ve topluluk başarıyla oluşturuldu!";
+                                        // Sayfayı yenile ki yeni topluluk listede görünsün
+                                        header("Refresh: 2; url=" . $_SERVER['PHP_SELF'] . "?view=communities");
                                     } else {
                                         @rmdir($full_path);
                                         $error = "Şablon dosyaları oluşturulamadı!";
