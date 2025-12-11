@@ -15,6 +15,8 @@ class SubscriptionManager {
     public function __construct($db, $communityId) {
         $this->db = $db;
         $this->communityId = $communityId;
+        // Tabloyu otomatik oluştur
+        $this->createSubscriptionTable();
     }
     
     /**
