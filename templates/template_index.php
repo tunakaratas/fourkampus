@@ -4762,14 +4762,36 @@ ensure_products_table($db_init);
 $stats = get_stats();
 // Events modülünü yükle (get_events için)
 load_module('events');
-// Tüm etkinlikleri göster
-$events = get_events();
-$has_more_events = false;
+// Etkinlikleri lazy loading için ilk 30'unu göster
+$db = get_db();
+$events_stmt = $db->prepare("SELECT * FROM events WHERE club_id = ? ORDER BY date DESC, id DESC LIMIT 30");
+$events_stmt->bindValue(1, CLUB_ID, SQLITE3_INTEGER);
+$events_result = $events_stmt->execute();
+$events = [];
+while ($row = $events_result->fetchArray(SQLITE3_ASSOC)) {
+    $events[] = $row;
+}
+// Toplam sayıyı kontrol et
+$total_events_stmt = $db->prepare("SELECT COUNT(*) FROM events WHERE club_id = ?");
+$total_events_stmt->bindValue(1, CLUB_ID, SQLITE3_INTEGER);
+$total_events_count = $total_events_stmt->execute()->fetchArray()[0] ?? 0;
+$has_more_events = $total_events_count > count($events);
+
 // Members modülünü yükle (get_members, get_board_members, vb. için)
 load_module('members');
-// Tüm üyeleri göster
-$members = get_members();
-$has_more_members = false;
+// Üyeleri lazy loading için ilk 30'unu göster
+$members_stmt = $db->prepare("SELECT * FROM members WHERE club_id = ? ORDER BY registration_date DESC, id DESC LIMIT 30");
+$members_stmt->bindValue(1, CLUB_ID, SQLITE3_INTEGER);
+$members_result = $members_stmt->execute();
+$members = [];
+while ($row = $members_result->fetchArray(SQLITE3_ASSOC)) {
+    $members[] = $row;
+}
+// Toplam sayıyı kontrol et
+$total_members_stmt = $db->prepare("SELECT COUNT(*) FROM members WHERE club_id = ?");
+$total_members_stmt->bindValue(1, CLUB_ID, SQLITE3_INTEGER);
+$total_members_count = $total_members_stmt->execute()->fetchArray()[0] ?? 0;
+$has_more_members = $total_members_count > count($members);
 // Tüm yönetim kurulu üyelerini göster
 $board = get_board_members();
 $has_more_board = false;
@@ -9746,7 +9768,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             Etkinlik Yönetimi
                                         </h2>
                                         <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-                                            <?= count($events) ?> etkinlik
+                                            <?= isset($total_events_count) ? $total_events_count : count($events) ?> etkinlik
+                                            <?php if ($has_more_events): ?>
+                                                <span class="text-xs text-indigo-600 dark:text-indigo-400">(<?= count($events) ?> gösteriliyor)</span>
+                                            <?php endif; ?>
                                         </p>
                                     </div>
                                 </div>
@@ -10073,6 +10098,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                 <?php endif; ?>
                             </div>
                             
+                            <!-- Lazy Loading Spinner for Events -->
+                            <div id="eventsLoadingSpinner" class="mt-6 text-center hidden" style="min-height: 60px;">
+                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                                <p class="text-gray-600 dark:text-gray-400 mt-2">Etkinlikler yükleniyor...</p>
+                            </div>
                             
                         </div>
                     </div>
@@ -10089,7 +10119,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     </div>
                                     <div>
                                         <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Üye Listesi</h1>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Toplam <strong><?= isset($total_members_count) ? $total_members_count : count($members) ?></strong> kayıtlı üye</p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Toplam <strong><?= isset($total_members_count) ? $total_members_count : count($members) ?></strong> kayıtlı üye
+                                            <?php if ($has_more_members): ?>
+                                                <span class="text-xs text-indigo-600 dark:text-indigo-400">(<?= count($members) ?> gösteriliyor)</span>
+                                            <?php endif; ?>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 flex-wrap">
@@ -10305,6 +10339,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                 <p class="text-gray-400 dark:text-gray-500 text-sm mt-2">Yeni üye eklemek için yukarıdaki butonu kullanın</p>
                             </div>
                                         <?php endif; ?>
+                            </div>
+                            
+                            <!-- Lazy Loading Spinner for Members -->
+                            <div id="membersLoadingSpinner" class="mt-6 text-center hidden" style="min-height: 60px;">
+                                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                                <p class="text-gray-600 dark:text-gray-400 mt-2">Üyeler yükleniyor...</p>
                             </div>
                         </div>
                     </div>
@@ -23070,74 +23110,101 @@ if (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) {
     const escapeHtml = window.escapeHtml;
     const escapeJs = window.escapeJs;
     
-    // Lazy Loading kaldırıldı - tüm veriler gösteriliyor
+    // Lazy Loading System - Scroll-based
     const LazyLoader = {
         state: {},
+        observers: {},
         
-        // Get config for type (lazy loading kaldırıldı)
-        getConfig(type) {
-            return null;
+        // Initialize lazy loading for a type
+        init(type, config) {
+            if (!config || !config.endpoint || !config.containerId) {
+                console.warn(`[${type}] Lazy loading config eksik:`, config);
+                return;
+            }
+            
+            // State'i başlat
+            this.state[type] = {
+                offset: config.initialOffset || 0,
+                limit: config.limit || 30,
+                hasMore: true,
+                loading: false,
+                total: 0
+            };
+            
+            // Intersection Observer oluştur
+            const container = document.getElementById(config.containerId);
+            const spinner = config.spinnerId ? document.getElementById(config.spinnerId) : null;
+            
+            if (!container) {
+                console.warn(`[${type}] Container bulunamadı: ${config.containerId}`);
+                return;
+            }
+            
+            // Observer oluştur
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !this.state[type].loading && this.state[type].hasMore) {
+                        this.load(type, config, observer);
+                    }
+                });
+            }, {
+                rootMargin: '200px' // 200px önceden yükle
+            });
+            
+            this.observers[type] = observer;
+            
+            // Spinner'ı gözle
+            if (spinner) {
+                observer.observe(spinner);
+            }
+            
+            console.log(`[${type}] Lazy loading başlatıldı`, {
+                containerId: config.containerId,
+                spinnerId: config.spinnerId,
+                hasSpinner: !!spinner,
+                hasContainer: !!container
+            });
         },
         
-        // Load function kaldırıldı (lazy loading yok)
+        // Load more data
         async load(type, config, observer = null) {
-            // Lazy loading kaldırıldı
-            return;
-        }
             const state = this.state[type];
             if (!state) {
-                console.error(`Unknown lazy load type: ${type}`);
+                console.error(`[${type}] State bulunamadı`);
                 return;
             }
             
             // Daha fazla veri yoksa veya zaten yükleniyorsa çık
             if (!state.hasMore || state.loading) {
-                console.log(`[${type}] Yükleme atlandı:`, { hasMore: state.hasMore, loading: state.loading, offset: state.offset });
                 return;
             }
             
             state.loading = true;
-            const { endpoint, containerId, spinnerId, createCard, limit = 30, customInsert } = config;
+            const { endpoint, containerId, spinnerId, createCard, limit = 30 } = config;
             
             const spinner = spinnerId ? document.getElementById(spinnerId) : null;
             const container = containerId ? document.getElementById(containerId) : null;
             
-            console.log(`[${type}] Load başlatıldı:`, {
-                endpoint,
-                containerId,
-                spinnerId,
-                hasContainer: !!container,
-                hasSpinner: !!spinner,
-                hasCreateCard: typeof createCard === 'function',
-                createCard: createCard,
-                limit,
-                offset: state.offset
-            });
-            
-            if (!container && !customInsert) {
-                console.error(`[${type}] ${containerId || 'container'} bulunamadı!`);
+            if (!container) {
+                console.error(`[${type}] Container bulunamadı: ${containerId}`);
                 state.loading = false;
                 return;
             }
             
-            // createCard fonksiyonunu kontrol et
             if (!createCard || typeof createCard !== 'function') {
-                console.error(`[${type}] createCard fonksiyonu bulunamadı veya fonksiyon değil!`, createCard);
+                console.error(`[${type}] createCard fonksiyonu bulunamadı`);
                 state.loading = false;
-                if (spinner) spinner.style.display = 'none';
                 return;
             }
             
-            // UI güncelle (scroll-based) - Spinner zaten görünür
+            // Spinner'ı göster
             if (spinner) {
-                spinner.style.display = 'block';
+                spinner.classList.remove('hidden');
             }
             
             const apiUrl = `${API_BASE_URL}/${endpoint}?offset=${state.offset}&limit=${limit}`;
-            console.log(`[${type}] Yükleniyor:`, { apiUrl, offset: state.offset, limit: limit, hasMore: state.hasMore, loading: state.loading });
             
             try {
-                console.log(`[${type}] API çağrısı başlatılıyor:`, apiUrl);
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: { 
@@ -23146,168 +23213,63 @@ if (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) {
                     },
                     credentials: 'same-origin',
                     cache: 'no-cache'
-                }).catch(err => {
-                    console.error(`[${type}] Fetch hatası:`, err);
-                    throw err;
                 });
                 
-                console.log(`[${type}] API response alındı:`, response.status, response.statusText);
-                
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error(`[${type}] API hata response:`, errorText);
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                let data;
-                try {
-                    const text = await response.text();
-                    console.log(`[${type}] API Response text (ilk 500 karakter):`, text.substring(0, 500));
-                    data = JSON.parse(text);
-                } catch (parseError) {
-                    console.error(`[${type}] JSON parse hatası:`, parseError);
-                    throw new Error('Geçersiz JSON yanıtı: ' + parseError.message);
-                }
-                console.log(`[${type}] API Response parsed:`, data);
+                const data = await response.json();
                 
                 if (data.error) {
                     throw new Error(data.error);
                 }
                 
-                // API response formatını kontrol et
-                // Members için: data.members, events için: data.events, vb.
+                // Items'ı al
                 let items = [];
                 if (type === 'members' && data.members) {
                     items = data.members;
                 } else if (type === 'events' && data.events) {
                     items = data.events;
-                } else if (type === 'board' && data.board) {
-                    items = data.board;
-                } else if (type === 'products' && data.products) {
-                    items = data.products;
-                } else if (type === 'campaigns' && data.campaigns) {
-                    items = data.campaigns;
                 } else {
                     items = data[type] || data.data || [];
                 }
                 
-                console.log(`[${type}] API'den gelen items:`, items.length, 'adet', items);
-                
-                // createCard fonksiyonunu kontrol et
-                if (!createCard || typeof createCard !== 'function') {
-                    console.error(`[${type}] createCard fonksiyonu bulunamadı veya fonksiyon değil!`, createCard);
-                    console.error(`[${type}] window.createEventCard:`, typeof window.createEventCard);
-                    console.error(`[${type}] window.createMemberCard:`, typeof window.createMemberCard);
-                    console.error(`[${type}] window.createBoardMemberCard:`, typeof window.createBoardMemberCard);
-                    console.error(`[${type}] window.createCampaignCard:`, typeof window.createCampaignCard);
-                    throw new Error(`createCard fonksiyonu bulunamadı: ${type}`);
-                }
-                
                 if (data.success && Array.isArray(items) && items.length > 0) {
-                    let addedCount = 0;
-                    
-                    items.forEach((item, index) => {
+                    // Items'ı ekle
+                    items.forEach((item) => {
                         try {
-                            console.log(`[${type}] Item ${index + 1} işleniyor:`, item);
                             const html = createCard(item);
-                            console.log(`[${type}] Item ${index + 1} HTML:`, html ? html.substring(0, 100) + '...' : 'BOŞ');
                             if (html && html.trim() !== '') {
-                                if (customInsert) {
-                                    if (customInsert(html)) {
-                                        addedCount++;
-                                        console.log(`[${type}] Item ${index + 1} customInsert ile eklendi`);
-                                    } else {
-                                        console.warn(`[${type}] Item ${index + 1} customInsert başarısız`);
-                                    }
-                                } else if (container) {
-                                    container.insertAdjacentHTML('beforeend', html);
-                                    addedCount++;
-                                    console.log(`[${type}] Item ${index + 1} container'a eklendi`);
-                                } else {
-                                    console.warn(`[${type}] Item ${index + 1} için container bulunamadı`);
-                                }
-                            } else {
-                                console.warn(`[${type}] Item ${index + 1} için HTML oluşturulamadı veya boş`, { item, html });
+                                container.insertAdjacentHTML('beforeend', html);
                             }
                         } catch (error) {
-                            console.error(`[${type}] Item ${index + 1} eklenirken hata:`, error, error.stack);
+                            console.error(`[${type}] Item eklenirken hata:`, error);
                         }
                     });
                     
-                    console.log(`[${type}] ${addedCount} item eklendi`);
-                    
-                    // Offset güncelle - Mevcut offset + eklenen item sayısı
-                    const oldOffset = state.offset;
-                    state.offset = oldOffset + addedCount;
+                    // State güncelle
+                    state.offset += items.length;
                     state.hasMore = data.has_more !== undefined ? data.has_more : (data.hasMore !== undefined ? data.hasMore : false);
-                    console.log(`[${type}] Yeni offset:`, state.offset, `(önceki: ${oldOffset}, eklenen: ${addedCount}), hasMore: ${state.hasMore}, API has_more: ${data.has_more}, total: ${data.total || 'N/A'}`);
+                    state.total = data.total || state.total;
                     
-                    // Eğer daha fazla yoksa spinner'ı gizle
-                    if (!state.hasMore) {
-                        if (spinner) {
-                            spinner.style.display = 'none';
-                        }
-                    } else {
-                        // Yeni elemanları gözlemle (scroll-based lazy loading için)
-                        if (container && observer) {
-                            // Son birkaç elemanı gözlemle
-                            const children = Array.from(container.children);
-                            const lastFew = children.slice(-5);
-                            lastFew.forEach(child => {
-                                observer.observe(child);
-                            });
-                            
-                            // Spinner'ı da tekrar gözlemle
-                            if (spinner && spinner.style.display !== 'none') {
-                                observer.observe(spinner);
-                            }
-                            
-                            // Observer helper'ı varsa onu da çağır
-                            if (window[`${type}Observer`] && window[`${type}Observer`].observeElements) {
-                                window[`${type}Observer`].observeElements();
-                            }
-                        }
+                    // Daha fazla yoksa spinner'ı gizle
+                    if (!state.hasMore && spinner) {
+                        spinner.classList.add('hidden');
                     }
                 } else {
-                    console.log(`[${type}] Daha fazla veri yok veya items boş`, { 
-                        success: data.success, 
-                        itemsLength: items.length, 
-                        hasMore: data.has_more,
-                        data: data 
-                    });
                     state.hasMore = false;
                     if (spinner) {
-                        spinner.style.display = 'none';
+                        spinner.classList.add('hidden');
                     }
                 }
             } catch (error) {
-                // Storage hatalarını filtrele (bunlar lazy loading'i etkilemez)
-                if (error.message && error.message.includes('storage')) {
-                    console.warn(`[${type}] Storage hatası (yok sayılıyor):`, error.message);
-                    // Storage hatası lazy loading'i durdurmamalı, devam et
-                    state.loading = false;
-                    if (spinner) {
-                        spinner.style.display = 'none';
-                    }
-                    return;
-                }
-                
-                console.error(`[${type}] Yükleme hatası:`, error, error.stack);
-                // Hata durumunda spinner'ı gizle
+                console.error(`[${type}] Yükleme hatası:`, error);
                 if (spinner) {
-                    spinner.style.display = 'none';
+                    spinner.classList.add('hidden');
                 }
-                // Hata mesajını göster (sadece development için)
-                console.error(`[${type}] Hata detayı:`, {
-                    message: error.message,
-                    stack: error.stack,
-                    type: type,
-                    config: config,
-                    state: state
-                });
             } finally {
                 state.loading = false;
-                console.log(`[${type}] Loading state: false (finally)`);
             }
         }
     };
@@ -23315,7 +23277,38 @@ if (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) {
     // Global scope'a ekle
     window.LazyLoader = LazyLoader;
     
-    // Lazy loading kaldırıldı - tüm veriler gösteriliyor
+    // Sayfa yüklendiğinde lazy loading'i başlat
+    document.addEventListener('DOMContentLoaded', function() {
+        // Etkinlikler için lazy loading
+        const eventsContainer = document.getElementById('eventsCardsContainer');
+        if (eventsContainer) {
+            const initialEventsCount = eventsContainer.children.length;
+            LazyLoader.init('events', {
+                endpoint: 'load_events.php',
+                containerId: 'eventsCardsContainer',
+                spinnerId: 'eventsLoadingSpinner',
+                createCard: window.createEventCard,
+                limit: 30,
+                initialOffset: initialEventsCount
+            });
+            console.log('[LazyLoader] Etkinlikler lazy loading başlatıldı, ilk yükleme:', initialEventsCount);
+        }
+        
+        // Üyeler için lazy loading
+        const membersContainer = document.getElementById('member_cards_container');
+        if (membersContainer) {
+            const initialMembersCount = membersContainer.children.length;
+            LazyLoader.init('members', {
+                endpoint: 'load_members.php',
+                containerId: 'member_cards_container',
+                spinnerId: 'membersLoadingSpinner',
+                createCard: window.createMemberCard,
+                limit: 30,
+                initialOffset: initialMembersCount
+            });
+            console.log('[LazyLoader] Üyeler lazy loading başlatıldı, ilk yükleme:', initialMembersCount);
+        }
+    });
 })();
 
 // Etkinlik kartı oluştur
