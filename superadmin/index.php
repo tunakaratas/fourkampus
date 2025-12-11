@@ -3565,21 +3565,21 @@ foreach ($community_details as $details) {
                         <!-- Mevcut Topluluklar -->
                         <div class="bg-white rounded-xl card-shadow">
                             <div class="p-6 border-b border-gray-200">
-                                    <div class="flex items-center justify-between mb-6">
+                                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                                     <div>
                                         <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
                                             <svg class="w-6 h-6 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
                                             Mevcut Topluluklar
                                         </h2>
-                                        <p class="text-sm text-gray-500 mt-1">Toplam <span id="totalCommunitiesCount"><?= count($communities) ?></span> topluluk</p>
+                                        <p class="text-sm text-gray-500 mt-1">Toplam <span id="totalCommunitiesCount" class="font-semibold text-purple-600"><?= count($communities) ?></span> topluluk</p>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+                                    <div class="flex items-center gap-3 flex-wrap">
+                                        <select id="filterStatus" class="community-filter-select px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white transition-all">
                                             <option value="all">Tüm Durumlar</option>
                                             <option value="active">Aktif</option>
                                             <option value="inactive">Kapalı</option>
                                         </select>
-                                        <select id="filterTier" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+                                        <select id="filterTier" class="community-filter-select px-4 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white transition-all">
                                             <option value="all">Tüm Planlar</option>
                                             <option value="standard">Standart</option>
                                             <option value="professional">Profesyonel</option>
@@ -3589,27 +3589,27 @@ foreach ($community_details as $details) {
                                 </div>
                                 
                                 <!-- Gelişmiş Arama ve Filtreleme -->
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div class="relative">
-                                        <input type="text" id="communitySearch" placeholder="Topluluk adı, klasör veya üniversite ara..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                                        <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <input type="text" id="communitySearch" placeholder="Topluluk adı, klasör veya üniversite ara..." class="community-filter-input w-full pl-10 pr-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">
+                                        <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                         </svg>
                                     </div>
                                     <div class="relative">
-                                        <input type="text" id="filterUniversity" placeholder="Üniversite ara..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                                        <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <input type="text" id="filterUniversity" placeholder="Üniversite ara..." class="community-filter-input w-full pl-10 pr-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all">
+                                        <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                         </svg>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <button id="clearFiltersBtn" class="px-4 py-2.5 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-150 flex items-center gap-2">
+                                        <button id="clearFiltersBtn" class="px-4 py-2.5 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-150 flex items-center gap-2 border-2 border-transparent hover:border-gray-300">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                             </svg>
                                             Temizle
                                         </button>
-                                        <span id="filteredCount" class="text-sm text-gray-600 font-medium"></span>
+                                        <span id="filteredCount" class="text-sm text-purple-600 font-semibold hidden"></span>
                                     </div>
                                 </div>
                             </div>
@@ -3847,7 +3847,7 @@ foreach ($community_details as $details) {
                                                         Düzenle
                                                     </button>
                                                 </div>
-                                                <div class="grid grid-cols-3 gap-2">
+                                                <div class="grid grid-cols-4 gap-2">
                                                     <button onclick="openAssignPlanModal(<?= htmlspecialchars(json_encode($community), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($community_details[$community]['name'] ?? 'Bilinmeyen Topluluk'), ENT_QUOTES) ?>)" class="px-3 py-2.5 bg-white text-purple-600 border-2 border-purple-300 rounded-lg hover:bg-purple-50 transition-all duration-200 font-semibold text-xs flex items-center justify-center shadow-sm hover:shadow-md">
                                                         <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -3860,6 +3860,13 @@ foreach ($community_details as $details) {
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                                         </svg>
                                                         SMS
+                                                    </button>
+                                                    
+                                                    <button onclick="showCommunityQRCode('<?= htmlspecialchars($community, ENT_QUOTES) ?>', '<?= htmlspecialchars($community_details[$community]['name'] ?? $community, ENT_QUOTES) ?>')" class="px-3 py-2.5 bg-white text-purple-600 border-2 border-purple-300 rounded-lg hover:bg-purple-50 transition-all duration-200 font-semibold text-xs flex items-center justify-center shadow-sm hover:shadow-md" title="QR Kod">
+                                                        <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                                                        </svg>
+                                                        QR
                                                     </button>
                                                     
                                                     <button onclick="deleteCommunity(<?= htmlspecialchars(json_encode($community), ENT_QUOTES) ?>)" class="px-3 py-2.5 bg-white text-red-600 border-2 border-red-300 rounded-lg hover:bg-red-50 transition-all duration-200 font-semibold text-xs flex items-center justify-center shadow-sm hover:shadow-md">
@@ -5195,116 +5202,237 @@ let communitiesOffset = <?= isset($has_more_communities) && $has_more_communitie
 let allCommunities = <?= json_encode($communities ?? []) ?>;
 let isLoadingCommunities = false;
 
-function filterCommunities() {
-    try {
-        const searchTerm = (document.getElementById('communitySearch')?.value || '').toLowerCase().trim();
-        const universityFilter = (document.getElementById('filterUniversity')?.value || '').toLowerCase().trim();
-        const statusFilter = document.getElementById('filterStatus')?.value || 'all';
-        const tierFilter = document.getElementById('filterTier')?.value || 'all';
+// Topluluk Filtreleme Sistemi - Tamamen Yeniden Yazıldı
+(function() {
+    'use strict';
+    
+    // Filtreleme state'i
+    const filterState = {
+        searchTerm: '',
+        universityFilter: '',
+        statusFilter: 'all',
+        tierFilter: 'all'
+    };
+    
+    // DOM elementlerini cache'le
+    let elements = {
+        searchInput: null,
+        universityInput: null,
+        statusSelect: null,
+        tierSelect: null,
+        clearBtn: null,
+        filteredCount: null,
+        totalCount: null,
+        communityItems: null
+    };
+    
+    // Elementleri bul ve cache'le
+    function initElements() {
+        elements.searchInput = document.getElementById('communitySearch');
+        elements.universityInput = document.getElementById('filterUniversity');
+        elements.statusSelect = document.getElementById('filterStatus');
+        elements.tierSelect = document.getElementById('filterTier');
+        elements.clearBtn = document.getElementById('clearFiltersBtn');
+        elements.filteredCount = document.getElementById('filteredCount');
+        elements.totalCount = document.getElementById('totalCommunitiesCount');
+        elements.communityItems = document.querySelectorAll('.community-item');
         
-        const items = document.querySelectorAll('.community-item');
-        let visibleCount = 0;
+        // Elementlerin varlığını kontrol et
+        if (!elements.communityItems || elements.communityItems.length === 0) {
+            console.warn('Community items not found');
+            return false;
+        }
         
-        if (items.length === 0) {
-            console.warn('No community items found');
+        return true;
+    }
+    
+    // Filtreleme fonksiyonu
+    function performFilter() {
+        if (!elements.communityItems || elements.communityItems.length === 0) {
             return;
         }
         
-        items.forEach(item => {
+        let visibleCount = 0;
+        const searchLower = filterState.searchTerm.toLowerCase().trim();
+        const universityLower = filterState.universityFilter.toLowerCase().trim();
+        
+        elements.communityItems.forEach(function(item) {
+            // Data attribute'ları al
             const name = (item.getAttribute('data-name') || '').toLowerCase();
             const folder = (item.getAttribute('data-folder') || '').toLowerCase();
             const university = (item.getAttribute('data-university') || '').toLowerCase();
             const status = item.getAttribute('data-status') || '';
             const tier = item.getAttribute('data-tier') || 'none';
             
-            // Arama filtresi
-            const matchesSearch = !searchTerm || 
-                name.includes(searchTerm) || 
-                folder.includes(searchTerm) || 
-                university.includes(searchTerm);
+            // Arama filtresi kontrolü
+            const matchesSearch = !searchLower || 
+                name.includes(searchLower) || 
+                folder.includes(searchLower) || 
+                university.includes(searchLower);
             
-            // Üniversite filtresi
-            const matchesUniversity = !universityFilter || university.includes(universityFilter);
+            // Üniversite filtresi kontrolü
+            const matchesUniversity = !universityLower || university.includes(universityLower);
             
-            // Durum filtresi
-            const matchesStatus = statusFilter === 'all' || 
-                (statusFilter === 'active' && status === 'active') ||
-                (statusFilter === 'inactive' && status !== 'active');
+            // Durum filtresi kontrolü
+            const matchesStatus = filterState.statusFilter === 'all' || 
+                (filterState.statusFilter === 'active' && status === 'active') ||
+                (filterState.statusFilter === 'inactive' && status !== 'active');
             
-            // Plan filtresi
-            const matchesTier = tierFilter === 'all' || tier === tierFilter;
+            // Plan filtresi kontrolü
+            const matchesTier = filterState.tierFilter === 'all' || tier === filterState.tierFilter;
             
+            // Tüm filtreler geçiyorsa göster
             if (matchesSearch && matchesUniversity && matchesStatus && matchesTier) {
                 item.style.display = '';
+                item.classList.remove('hidden');
                 visibleCount++;
             } else {
                 item.style.display = 'none';
+                item.classList.add('hidden');
             }
         });
         
-        // Filtrelenmiş sayıyı göster
-        const filteredCountEl = document.getElementById('filteredCount');
-        if (filteredCountEl) {
-            if (searchTerm || universityFilter || statusFilter !== 'all' || tierFilter !== 'all') {
-                filteredCountEl.textContent = `${visibleCount} topluluk gösteriliyor`;
-                filteredCountEl.classList.remove('hidden');
-            } else {
-                filteredCountEl.textContent = '';
-                filteredCountEl.classList.add('hidden');
+        // Sonuç sayısını güncelle
+        updateFilteredCount(visibleCount);
+    }
+    
+    // Filtrelenmiş sayıyı güncelle
+    function updateFilteredCount(visibleCount) {
+        if (!elements.filteredCount) return;
+        
+        const hasActiveFilters = filterState.searchTerm || 
+                                filterState.universityFilter || 
+                                filterState.statusFilter !== 'all' || 
+                                filterState.tierFilter !== 'all';
+        
+        if (hasActiveFilters) {
+            elements.filteredCount.textContent = visibleCount + ' topluluk gösteriliyor';
+            elements.filteredCount.classList.remove('hidden');
+        } else {
+            elements.filteredCount.textContent = '';
+            elements.filteredCount.classList.add('hidden');
+        }
+    }
+    
+    // Filtreleri temizle
+    function clearAllFilters() {
+        filterState.searchTerm = '';
+        filterState.universityFilter = '';
+        filterState.statusFilter = 'all';
+        filterState.tierFilter = 'all';
+        
+        if (elements.searchInput) elements.searchInput.value = '';
+        if (elements.universityInput) elements.universityInput.value = '';
+        if (elements.statusSelect) elements.statusSelect.value = 'all';
+        if (elements.tierSelect) elements.tierSelect.value = 'all';
+        
+        performFilter();
+    }
+    
+    // Event handler'ları
+    function setupEventListeners() {
+        // Arama input'u
+        if (elements.searchInput) {
+            elements.searchInput.addEventListener('input', function(e) {
+                filterState.searchTerm = e.target.value;
+                performFilter();
+            });
+            
+            elements.searchInput.addEventListener('keyup', function(e) {
+                filterState.searchTerm = e.target.value;
+                performFilter();
+            });
+        }
+        
+        // Üniversite input'u
+        if (elements.universityInput) {
+            elements.universityInput.addEventListener('input', function(e) {
+                filterState.universityFilter = e.target.value;
+                performFilter();
+            });
+            
+            elements.universityInput.addEventListener('keyup', function(e) {
+                filterState.universityFilter = e.target.value;
+                performFilter();
+            });
+        }
+        
+        // Durum select'i
+        if (elements.statusSelect) {
+            elements.statusSelect.addEventListener('change', function(e) {
+                filterState.statusFilter = e.target.value;
+                performFilter();
+            });
+        }
+        
+        // Plan select'i
+        if (elements.tierSelect) {
+            elements.tierSelect.addEventListener('change', function(e) {
+                filterState.tierFilter = e.target.value;
+                performFilter();
+            });
+        }
+        
+        // Temizle butonu
+        if (elements.clearBtn) {
+            elements.clearBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearAllFilters();
+            });
+        }
+    }
+    
+    // Global fonksiyonlar (geriye dönük uyumluluk için)
+    window.filterCommunities = function() {
+        // State'i güncelle
+        if (elements.searchInput) filterState.searchTerm = elements.searchInput.value || '';
+        if (elements.universityInput) filterState.universityFilter = elements.universityInput.value || '';
+        if (elements.statusSelect) filterState.statusFilter = elements.statusSelect.value || 'all';
+        if (elements.tierSelect) filterState.tierFilter = elements.tierSelect.value || 'all';
+        
+        performFilter();
+    };
+    
+    window.clearFilters = clearAllFilters;
+    
+    // Sayfa yüklendiğinde başlat
+    function init() {
+        // DOMContentLoaded bekleniyor mu kontrol et
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                if (initElements()) {
+                    setupEventListeners();
+                    performFilter(); // İlk filtreleme
+                }
+            });
+        } else {
+            // DOM zaten yüklü
+            if (initElements()) {
+                setupEventListeners();
+                performFilter(); // İlk filtreleme
             }
         }
-    } catch (error) {
-        console.error('filterCommunities error:', error);
-    }
-}
-
-function clearFilters() {
-    const searchInput = document.getElementById('communitySearch');
-    const universityInput = document.getElementById('filterUniversity');
-    const statusSelect = document.getElementById('filterStatus');
-    const tierSelect = document.getElementById('filterTier');
-    
-    if (searchInput) searchInput.value = '';
-    if (universityInput) universityInput.value = '';
-    if (statusSelect) statusSelect.value = 'all';
-    if (tierSelect) tierSelect.value = 'all';
-    
-    filterCommunities();
-}
-
-// Event listener'ları DOMContentLoaded'da bağla
-document.addEventListener('DOMContentLoaded', function() {
-    const communitySearch = document.getElementById('communitySearch');
-    const filterUniversity = document.getElementById('filterUniversity');
-    const filterStatus = document.getElementById('filterStatus');
-    const filterTier = document.getElementById('filterTier');
-    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-    
-    if (communitySearch) {
-        communitySearch.addEventListener('input', filterCommunities);
-        communitySearch.addEventListener('keyup', filterCommunities);
     }
     
-    if (filterUniversity) {
-        filterUniversity.addEventListener('input', filterCommunities);
-        filterUniversity.addEventListener('keyup', filterCommunities);
-    }
+    // Başlat
+    init();
     
-    if (filterStatus) {
-        filterStatus.addEventListener('change', filterCommunities);
-    }
+    // Sayfa değiştiğinde yeniden başlat (AJAX navigasyon için)
+    let lastUrl = location.href;
+    new MutationObserver(function() {
+        const url = location.href;
+        if (url !== lastUrl) {
+            lastUrl = url;
+            setTimeout(function() {
+                if (initElements()) {
+                    setupEventListeners();
+                    performFilter();
+                }
+            }, 100);
+        }
+    }).observe(document, { subtree: true, childList: true });
     
-    if (filterTier) {
-        filterTier.addEventListener('change', filterCommunities);
-    }
-    
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', clearFilters);
-    }
-    
-    // İlk yüklemede filtreleme yap (eğer varsayılan filtreler varsa)
-    filterCommunities();
-});
+})();
 
 function loadMoreCommunities() {
     if (isLoadingCommunities || !allCommunities || allCommunities.length === 0) return;

@@ -45,10 +45,13 @@ if ($method === 'GET') {
         exit;
     }
     
-    // QR kod içeriği oluştur
+    // QR kod içeriği oluştur - Gerçek URL'ler kullan
     $qrContent = '';
+    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+    
     if ($type === 'community') {
-        $qrContent = "unifour://community/$id";
+        // Gerçek topluluk URL'i
+        $qrContent = $baseUrl . "/communities/" . urlencode($id) . "/";
     } elseif ($type === 'event') {
         if (empty($communityId)) {
             http_response_code(400);
@@ -58,12 +61,25 @@ if ($method === 'GET') {
             ]);
             exit;
         }
-        $qrContent = "unifour://event/$communityId/$id";
+        // Gerçek etkinlik URL'i
+        $qrContent = $baseUrl . "/communities/" . urlencode($communityId) . "/?view=events&event_id=" . urlencode($id);
+    } elseif ($type === 'url') {
+        // Direkt URL parametresi
+        $url = $_GET['url'] ?? '';
+        if (empty($url)) {
+            http_response_code(400);
+            echo json_encode([
+                'success' => false,
+                'error' => 'URL parametresi gerekli'
+            ]);
+            exit;
+        }
+        $qrContent = urldecode($url);
     } else {
         http_response_code(400);
         echo json_encode([
             'success' => false,
-            'error' => 'Geçersiz type. community veya event olmalı'
+            'error' => 'Geçersiz type. community, event veya url olmalı'
         ]);
         exit;
     }
