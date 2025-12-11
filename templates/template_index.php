@@ -23279,34 +23279,55 @@ if (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) {
     
     // Sayfa yüklendiğinde lazy loading'i başlat
     document.addEventListener('DOMContentLoaded', function() {
+        // Sadece events veya members view'ında lazy loading başlat
+        const currentView = new URLSearchParams(window.location.search).get('view');
+        
         // Etkinlikler için lazy loading
-        const eventsContainer = document.getElementById('eventsCardsContainer');
-        if (eventsContainer) {
-            const initialEventsCount = eventsContainer.children.length;
-            LazyLoader.init('events', {
-                endpoint: 'load_events.php',
-                containerId: 'eventsCardsContainer',
-                spinnerId: 'eventsLoadingSpinner',
-                createCard: window.createEventCard,
-                limit: 30,
-                initialOffset: initialEventsCount
-            });
-            console.log('[LazyLoader] Etkinlikler lazy loading başlatıldı, ilk yükleme:', initialEventsCount);
+        if (currentView === 'events' || !currentView) {
+            const eventsContainer = document.getElementById('eventsCardsContainer');
+            if (eventsContainer) {
+                const initialEventsCount = eventsContainer.children.length;
+                // Eğer daha fazla etkinlik varsa lazy loading başlat
+                <?php if ($has_more_events): ?>
+                LazyLoader.init('events', {
+                    endpoint: 'load_events.php',
+                    containerId: 'eventsCardsContainer',
+                    spinnerId: 'eventsLoadingSpinner',
+                    createCard: window.createEventCard,
+                    limit: 30,
+                    initialOffset: initialEventsCount
+                });
+                console.log('[LazyLoader] Etkinlikler lazy loading başlatıldı, ilk yükleme:', initialEventsCount);
+                <?php else: ?>
+                // Daha fazla etkinlik yok, spinner'ı gizle
+                const eventsSpinner = document.getElementById('eventsLoadingSpinner');
+                if (eventsSpinner) eventsSpinner.classList.add('hidden');
+                <?php endif; ?>
+            }
         }
         
         // Üyeler için lazy loading
-        const membersContainer = document.getElementById('member_cards_container');
-        if (membersContainer) {
-            const initialMembersCount = membersContainer.children.length;
-            LazyLoader.init('members', {
-                endpoint: 'load_members.php',
-                containerId: 'member_cards_container',
-                spinnerId: 'membersLoadingSpinner',
-                createCard: window.createMemberCard,
-                limit: 30,
-                initialOffset: initialMembersCount
-            });
-            console.log('[LazyLoader] Üyeler lazy loading başlatıldı, ilk yükleme:', initialMembersCount);
+        if (currentView === 'members') {
+            const membersContainer = document.getElementById('member_cards_container');
+            if (membersContainer) {
+                const initialMembersCount = membersContainer.children.length;
+                // Eğer daha fazla üye varsa lazy loading başlat
+                <?php if ($has_more_members): ?>
+                LazyLoader.init('members', {
+                    endpoint: 'load_members.php',
+                    containerId: 'member_cards_container',
+                    spinnerId: 'membersLoadingSpinner',
+                    createCard: window.createMemberCard,
+                    limit: 30,
+                    initialOffset: initialMembersCount
+                });
+                console.log('[LazyLoader] Üyeler lazy loading başlatıldı, ilk yükleme:', initialMembersCount);
+                <?php else: ?>
+                // Daha fazla üye yok, spinner'ı gizle
+                const membersSpinner = document.getElementById('membersLoadingSpinner');
+                if (membersSpinner) membersSpinner.classList.add('hidden');
+                <?php endif; ?>
+            }
         }
     });
 })();
