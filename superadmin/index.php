@@ -3993,7 +3993,7 @@ foreach ($community_details as $details) {
                                                 
                                                 <!-- Alt Butonlar -->
                                                 <div class="grid grid-cols-3 gap-2">
-                                                    <button onclick="openAssignPlanSmsModal(<?= htmlspecialchars(json_encode($community), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($community_details[$community]['name'] ?? 'Bilinmeyen Topluluk'), ENT_QUOTES) ?>)" class="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 text-xs flex items-center justify-center">
+                                                    <button onclick="window.openAssignPlanSmsModal(<?= htmlspecialchars(json_encode($community), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($community_details[$community]['name'] ?? 'Bilinmeyen Topluluk'), ENT_QUOTES) ?>)" class="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 text-xs flex items-center justify-center">
                                                         Plan & SMS
                                                     </button>
                                                     
@@ -5307,7 +5307,6 @@ foreach ($community_details as $details) {
                         </div>
                     </div>
 
-<?php if ($view === 'communities'): ?>
                     <!-- Başkan Ekle/Düzenle Modal -->
                     <div id="addPresidentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto" style="display: none;">
                         <div class="flex items-center justify-center min-h-screen p-4">
@@ -5315,7 +5314,7 @@ foreach ($community_details as $details) {
                             <div class="p-6 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <h3 class="text-2xl font-bold text-gray-800">Topluluk Başkanı</h3>
-                                    <button onclick="closeAddPresidentModal()" class="text-gray-400 hover:text-gray-600 transition">
+                                    <button onclick="window.closeAddPresidentModal()" class="text-gray-400 hover:text-gray-600 transition">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
