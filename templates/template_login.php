@@ -505,6 +505,8 @@ function get_partner_logos() {
 // Topluluk onay durumunu kontrol et
 $community_pending = false;
 $community_pending_message = '';
+$community_disabled = false;
+$community_disabled_message = '';
 $folder_name = '';
 
 // DEBUG: Form'un render edildiğinden emin ol
@@ -558,6 +560,24 @@ try {
                     // Superadmin veritabanı yoksa, veritabanı dosyası da yoksa beklemede
                     $community_pending = true;
                     $community_pending_message = 'Topluluğunuz henüz oluşturulmamış. Lütfen superadmin onayını bekleyin.';
+                }
+            } else {
+                // Veritabanı varsa, topluluk durumunu kontrol et
+                try {
+                    $db = new SQLite3($db_path);
+                    $db->exec('PRAGMA journal_mode = WAL');
+                    
+                    // Settings tablosundan status değerini al
+                    $status = $db->querySingle("SELECT setting_value FROM settings WHERE setting_key = 'status'");
+                    if ($status === 'inactive' || $status === 'disabled') {
+                        $community_disabled = true;
+                        $club_name_temp = $db->querySingle("SELECT setting_value FROM settings WHERE setting_key = 'club_name'") ?: $folder_name;
+                        $community_disabled_message = htmlspecialchars($club_name_temp) . ' topluluğu şu anda pasif durumda. Giriş yapabilmek için topluluğun aktif hale getirilmesi gerekmektedir.';
+                    }
+                    
+                    $db->close();
+                } catch (Exception $e) {
+                    // Hata durumunda devam et
                 }
             }
         }
@@ -2543,6 +2563,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                         <div>
                             <span class="font-semibold block mb-1">Onay Bekleniyor</span>
                             <span class="text-yellow-700"><?= htmlspecialchars($community_pending_message) ?></span>
+                        </div>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if ($community_disabled): ?>
+                    <div class="mb-2 p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-sm flex items-start gap-3" style="animation: fadeInUp 0.4s ease-out;">
+                        <i class="fas fa-ban mt-0.5 flex-shrink-0"></i>
+                        <div>
+                            <span class="font-semibold block mb-1">Topluluk Pasif</span>
+                            <span class="text-red-700"><?= htmlspecialchars($community_disabled_message) ?></span>
                         </div>
                     </div>
                 <?php endif; ?>
