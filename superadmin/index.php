@@ -5689,16 +5689,20 @@ let isLoadingCommunities = false;
     
     // Sayfa yüklendiğinde başlat
     function init() {
+        function doInit() {
+            setupAllListeners();
+            // İlk yüklemede tüm kartları göster
+            setTimeout(function() {
+                performSearch();
+            }, 100);
+        }
+        
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
-                    setupAllListeners();
-                }, 500);
+                setTimeout(doInit, 500);
             });
         } else {
-            setTimeout(function() {
-                setupAllListeners();
-            }, 500);
+            setTimeout(doInit, 500);
         }
     }
     
@@ -5710,7 +5714,10 @@ let isLoadingCommunities = false;
         const communitiesListContainer = document.getElementById('communitiesList');
         if (communitiesListContainer) {
             const observer = new MutationObserver(function() {
-                performSearch();
+                // Yeni item'lar eklendiğinde filtrelemeyi yeniden çalıştır
+                setTimeout(function() {
+                    performSearch();
+                }, 100);
             });
             
             observer.observe(communitiesListContainer, {
