@@ -70,10 +70,18 @@ function get_requested_university_id() {
     if (isset($_GET['university_id'])) {
         $raw = (string)$_GET['university_id'];
         // URL decode - Swift'ten gelen encoded değeri decode et
+        // NOT: PHP'nin $_GET otomatik decode eder ama bazı durumlarda çift encode olabilir
         $raw = urldecode($raw);
+        // Eğer hala encoded görünüyorsa tekrar decode et
+        if (strpos($raw, '%') !== false) {
+            $raw = urldecode($raw);
+        }
     } elseif (isset($_GET['university'])) {
         $raw = (string)$_GET['university'];
         $raw = urldecode($raw);
+        if (strpos($raw, '%') !== false) {
+            $raw = urldecode($raw);
+        }
     }
 
     $raw = trim($raw);
@@ -548,6 +556,10 @@ try {
         
         if (count($formatted_communities) === 0) {
             write_communities_log("WARNING: No communities matched the filter!");
+            error_log("Communities API: ÜNİVERSİTE FİLTRESİ SONUCU - 0 topluluk bulundu (Requested ID: '{$requested_university_id}')");
+        } else {
+            write_communities_log("SUCCESS: " . count($formatted_communities) . " topluluk bulundu!");
+            error_log("Communities API: ÜNİVERSİTE FİLTRESİ SONUCU - " . count($formatted_communities) . " topluluk bulundu (Requested ID: '{$requested_university_id}')");
         }
         
         sendResponse(true, $formatted_communities);
