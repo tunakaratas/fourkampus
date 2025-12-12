@@ -3732,7 +3732,7 @@ foreach ($community_details as $details) {
                                         <div class="relative group">
                                             <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Genel Arama</label>
                                             <div class="relative flex items-center">
-                                                <input type="text" id="communitySearch" placeholder="Topluluk adı, klasör veya üniversite ara..." onkeyup="if(event.key === 'Enter' && typeof filterCommunities === 'function') filterCommunities();" class="w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-400">
+                                                <input type="text" id="communitySearch" placeholder="Topluluk adı, klasör veya üniversite ara..." onkeyup="if(event.key === 'Enter' && typeof window.filterCommunities === 'function') { window.filterCommunities(); }" class="w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-400">
                                                 <svg class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                                 </svg>
@@ -3749,7 +3749,7 @@ foreach ($community_details as $details) {
                                         <div class="relative group">
                                             <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Üniversite Filtresi</label>
                                             <div class="relative flex items-center">
-                                                <input type="text" id="filterUniversity" placeholder="Üniversite adı ile ara..." onkeyup="if(event.key === 'Enter' && typeof filterCommunities === 'function') filterCommunities();" class="w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-400">
+                                                <input type="text" id="filterUniversity" placeholder="Üniversite adı ile ara..." onkeyup="if(event.key === 'Enter' && typeof window.filterCommunities === 'function') { window.filterCommunities(); }" class="w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-400">
                                                 <svg class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                                 </svg>
@@ -5607,15 +5607,25 @@ let isLoadingCommunities = false;
     
     // Arama butonları için event listener'lar
     function setupSearchButtons() {
-        // Arama butonlarını bul (input içindeki butonlar)
-        const searchButtons = document.querySelectorAll('button[onclick*="filterCommunities"]');
-        searchButtons.forEach(function(btn) {
-            btn.addEventListener('click', function(e) {
+        // Arama butonlarını bul
+        const searchCommunityBtn = document.getElementById('searchCommunityBtn');
+        const searchUniversityBtn = document.getElementById('searchUniversityBtn');
+        
+        if (searchCommunityBtn) {
+            searchCommunityBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 performSearch();
             });
-        });
+        }
+        
+        if (searchUniversityBtn) {
+            searchUniversityBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                performSearch();
+            });
+        }
     }
     
     // Enter tuşu için event listener'lar
