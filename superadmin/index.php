@@ -3886,11 +3886,11 @@ foreach ($community_details as $details) {
                                                         Plan & SMS
                                                     </button>
                                                     
-                                                    <button onclick="showCommunityQRCode('<?= htmlspecialchars($community, ENT_QUOTES) ?>', '<?= htmlspecialchars($community_details[$community]['name'] ?? $community, ENT_QUOTES) ?>')" class="px-3 py-2.5 bg-white text-green-600 border-2 border-green-300 rounded-lg hover:bg-green-50 hover:border-green-400 transition-all duration-200 font-semibold text-xs flex items-center justify-center shadow-sm hover:shadow-md transform hover:scale-105" title="QR Kod">
+                                                    <button onclick="openAddPresidentModal('<?= htmlspecialchars($community, ENT_QUOTES) ?>', '<?= htmlspecialchars($community_details[$community]['name'] ?? $community, ENT_QUOTES) ?>', <?= htmlspecialchars(json_encode($community_details[$community]['president'] ?? []), ENT_QUOTES) ?>)" class="px-3 py-2.5 bg-white text-purple-600 border-2 border-purple-300 rounded-lg hover:bg-purple-50 hover:border-purple-400 transition-all duration-200 font-semibold text-xs flex items-center justify-center shadow-sm hover:shadow-md transform hover:scale-105" title="Başkan Ekle/Düzenle">
                                                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                                                         </svg>
-                                                        QR
+                                                        Başkan
                                                     </button>
                                                     
                                                     <button onclick="deleteCommunity(<?= htmlspecialchars(json_encode($community), ENT_QUOTES) ?>)" class="px-3 py-2.5 bg-white text-red-600 border-2 border-red-300 rounded-lg hover:bg-red-50 hover:border-red-400 transition-all duration-200 font-semibold text-xs flex items-center justify-center shadow-sm hover:shadow-md transform hover:scale-105">
@@ -5202,42 +5202,92 @@ foreach ($community_details as $details) {
                         </div>
                     </div>
 
-                    <!-- QR Kod Modal -->
-                    <div id="qrCodeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
-                        <div class="flex items-center justify-center min-h-screen p-4">
-                            <div class="bg-white rounded-xl shadow-xl max-w-md w-full">
-                                <div class="p-6 border-b border-gray-200">
-                                    <div class="flex items-center justify-between">
-                                        <h3 id="qrCodeTitle" class="text-xl font-semibold text-gray-800">QR Kod</h3>
-                                        <button onclick="closeQRCodeModal()" class="text-gray-400 hover:text-gray-600 transition">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="p-6">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <div class="bg-white p-4 rounded-lg border-2 border-gray-200 mb-4">
-                                            <img id="qrCodeImage" src="" alt="QR Kod" class="w-64 h-64 mx-auto" style="display: none;">
-                                        </div>
-                                        <div class="w-full mb-4">
-                                            <label class="block text-sm font-medium text-gray-700 mb-2">QR Kod URL'i:</label>
-                                            <div class="flex items-center gap-2">
-                                                <input type="text" id="qrCodeUrl" readonly class="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm text-gray-700">
-                                                <button onclick="copyQRUrl()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-semibold">
-                                                    Kopyala
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="w-full">
-                                            <a id="qrCodeLink" href="#" target="_blank" class="block w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-center font-semibold">
-                                                Linki Aç
-                                            </a>
-                                        </div>
-                                    </div>
+                    <!-- Başkan Ekle/Düzenle Modal -->
+                    <div id="addPresidentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+                        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl my-8 transform transition-all">
+                            <div class="p-6 border-b border-gray-200">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-2xl font-bold text-gray-800">Topluluk Başkanı</h3>
+                                    <button onclick="closeAddPresidentModal()" class="text-gray-400 hover:text-gray-600 transition">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </div>
+                            <form method="POST" action="index.php?view=communities" id="addPresidentForm" class="p-6">
+                                <?= get_csrf_field() ?>
+                                <input type="hidden" name="action" value="create_president">
+                                <input type="hidden" name="community_folder" id="presidentCommunityFolder">
+                                
+                                <div class="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                                    <p class="text-sm text-gray-600">
+                                        <span class="font-medium">Topluluk:</span> 
+                                        <span id="presidentCommunityName" class="text-purple-700 font-semibold"></span>
+                                    </p>
+                                </div>
+                                
+                                <div class="space-y-4">
+                                    <!-- Başkan Adı Soyadı -->
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                                            Başkan Adı Soyadı <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="president_name" id="presidentName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Örn: Ahmet Yılmaz">
+                                    </div>
+                                    
+                                    <!-- E-posta ve Telefon - Yan Yana -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">E-posta</label>
+                                            <input type="email" name="president_email" id="presidentEmail" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="ornek@email.com">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
+                                            <input type="tel" name="president_phone" id="presidentPhone" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="5XXXXXXXXX">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Öğrenci No ve Bölüm - Yan Yana -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Öğrenci No</label>
+                                            <input type="text" name="president_student_id" id="presidentStudentId" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Örn: 202012345">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2">Bölüm</label>
+                                            <select name="president_department" id="presidentDepartment" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                                <option value="">Bölüm Seçiniz</option>
+                                                <?php
+                                                $departments = [
+                                                    'Bilgisayar Mühendisliği', 'Yazılım Mühendisliği', 'Elektrik-Elektronik Mühendisliği', 'Endüstri Mühendisliği',
+                                                    'Makine Mühendisliği', 'İnşaat Mühendisliği', 'Kimya Mühendisliği', 'Gıda Mühendisliği',
+                                                    'Mimarlık', 'Şehir ve Bölge Planlama', 'İç Mimarlık', 'Endüstriyel Tasarım',
+                                                    'İşletme', 'İktisat', 'Siyaset Bilimi ve Kamu Yönetimi', 'Uluslararası İlişkiler',
+                                                    'Hukuk', 'Tıp', 'Diş Hekimliği', 'Eczacılık',
+                                                    'Hemşirelik', 'Fizyoterapi ve Rehabilitasyon', 'Beslenme ve Diyetetik', 'Psikoloji',
+                                                    'Sosyoloji', 'Tarih', 'Türk Dili ve Edebiyatı', 'İngiliz Dili ve Edebiyatı',
+                                                    'Matematik', 'Fizik', 'Kimya', 'Biyoloji',
+                                                    'Eğitim Bilimleri', 'Öğretmenlik Programları', 'Güzel Sanatlar', 'Müzik',
+                                                    'Spor Bilimleri', 'Turizm ve Otelcilik', 'Gastronomi ve Mutfak Sanatları', 'Diğer'
+                                                ];
+                                                foreach ($departments as $dept): ?>
+                                                    <option value="<?= htmlspecialchars($dept) ?>"><?= htmlspecialchars($dept) ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex space-x-3 mt-6">
+                                    <button type="submit" class="flex-1 px-4 py-2.5 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-150 font-semibold">
+                                        Kaydet
+                                    </button>
+                                    <button type="button" onclick="closeAddPresidentModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 font-semibold">
+                                        İptal
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -5258,7 +5308,58 @@ foreach ($community_details as $details) {
                             }
                         });
                         
-                        // QR Kod Fonksiyonları
+                        // Başkan Ekle/Düzenle Modal Fonksiyonları
+                        function openAddPresidentModal(communityFolder, communityName, presidentData) {
+                            try {
+                                const modal = document.getElementById('addPresidentModal');
+                                if (!modal) {
+                                    console.error('addPresidentModal bulunamadı!');
+                                    alert('Modal bulunamadı. Sayfayı yenileyin.');
+                                    return;
+                                }
+                                
+                                // Form alanlarını doldur
+                                document.getElementById('presidentCommunityFolder').value = communityFolder;
+                                document.getElementById('presidentCommunityName').textContent = communityName;
+                                
+                                // Mevcut başkan bilgilerini doldur (varsa)
+                                if (presidentData && presidentData.name) {
+                                    document.getElementById('presidentName').value = presidentData.name || '';
+                                    document.getElementById('presidentEmail').value = presidentData.email || '';
+                                    document.getElementById('presidentPhone').value = presidentData.phone || '';
+                                    document.getElementById('presidentStudentId').value = presidentData.student_id || '';
+                                    document.getElementById('presidentDepartment').value = presidentData.department || '';
+                                } else {
+                                    // Formu temizle
+                                    document.getElementById('presidentName').value = '';
+                                    document.getElementById('presidentEmail').value = '';
+                                    document.getElementById('presidentPhone').value = '';
+                                    document.getElementById('presidentStudentId').value = '';
+                                    document.getElementById('presidentDepartment').value = '';
+                                }
+                                
+                                // Modal'ı göster
+                                modal.classList.remove('hidden');
+                                modal.classList.add('flex');
+                            } catch (error) {
+                                console.error('openAddPresidentModal hatası:', error);
+                                alert('Modal açılırken hata oluştu: ' + error.message);
+                            }
+                        }
+                        
+                        function closeAddPresidentModal() {
+                            try {
+                                const modal = document.getElementById('addPresidentModal');
+                                if (modal) {
+                                    modal.classList.add('hidden');
+                                    modal.classList.remove('flex');
+                                }
+                            } catch (error) {
+                                console.error('closeAddPresidentModal hatası:', error);
+                            }
+                        }
+                        
+                        // QR Kod Fonksiyonları (diğer yerlerde kullanılıyor olabilir)
                         function showCommunityQRCode(communityFolder, communityName) {
                             const modal = document.getElementById('qrCodeModal');
                             const qrImage = document.getElementById('qrCodeImage');
