@@ -6918,7 +6918,27 @@ function loadMoreSuperadminEvents() {
                     <!-- Üniversite -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Üniversite <span class="text-red-500">*</span></label>
-                        <input type="text" name="university" id="editCommunityUniversity" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <select name="university" id="editCommunityUniversity" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="">Üniversite Seçiniz</option>
+                            <?php
+                            $universities = [
+                                'Bandırma 17 Eylül Üniversitesi', 'İstanbul Üniversitesi', 'Ankara Üniversitesi', 'Hacettepe Üniversitesi', 'Boğaziçi Üniversitesi',
+                                'Orta Doğu Teknik Üniversitesi', 'İstanbul Teknik Üniversitesi', 'Gazi Üniversitesi', 'Ege Üniversitesi',
+                                'Dokuz Eylül Üniversitesi', 'Marmara Üniversitesi', 'Yıldız Teknik Üniversitesi', 'Anadolu Üniversitesi',
+                                'Selçuk Üniversitesi', 'Akdeniz Üniversitesi', 'Çukurova Üniversitesi', 'Erciyes Üniversitesi',
+                                'Uludağ Üniversitesi', 'Atatürk Üniversitesi', 'Ondokuz Mayıs Üniversitesi', 'Karadeniz Teknik Üniversitesi',
+                                'Pamukkale Üniversitesi', 'Süleyman Demirel Üniversitesi', 'Kocaeli Üniversitesi', 'Sakarya Üniversitesi',
+                                'Trakya Üniversitesi', 'Çanakkale Onsekiz Mart Üniversitesi', 'Balıkesir Üniversitesi', 'Adnan Menderes Üniversitesi',
+                                'Muğla Sıtkı Koçman Üniversitesi', 'Bursa Teknik Üniversitesi', 'İzmir Yüksek Teknoloji Enstitüsü', 'Gebze Teknik Üniversitesi',
+                                'Sabancı Üniversitesi', 'Koç Üniversitesi', 'Bilkent Üniversitesi', 'Özyeğin Üniversitesi',
+                                'Bahçeşehir Üniversitesi', 'İstanbul Bilgi Üniversitesi', 'İstanbul Kültür Üniversitesi', 'Yeditepe Üniversitesi',
+                                'Maltepe Üniversitesi', 'Kadir Has Üniversitesi', 'İstanbul Aydın Üniversitesi', 'Altınbaş Üniversitesi',
+                                'İstanbul Medipol Üniversitesi', 'Acıbadem Üniversitesi', 'Bezmialem Vakıf Üniversitesi', 'Diğer'
+                            ];
+                            foreach ($universities as $univ): ?>
+                                <option value="<?= htmlspecialchars($univ) ?>"><?= htmlspecialchars($univ) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     
                     <!-- Durum -->
