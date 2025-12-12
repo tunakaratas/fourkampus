@@ -7092,42 +7092,6 @@ function loadMoreSuperadminEvents() {
     </div>
 
     <script>
-        function openEditModal(folder, name, code, university, admin) {
-            try {
-                const modal = document.getElementById('editModal');
-                if (!modal) {
-                    console.error('editModal bulunamadı!');
-                    alert('Modal bulunamadı. Sayfayı yenileyin.');
-                    return;
-                }
-                document.getElementById('editFolder').value = folder;
-                document.getElementById('editFolderName').value = folder;
-                document.getElementById('editName').value = name || '';
-                document.getElementById('editCode').value = code || '';
-                document.getElementById('editUniversity').value = university || '';
-                document.getElementById('editAdmin').value = admin || '';
-                document.getElementById('editPassword').value = '';
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                modal.style.display = 'flex';
-            } catch (error) {
-                console.error('openEditModal hatası:', error);
-                alert('Modal açılırken hata oluştu: ' + error.message);
-            }
-        }
-
-        function closeEditModal() {
-            try {
-                const modal = document.getElementById('editModal');
-                if (modal) {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                    modal.style.display = 'none';
-                }
-            } catch (error) {
-                console.error('closeEditModal hatası:', error);
-            }
-        }
 
         // AJAX işlemleri için fonksiyonlar
         function performAction(action, community, callback, extraData = {}) {
