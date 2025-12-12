@@ -691,24 +691,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     // Settings tablosunu oluştur (eğer yoksa)
                     $db->exec("CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, club_id INTEGER, setting_key TEXT, setting_value TEXT)");
                     
-                    // Başkan bilgilerini kaydet
-                    $settings = [
-                        ['president_name', $president_name],
-                        ['president_email', $president_email],
-                        ['president_phone', $president_phone],
-                        ['president_student_id', $president_student_id],
-                        ['president_department', $president_department]
-                    ];
+                    // Başkan bilgilerini kaydet (eğer formdan geliyorsa)
+                    if (!empty($president_name)) {
+                        $settings = [
+                            ['president_name', $president_name],
+                            ['president_email', $president_email],
+                            ['president_phone', $president_phone],
+                            ['president_student_id', $president_student_id],
+                            ['president_department', $president_department]
+                        ];
+                    } else {
+                        $settings = [];
+                    }
                     
-                    foreach ($settings as $setting) {
-                        $stmt = $db->prepare("INSERT OR REPLACE INTO settings (club_id, setting_key, setting_value) VALUES (1, ?, ?)");
-                        if ($stmt) {
-                            $stmt->bindValue(1, $setting[0], SQLITE3_TEXT);
-                            $stmt->bindValue(2, $setting[1], SQLITE3_TEXT);
-                            try {
-                                executeSQLite3Stmt($stmt);
-                            } catch (Exception $e) {
-                                error_log("Settings insert hatası: " . $e->getMessage());
+                    if (!empty($settings)) {
+                        foreach ($settings as $setting) {
+                            $stmt = $db->prepare("INSERT OR REPLACE INTO settings (club_id, setting_key, setting_value) VALUES (1, ?, ?)");
+                            if ($stmt) {
+                                $stmt->bindValue(1, $setting[0], SQLITE3_TEXT);
+                                $stmt->bindValue(2, $setting[1], SQLITE3_TEXT);
+                                try {
+                                    executeSQLite3Stmt($stmt);
+                                } catch (Exception $e) {
+                                    error_log("Settings insert hatası: " . $e->getMessage());
+                                }
                             }
                         }
                     }
@@ -940,6 +946,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
         $admin_username = trim($_POST['admin_username'] ?? '');
         $admin_password = trim($_POST['admin_password'] ?? '');
         $selected_university = trim($_POST['university'] ?? '');
+        
+        // Başkan bilgileri
+        $president_name = trim($_POST['president_name'] ?? '');
+        $president_email = trim($_POST['president_email'] ?? '');
+        $president_phone = trim($_POST['president_phone'] ?? '');
+        $president_student_id = trim($_POST['president_student_id'] ?? '');
+        $president_department = trim($_POST['president_department'] ?? '');
         
         // Topluluk adından "Topluluğu" kelimesini kaldır
         $community_name = cleanCommunityName($community_name);
@@ -1308,6 +1321,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                                         }
                                     } catch (Exception $e) {
                                         error_log("Topluluk kodu kaydedilemedi: " . $e->getMessage());
+                                    }
+                                    
+                                    // Başkan bilgilerini kaydet (eğer formdan geliyorsa)
+                                    if (!empty($president_name)) {
+                                        $president_settings = [
+                                            ['president_name', $president_name],
+                                            ['president_email', $president_email],
+                                            ['president_phone', $president_phone],
+                                            ['president_student_id', $president_student_id],
+                                            ['president_department', $president_department]
+                                        ];
+                                        
+                                        foreach ($president_settings as $setting) {
+                                            try {
+                                                $stmt = $db->prepare("INSERT INTO settings (club_id, setting_key, setting_value) VALUES (?, ?, ?)");
+                                                if ($stmt) {
+                                                    $stmt->bindValue(1, 1, SQLITE3_INTEGER);
+                                                    $stmt->bindValue(2, $setting[0], SQLITE3_TEXT);
+                                                    $stmt->bindValue(3, $setting[1], SQLITE3_TEXT);
+                                                    $stmt->execute();
+                                                }
+                                            } catch (Exception $e) {
+                                                error_log("Başkan bilgisi kaydedilemedi ({$setting[0]}): " . $e->getMessage());
+                                            }
+                                        }
                                     }
                                     
                                     // SMTP ayarlarını config/credentials.php'den çek ve kaydet
@@ -5194,8 +5232,9 @@ foreach ($community_details as $details) {
                     </div>
 
                     <!-- Başkan Ekle/Düzenle Modal -->
-                    <div id="addPresidentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
-                        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl my-8 transform transition-all">
+                    <div id="addPresidentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto" style="display: none;">
+                        <div class="flex items-center justify-center min-h-screen p-4">
+                        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">
                             <div class="p-6 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <h3 class="text-2xl font-bold text-gray-800">Topluluk Başkanı</h3>
@@ -5319,8 +5358,8 @@ foreach ($community_details as $details) {
                                 }
                                 
                                 // Modal'ı göster
+                                modal.style.display = 'flex';
                                 modal.classList.remove('hidden');
-                                modal.classList.add('flex');
                             } catch (error) {
                                 console.error('openAddPresidentModal hatası:', error);
                                 alert('Modal açılırken hata oluştu: ' + error.message);
@@ -5331,8 +5370,8 @@ foreach ($community_details as $details) {
                             try {
                                 const modal = document.getElementById('addPresidentModal');
                                 if (modal) {
+                                    modal.style.display = 'none';
                                     modal.classList.add('hidden');
-                                    modal.classList.remove('flex');
                                 }
                             } catch (error) {
                                 console.error('closeAddPresidentModal hatası:', error);
@@ -7657,25 +7696,48 @@ function loadMoreSuperadminEvents() {
                         </div>
                     </div>
                     
+                    <!-- Başkan Bilgileri -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-4">Topluluk Başkanı Bilgileri</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="president_name_create" class="block text-sm font-medium text-gray-700 mb-1">Başkan Adı Soyadı</label>
+                                <input type="text" name="president_name" id="president_name_create" class="w-full p-3 border border-gray-300 rounded-lg input-focus" placeholder="Örn: Ahmet Yılmaz">
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="president_email_create" class="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
+                                    <input type="email" name="president_email" id="president_email_create" class="w-full p-3 border border-gray-300 rounded-lg input-focus" placeholder="ornek@email.com">
+                                </div>
+                                <div>
+                                    <label for="president_phone_create" class="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                                    <input type="tel" name="president_phone" id="president_phone_create" class="w-full p-3 border border-gray-300 rounded-lg input-focus" placeholder="5XXXXXXXXX">
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="president_student_id_create" class="block text-sm font-medium text-gray-700 mb-1">Öğrenci No</label>
+                                    <input type="text" name="president_student_id" id="president_student_id_create" class="w-full p-3 border border-gray-300 rounded-lg input-focus" placeholder="Örn: 202012345">
+                                </div>
+                                <div>
+                                    <label for="president_department_create" class="block text-sm font-medium text-gray-700 mb-1">Bölüm</label>
+                                    <select name="president_department" id="president_department_create" class="w-full p-3 border border-gray-300 rounded-lg input-focus">
+                                        <option value="">Bölüm Seçiniz</option>
+                                        <?php foreach ($departments as $dept): ?>
+                                            <option value="<?= htmlspecialchars($dept) ?>"><?= htmlspecialchars($dept) ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
                         <p class="text-sm text-blue-700">
                             <strong>Topluluk Kodu:</strong> Topluluk adından otomatik olarak oluşturulacaktır. Format: İlk 3 harf (topluluk adından) + 1 rastgele rakam (örn: BIL5). Aynı üniversitede benzersiz olacak şekilde kontrol edilir.
                         </p>
-                    </div>
-                    
-                    <!-- Otomatik Veri Çekme Bilgisi -->
-                    <div class="border-t border-gray-200 pt-4">
-                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                            <div class="flex items-center mb-2">
-                                <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <h3 class="text-lg font-semibold text-blue-800">Otomatik Veri Çekme</h3>
-                            </div>
-                            <p class="text-sm text-blue-700">
-                                Topluluk oluşturulduktan sonra, yönetim kurulu üyeleri ve başkan bilgileri topluluk panelinden otomatik olarak çekilecektir. Manuel giriş gerekmez.
-                            </p>
-                        </div>
                     </div>
                     
                     <div class="flex justify-end space-x-3 pt-4">
