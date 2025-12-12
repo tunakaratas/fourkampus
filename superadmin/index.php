@@ -3762,7 +3762,7 @@ foreach ($community_details as $details) {
                                                 <?php endif; ?>
                                                 
                                                 <!-- Başkan ve Yönetim Kurulu -->
-                                                <div class="space-y-3">
+                                                <div class="space-y-3 flex-1">
                                                     <!-- Topluluk Başkanı -->
                                                     <?php if (isset($community_details[$community]['president']) && !empty($community_details[$community]['president']['name'])): ?>
                                                     <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
