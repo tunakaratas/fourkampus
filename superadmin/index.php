@@ -7842,7 +7842,6 @@ function loadMoreSuperadminEvents() {
                         </div>
                         </div>
                     </div>
-<?php endif; ?>
 
                     <script>
         // openCreateModal ve closeCreateModal zaten head'de window objesine eklendi
