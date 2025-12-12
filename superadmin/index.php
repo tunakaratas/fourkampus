@@ -4069,12 +4069,13 @@ foreach ($community_details as $details) {
                                                         Erişim
                                                     </a>
                                                     
-                                                    <button onclick="openEditModal(<?= htmlspecialchars(json_encode($community), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($community_details[$community]['name'] ?? 'Bilinmeyen Topluluk'), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($community_details[$community]['community_code'] ?? ''), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($community_details[$community]['university'] ?? ''), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($community_details[$community]['admin']['username'] ?? ''), ENT_QUOTES) ?>)" class="group/btn px-4 py-3 bg-white text-purple-600 border-2 border-purple-600 rounded-xl hover:bg-purple-50 transition-all duration-200 font-bold text-sm flex items-center justify-center shadow-md hover:shadow-lg">
+                                                    <a href="../communities/<?= urlencode($community) ?>/admin.php?superadmin_access=true" target="_blank" class="group/btn px-4 py-3 bg-white text-purple-600 border-2 border-purple-600 rounded-xl hover:bg-purple-50 transition-all duration-200 font-bold text-sm flex items-center justify-center shadow-md hover:shadow-lg">
                                                         <svg class="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                                         </svg>
-                                                        Düzenle
-                                                    </button>
+                                                        Yönetim
+                                                    </a>
                                                 </div>
                                                 <div class="grid grid-cols-4 gap-2">
                                                     <button onclick="openAssignPlanModal(<?= htmlspecialchars(json_encode($community), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($community_details[$community]['name'] ?? 'Bilinmeyen Topluluk'), ENT_QUOTES) ?>)" class="px-3 py-2.5 bg-white text-purple-600 border-2 border-purple-300 rounded-lg hover:bg-purple-50 transition-all duration-200 font-semibold text-xs flex items-center justify-center shadow-sm hover:shadow-md">
@@ -6857,76 +6858,6 @@ function loadMoreSuperadminEvents() {
         </div>
     </div>
 
-    <!-- Topluluk Düzenleme Modal -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
-        <div class="bg-white rounded-xl p-6 w-full max-w-lg mx-4 my-8">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-semibold text-gray-800">Topluluk Düzenle</h3>
-                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-            <form method="POST" action="?action=edit" id="editForm">
-                <?= get_csrf_field() ?>
-                <input type="hidden" name="folder" id="editFolder">
-                <div class="space-y-3">
-                    <!-- Topluluk Adı -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Topluluk Adı</label>
-                        <input type="text" name="new_name" id="editName" required class="w-full p-2.5 border border-gray-300 rounded-lg input-focus text-sm">
-                    </div>
-                    
-                    <!-- Üniversite ve Kod - Yan Yana -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Üniversite</label>
-                            <select name="new_university" id="editUniversity" required class="w-full p-2.5 border border-gray-300 rounded-lg input-focus text-sm">
-                                <option value="">Seçin</option>
-                                <?php foreach ($universities as $uni): ?>
-                                    <option value="<?= htmlspecialchars($uni) ?>"><?= htmlspecialchars($uni) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Kod</label>
-                            <input type="text" name="new_code" id="editCode" required maxlength="4" class="w-full p-2.5 border border-gray-300 rounded-lg input-focus text-sm font-mono text-center" style="text-transform: uppercase; letter-spacing: 0.3em;">
-                        </div>
-                    </div>
-                    
-                    <!-- Admin Bilgileri - Yan Yana -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Admin Kullanıcı</label>
-                            <input type="text" name="new_admin" id="editAdmin" class="w-full p-2.5 border border-gray-300 rounded-lg input-focus text-sm" placeholder="Opsiyonel">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Yeni Şifre</label>
-                            <input type="password" name="new_password" id="editPassword" class="w-full p-2.5 border border-gray-300 rounded-lg input-focus text-sm" placeholder="Opsiyonel">
-                        </div>
-                    </div>
-                    
-                    <!-- Klasör Adı - Küçük ve Opsiyonel -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                            Klasör Adı 
-                            <span class="text-xs text-gray-400 font-normal">(Değiştirmek için)</span>
-                        </label>
-                        <input type="text" name="new_folder" id="editFolderName" class="w-full p-2.5 border border-gray-300 rounded-lg input-focus text-sm" placeholder="Boş bırak = değişmez">
-                    </div>
-                </div>
-                <div class="flex space-x-3 mt-5">
-                    <button type="submit" class="flex-1 px-4 py-2.5 text-white color-primary rounded-lg hover-primary transition duration-150 text-sm font-medium">
-                        Kaydet
-                    </button>
-                    <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 text-sm">
-                        İptal
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <!-- Başkan Oluşturma Modal -->
     <div id="createPresidentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
@@ -7292,9 +7223,29 @@ function loadMoreSuperadminEvents() {
         }
 
         function deleteCommunity(community) {
-            if (confirm('Bu topluluğu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
-                performAction('delete', null, null, {folder: community});
+            if (!confirm('Bu topluluğu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
+                return;
             }
+            
+            // Form oluştur ve submit et
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = window.location.href;
+            
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'delete';
+            form.appendChild(actionInput);
+            
+            const folderInput = document.createElement('input');
+            folderInput.type = 'hidden';
+            folderInput.name = 'folder';
+            folderInput.value = community;
+            form.appendChild(folderInput);
+            
+            document.body.appendChild(form);
+            form.submit();
         }
 
         function openCreatePresidentModal(communityFolder, communityName) {
