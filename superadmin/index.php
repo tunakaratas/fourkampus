@@ -6891,61 +6891,77 @@ function loadMoreSuperadminEvents() {
 
     <!-- Topluluk Düzenleme Modalı -->
     <div id="editCommunityModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl my-8 transform transition-all">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl my-8 transform transition-all">
             <div class="p-6 border-b border-gray-200">
                 <h3 class="text-2xl font-bold text-gray-800">Topluluk Düzenle</h3>
                 <p class="text-sm text-gray-600 mt-1" id="editCommunityFolderName"></p>
             </div>
-            <form method="POST" action="index.php?view=communities" id="editCommunityForm" class="p-6 space-y-4">
+            <form method="POST" action="index.php?view=communities" id="editCommunityForm" class="p-6">
                 <?= get_csrf_field() ?>
                 <input type="hidden" name="action" value="edit_community">
                 <input type="hidden" name="folder" id="editCommunityFolder">
                 
-                <!-- Topluluk Klasörü (Sadece Göster) -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Topluluk Klasörü</label>
-                    <input type="text" id="editCommunityFolderDisplay" readonly class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
-                    <p class="text-xs text-gray-500 mt-1">Klasör adı değiştirilemez</p>
+                <!-- İlk Satır: Klasör ve Topluluk Adı -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <!-- Topluluk Klasörü (Sadece Göster) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Topluluk Klasörü</label>
+                        <input type="text" id="editCommunityFolderDisplay" readonly class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
+                        <p class="text-xs text-gray-500 mt-1">Klasör adı değiştirilemez</p>
+                    </div>
+                    
+                    <!-- Topluluk Adı -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Topluluk Adı <span class="text-red-500">*</span></label>
+                        <input type="text" name="community_name" id="editCommunityName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
                 </div>
                 
-                <!-- Topluluk Adı -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Topluluk Adı <span class="text-red-500">*</span></label>
-                    <input type="text" name="community_name" id="editCommunityName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <!-- İkinci Satır: Üniversite ve Durum -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <!-- Üniversite -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Üniversite <span class="text-red-500">*</span></label>
+                        <input type="text" name="university" id="editCommunityUniversity" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- Durum -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Durum</label>
+                        <select name="status" id="editCommunityStatus" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <option value="active">Aktif</option>
+                            <option value="inactive">Pasif</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <!-- Üniversite -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Üniversite <span class="text-red-500">*</span></label>
-                    <input type="text" name="university" id="editCommunityUniversity" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                </div>
-                
-                <!-- Topluluk Kodu -->
-                <div>
+                <!-- Üçüncü Satır: Topluluk Kodu (4 Kutulu) -->
+                <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Topluluk Kodu</label>
-                    <input type="text" name="community_code" id="editCommunityCode" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="editCommunityCode1" readonly maxlength="1" class="w-16 h-16 px-0 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none" style="font-family: 'Courier New', monospace;">
+                        <input type="text" id="editCommunityCode2" readonly maxlength="1" class="w-16 h-16 px-0 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none" style="font-family: 'Courier New', monospace;">
+                        <input type="text" id="editCommunityCode3" readonly maxlength="1" class="w-16 h-16 px-0 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none" style="font-family: 'Courier New', monospace;">
+                        <input type="text" id="editCommunityCode4" readonly maxlength="1" class="w-16 h-16 px-0 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed focus:outline-none" style="font-family: 'Courier New', monospace;">
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Topluluk kodu değiştirilemez</p>
+                    <input type="hidden" name="community_code" id="editCommunityCode">
                 </div>
                 
-                <!-- Admin Kullanıcı Adı -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin Kullanıcı Adı</label>
-                    <input type="text" name="admin_username" id="editCommunityAdminUsername" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                </div>
-                
-                <!-- Admin Şifresi -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Admin Şifresi</label>
-                    <input type="password" name="admin_password" id="editCommunityAdminPassword" placeholder="Değiştirmek için yeni şifre girin" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                    <p class="text-xs text-gray-500 mt-1">Boş bırakırsanız şifre değişmez</p>
-                </div>
-                
-                <!-- Durum -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Durum</label>
-                    <select name="status" id="editCommunityStatus" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
-                        <option value="active">Aktif</option>
-                        <option value="inactive">Pasif</option>
-                    </select>
+                <!-- Dördüncü Satır: Admin Bilgileri -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <!-- Admin Kullanıcı Adı -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Admin Kullanıcı Adı</label>
+                        <input type="text" name="admin_username" id="editCommunityAdminUsername" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- Admin Şifresi -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Admin Şifresi</label>
+                        <input type="password" name="admin_password" id="editCommunityAdminPassword" placeholder="Değiştirmek için yeni şifre girin" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <p class="text-xs text-gray-500 mt-1">Boş bırakırsanız şifre değişmez</p>
+                    </div>
                 </div>
                 
                 <div class="flex space-x-3 pt-4 border-t border-gray-200">
