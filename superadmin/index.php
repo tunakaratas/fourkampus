@@ -2569,6 +2569,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
         }
 
+        // Topluluk düzenleme
+        elseif ($_POST['action'] === 'edit_community') {
+            $folder = $_POST['folder'] ?? '';
+            $community_name = trim($_POST['community_name'] ?? '');
+            $university = trim($_POST['university'] ?? '');
+            $community_code = trim($_POST['community_code'] ?? '');
+            $status = $_POST['status'] ?? 'active';
+            
+            if ($folder && isValidCommunityName($folder)) {
+                $db_path = COMMUNITIES_DIR . $folder . '/unipanel.sqlite';
+                
+                if (file_exists($db_path)) {
+                    try {
+                        $db = new SQLite3($db_path);
+                        
+                        // Settings tablosunu güncelle
+                        if ($community_name) {
+                            $stmt = $db->prepare("INSERT OR REPLACE INTO settings (club_id, setting_key, setting_value) VALUES (1, 'club_name', ?)");
+                            $stmt->bindValue(1, $community_name, SQLITE3_TEXT);
+                            $stmt->execute();
+                        }
+                        
+                        if ($university) {
+                            $stmt = $db->prepare("INSERT OR REPLACE INTO settings (club_id, setting_key, setting_value) VALUES (1, 'university', ?)");
+                            $stmt->bindValue(1, $university, SQLITE3_TEXT);
+                            $stmt->execute();
+                        }
+                        
+                        if ($community_code) {
+                            $stmt = $db->prepare("INSERT OR REPLACE INTO settings (club_id, setting_key, setting_value) VALUES (1, 'community_code', ?)");
+                            $stmt->bindValue(1, $community_code, SQLITE3_TEXT);
+                            $stmt->execute();
+                        }
+                        
+                        // Durum güncelleme
+                        $stmt = $db->prepare("INSERT OR REPLACE INTO settings (club_id, setting_key, setting_value) VALUES (1, 'status', ?)");
+                        $stmt->bindValue(1, $status, SQLITE3_TEXT);
+                        $stmt->execute();
+                        
+                        $db->close();
+                        $success = "Topluluk başarıyla güncellendi!";
+                        
+                        // Cache'i temizle
+                        clearCommunitiesCache();
+                    } catch (Exception $e) {
+                        $error = "Topluluk güncellenirken hata: " . $e->getMessage();
+                    }
+                } else {
+                    $error = "Topluluk veritabanı bulunamadı!";
+                }
+            } else {
+                $error = "Geçersiz klasör adı!";
+            }
+        }
+
         // Topluluk silme
         elseif ($_POST['action'] === 'delete') {
             $folder = $_POST['folder'] ?? '';
@@ -3787,13 +3842,12 @@ foreach ($community_details as $details) {
                                                         Erişim
                                                     </a>
                                                     
-                                                    <a href="../communities/<?= urlencode($community) ?>/index.php?view=dashboard&superadmin_access=true&superadmin_login=<?= urlencode(superadmin_expected_token()) ?>" target="_blank" class="group px-4 py-3 bg-white text-purple-600 border-2 border-purple-600 rounded-xl hover:bg-purple-50 transition-all duration-200 font-bold text-sm flex items-center justify-center shadow-md hover:shadow-lg">
+                                                    <button onclick="openEditCommunityModal('<?= htmlspecialchars($community, ENT_QUOTES) ?>', <?= htmlspecialchars(json_encode($community_details[$community] ?? []), ENT_QUOTES) ?>)" class="group px-4 py-3 bg-white text-purple-600 border-2 border-purple-600 rounded-xl hover:bg-purple-50 transition-all duration-200 font-bold text-sm flex items-center justify-center shadow-md hover:shadow-lg">
                                                         <svg class="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                                         </svg>
-                                                        Yönetim
-                                                    </a>
+                                                        Düzenle
+                                                    </button>
                                                 </div>
                                                 
                                                 <!-- Alt Butonlar -->
@@ -6906,6 +6960,44 @@ function loadMoreSuperadminEvents() {
             }
         }
 
+        function openEditCommunityModal(communityFolder, communityData) {
+            try {
+                const modal = document.getElementById('editCommunityModal');
+                if (!modal) {
+                    console.error('editCommunityModal bulunamadı!');
+                    alert('Modal bulunamadı. Sayfayı yenileyin.');
+                    return;
+                }
+                
+                // Form alanlarını doldur
+                document.getElementById('editCommunityFolder').value = communityFolder;
+                document.getElementById('editCommunityFolderName').textContent = 'Klasör: ' + communityFolder;
+                document.getElementById('editCommunityName').value = communityData.name || '';
+                document.getElementById('editCommunityUniversity').value = communityData.university || '';
+                document.getElementById('editCommunityCode').value = communityData.code || '';
+                document.getElementById('editCommunityStatus').value = communityData.status === 'active' ? 'active' : 'inactive';
+                
+                // Modal'ı göster
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } catch (error) {
+                console.error('openEditCommunityModal hatası:', error);
+                alert('Modal açılırken hata oluştu: ' + error.message);
+            }
+        }
+        
+        function closeEditCommunityModal() {
+            try {
+                const modal = document.getElementById('editCommunityModal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            } catch (error) {
+                console.error('closeEditCommunityModal hatası:', error);
+            }
+        }
+
         function deleteCommunity(community) {
             if (!confirm('Bu topluluğu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
                 return;
@@ -7053,6 +7145,44 @@ function loadMoreSuperadminEvents() {
                 }
             } catch (error) {
                 console.error('closeAssignSmsPackageModal hatası:', error);
+            }
+        }
+        
+        function openEditCommunityModal(communityFolder, communityData) {
+            try {
+                const modal = document.getElementById('editCommunityModal');
+                if (!modal) {
+                    console.error('editCommunityModal bulunamadı!');
+                    alert('Modal bulunamadı. Sayfayı yenileyin.');
+                    return;
+                }
+                
+                // Form alanlarını doldur
+                document.getElementById('editCommunityFolder').value = communityFolder;
+                document.getElementById('editCommunityFolderName').textContent = 'Klasör: ' + communityFolder;
+                document.getElementById('editCommunityName').value = communityData.name || '';
+                document.getElementById('editCommunityUniversity').value = communityData.university || '';
+                document.getElementById('editCommunityCode').value = communityData.code || '';
+                document.getElementById('editCommunityStatus').value = communityData.status === 'active' ? 'active' : 'inactive';
+                
+                // Modal'ı göster
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } catch (error) {
+                console.error('openEditCommunityModal hatası:', error);
+                alert('Modal açılırken hata oluştu: ' + error.message);
+            }
+        }
+        
+        function closeEditCommunityModal() {
+            try {
+                const modal = document.getElementById('editCommunityModal');
+                if (modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            } catch (error) {
+                console.error('closeEditCommunityModal hatası:', error);
             }
         }
 

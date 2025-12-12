@@ -26,6 +26,17 @@ if (!function_exists('superadmin_auto_login_enabled')) {
             return $enabled;
         }
 
+        // Localhost için otomatik enable et
+        $remoteIp = $_SERVER['REMOTE_ADDR'] ?? '';
+        $isLocalhost = in_array($remoteIp, ['127.0.0.1', '::1', 'localhost'], true) || 
+                       strpos($remoteIp, '192.168.') === 0 || 
+                       strpos($remoteIp, '10.') === 0;
+        
+        if ($isLocalhost) {
+            $enabled = true;
+            return $enabled;
+        }
+
         $flag = getenv('ENABLE_SUPERADMIN_LOGIN') ?? ($_SERVER['ENABLE_SUPERADMIN_LOGIN'] ?? null);
         $enabled = superadmin_env_flag_true($flag);
 
@@ -39,6 +50,15 @@ if (!function_exists('superadmin_trusted_ip')) {
         $remoteIp = $_SERVER['REMOTE_ADDR'] ?? '';
         if ($remoteIp === '') {
             return false;
+        }
+
+        // Localhost için otomatik izin ver
+        $isLocalhost = in_array($remoteIp, ['127.0.0.1', '::1', 'localhost'], true) || 
+                       strpos($remoteIp, '192.168.') === 0 || 
+                       strpos($remoteIp, '10.') === 0;
+        
+        if ($isLocalhost) {
+            return true;
         }
 
         $allowed = getenv('SUPERADMIN_ALLOWED_IPS') ?? ($_SERVER['SUPERADMIN_ALLOWED_IPS'] ?? '127.0.0.1,::1');
