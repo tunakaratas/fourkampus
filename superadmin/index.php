@@ -5505,14 +5505,10 @@ let isLoadingCommunities = false;
     
     // Arama fonksiyonu - Topluluk isimlerini HTML'den çeker
     function performSearch() {
-        console.log('Arama başlatıldı...');
-        
         // Tüm topluluk kartlarını al
         const communityItems = document.querySelectorAll('.community-item');
-        console.log('Toplam topluluk sayısı:', communityItems.length);
         
         if (communityItems.length === 0) {
-            console.warn('Topluluk kartı bulunamadı!');
             return;
         }
         
@@ -5528,13 +5524,6 @@ let isLoadingCommunities = false;
         const universityTerm = universityInput ? universityInput.value.trim().toLowerCase() : '';
         const statusFilter = statusSelect ? statusSelect.value : 'all';
         const tierFilter = tierSelect ? tierSelect.value : 'all';
-        
-        console.log('Arama terimleri:', {
-            searchTerm: searchTerm,
-            universityTerm: universityTerm,
-            statusFilter: statusFilter,
-            tierFilter: tierFilter
-        });
         
         let visibleCount = 0;
         
