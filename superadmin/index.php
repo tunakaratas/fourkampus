@@ -7246,31 +7246,6 @@ function loadMoreSuperadminEvents() {
             }
         }
         
-        function openEditCommunityModal(communityFolder, communityData) {
-            try {
-                const modal = document.getElementById('editCommunityModal');
-                if (!modal) {
-                    console.error('editCommunityModal bulunamadı!');
-                    alert('Modal bulunamadı. Sayfayı yenileyin.');
-                    return;
-                }
-                
-                // Form alanlarını doldur
-                document.getElementById('editCommunityFolder').value = communityFolder;
-                document.getElementById('editCommunityFolderName').textContent = 'Klasör: ' + communityFolder;
-                document.getElementById('editCommunityName').value = communityData.name || '';
-                document.getElementById('editCommunityUniversity').value = communityData.university || '';
-                document.getElementById('editCommunityCode').value = communityData.code || '';
-                document.getElementById('editCommunityStatus').value = communityData.status === 'active' ? 'active' : 'inactive';
-                
-                // Modal'ı göster
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            } catch (error) {
-                console.error('openEditCommunityModal hatası:', error);
-                alert('Modal açılırken hata oluştu: ' + error.message);
-            }
-        }
         
         function closeEditCommunityModal() {
             try {
