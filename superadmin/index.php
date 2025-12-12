@@ -3306,7 +3306,7 @@ foreach ($community_details as $details) {
     <!-- Topluluk Arama JavaScript - Head İçinde -->
     <script>
     // Başkan Ekle/Düzenle Modal Fonksiyonları - Global scope (head'de tanımla)
-    function openAddPresidentModal(communityFolder, communityName, presidentData) {
+    window.openAddPresidentModal = function(communityFolder, communityName, presidentData) {
         try {
             const modal = document.getElementById('addPresidentModal');
             if (!modal) {
@@ -3352,7 +3352,7 @@ foreach ($community_details as $details) {
         }
     }
     
-    function closeAddPresidentModal() {
+    window.closeAddPresidentModal = function() {
         try {
             const modal = document.getElementById('addPresidentModal');
             if (modal) {
@@ -3425,6 +3425,23 @@ foreach ($community_details as $details) {
             window.doSearch();
         } catch (e) {
             console.error('Temizleme hatası:', e);
+        }
+    };
+    
+    // Tüm modal fonksiyonlarını global scope'a ekle
+    window.openCreateModal = function() {
+        const modal = document.getElementById('createModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            modal.style.display = 'flex';
+        }
+    };
+    
+    window.closeCreateModal = function() {
+        const modal = document.getElementById('createModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.style.display = 'none';
         }
     };
     </script>
@@ -7766,11 +7783,14 @@ function loadMoreSuperadminEvents() {
         }
         
         // Modal dışına tıklayınca kapat
-        document.getElementById('createModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeCreateModal();
-            }
-        });
+        const createModal = document.getElementById('createModal');
+        if (createModal) {
+            createModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCreateModal();
+                }
+            });
+        }
         
         // Bildirim formu validation
         function validateNotificationForm() {
