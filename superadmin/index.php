@@ -6865,6 +6865,53 @@ function loadMoreSuperadminEvents() {
         </div>
     </div>
 
+    <!-- Topluluk Düzenleme Modalı -->
+    <div id="editCommunityModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl my-8 transform transition-all">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-2xl font-bold text-gray-800">Topluluk Düzenle</h3>
+                <p class="text-sm text-gray-600 mt-1" id="editCommunityFolderName"></p>
+            </div>
+            <form method="POST" action="index.php?view=communities" id="editCommunityForm" class="p-6 space-y-4">
+                <?= get_csrf_field() ?>
+                <input type="hidden" name="action" value="edit_community">
+                <input type="hidden" name="folder" id="editCommunityFolder">
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Topluluk Adı</label>
+                    <input type="text" name="community_name" id="editCommunityName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Üniversite</label>
+                    <input type="text" name="university" id="editCommunityUniversity" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Topluluk Kodu</label>
+                    <input type="text" name="community_code" id="editCommunityCode" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Durum</label>
+                    <select name="status" id="editCommunityStatus" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="active">Aktif</option>
+                        <option value="inactive">Pasif</option>
+                    </select>
+                </div>
+                
+                <div class="flex space-x-3 pt-4 border-t border-gray-200">
+                    <button type="submit" class="flex-1 px-4 py-2.5 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-150 text-sm font-medium">
+                        Kaydet
+                    </button>
+                    <button type="button" onclick="closeEditCommunityModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 text-sm">
+                        İptal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
 
         // AJAX işlemleri için fonksiyonlar
