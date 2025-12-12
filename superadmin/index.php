@@ -3732,11 +3732,11 @@ foreach ($community_details as $details) {
                                         <div class="relative group">
                                             <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Genel Arama</label>
                                             <div class="relative flex items-center">
-                                                <input type="text" id="communitySearch" placeholder="Topluluk adı, klasör veya üniversite ara..." onkeyup="if(event.key === 'Enter' && typeof window.filterCommunities === 'function') { window.filterCommunities(); }" class="w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-400">
+                                                <input type="text" id="communitySearch" placeholder="Topluluk adı, klasör veya üniversite ara..." class="w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-400">
                                                 <svg class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                                 </svg>
-                                                <button id="searchCommunityBtn" onclick="if(typeof window.filterCommunities === 'function') { window.filterCommunities(); } return false;" class="absolute right-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 text-sm font-semibold">
+                                                <button id="searchCommunityBtn" type="button" class="absolute right-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 text-sm font-semibold">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                                     </svg>
@@ -3749,11 +3749,11 @@ foreach ($community_details as $details) {
                                         <div class="relative group">
                                             <label class="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Üniversite Filtresi</label>
                                             <div class="relative flex items-center">
-                                                <input type="text" id="filterUniversity" placeholder="Üniversite adı ile ara..." onkeyup="if(event.key === 'Enter' && typeof window.filterCommunities === 'function') { window.filterCommunities(); }" class="w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-400">
+                                                <input type="text" id="filterUniversity" placeholder="Üniversite adı ile ara..." class="w-full pl-12 pr-20 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all bg-gray-50 hover:bg-white text-gray-800 placeholder-gray-400">
                                                 <svg class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                                 </svg>
-                                                <button id="searchUniversityBtn" onclick="if(typeof window.filterCommunities === 'function') { window.filterCommunities(); } return false;" class="absolute right-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 text-sm font-semibold">
+                                                <button id="searchUniversityBtn" type="button" class="absolute right-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 text-sm font-semibold">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                                     </svg>
@@ -3769,7 +3769,7 @@ foreach ($community_details as $details) {
                                             <!-- Durum Filtresi -->
                                             <div class="flex items-center gap-2">
                                                 <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Durum:</label>
-                                                <select id="filterStatus" onchange="if(typeof window.filterCommunities === 'function') { window.filterCommunities(); }" class="px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white transition-all hover:border-purple-300 cursor-pointer min-w-[140px]">
+                                                <select id="filterStatus" class="px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white transition-all hover:border-purple-300 cursor-pointer min-w-[140px]">
                                                     <option value="all">🔍 Tüm Durumlar</option>
                                                     <option value="active">✅ Aktif</option>
                                                     <option value="inactive">❌ Kapalı</option>
@@ -3779,7 +3779,7 @@ foreach ($community_details as $details) {
                                             <!-- Plan Filtresi -->
                                             <div class="flex items-center gap-2">
                                                 <label class="text-xs font-semibold text-gray-600 whitespace-nowrap">Plan:</label>
-                                                <select id="filterTier" onchange="if(typeof window.filterCommunities === 'function') { window.filterCommunities(); }" class="px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white transition-all hover:border-purple-300 cursor-pointer min-w-[140px]">
+                                                <select id="filterTier" class="px-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm bg-white transition-all hover:border-purple-300 cursor-pointer min-w-[140px]">
                                                     <option value="all">📦 Tüm Planlar</option>
                                                     <option value="standard">⭐ Standart</option>
                                                     <option value="professional">💼 Profesyonel</option>
@@ -3791,7 +3791,7 @@ foreach ($community_details as $details) {
                                         <!-- Sonuç ve Temizle -->
                                         <div class="flex items-center gap-3">
                                             <span id="filteredCount" class="text-sm font-semibold text-purple-600 bg-purple-50 px-3 py-2 rounded-lg hidden"></span>
-                                            <button id="clearFiltersBtn" onclick="if(typeof window.clearFilters === 'function') { window.clearFilters(); } return false;" class="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                                            <button id="clearFiltersBtn" type="button" class="px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-pink-500 rounded-lg hover:from-red-600 hover:to-pink-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                                 </svg>
@@ -5604,9 +5604,28 @@ let isLoadingCommunities = false;
         performSearch();
     }
     
-    // Global fonksiyonlar
-    window.filterCommunities = performSearch;
+    // Global fonksiyonlar - Test için
+    window.filterCommunities = function() {
+        try {
+            performSearch();
+        } catch (error) {
+            console.error('Arama hatası:', error);
+            alert('Arama sırasında bir hata oluştu: ' + error.message);
+        }
+    };
     window.clearFilters = clearAllFilters;
+    
+    // Test fonksiyonu
+    window.testSearch = function() {
+        const items = document.querySelectorAll('.community-item');
+        const searchInput = document.getElementById('communitySearch');
+        alert('Test: ' + items.length + ' topluluk kartı bulundu\nArama input: ' + (searchInput ? 'Var' : 'Yok'));
+        if (items.length > 0 && searchInput) {
+            const firstItem = items[0];
+            const h3 = firstItem.querySelector('h3');
+            alert('İlk kart:\nH3 text: ' + (h3 ? h3.textContent : 'Bulunamadı') + '\nData-name: ' + firstItem.getAttribute('data-name'));
+        }
+    };
     
     // Arama butonları için event listener'lar
     function setupSearchButtons() {
