@@ -82,7 +82,14 @@ function get_requested_university_id() {
         return '';
     }
 
-    return normalize_university_id($raw);
+    $normalized = normalize_university_id($raw);
+    
+    // Debug log (her zaman - sorun tespiti için)
+    // if (defined('DEBUG') && DEBUG) {
+    //     error_log("Events API: get_requested_university_id() - Raw: '{$raw}' -> Normalized: '{$normalized}'");
+    // }
+    
+    return $normalized;
 }
 
 // Kullanıcının üye olduğu toplulukları getir
@@ -213,12 +220,10 @@ try {
     $all_events = [];
     $requested_university_id = get_requested_university_id();
     
-    // Debug log
-    if ($requested_university_id !== '') {
-        error_log("Events API: Üniversite filtresi aktif - Requested ID: '{$requested_university_id}'");
-    } else {
-        error_log("Events API: Üniversite filtresi yok - Tüm etkinlikler gösterilecek");
-    }
+    // Debug log (her zaman - sorun tespiti için)
+    // if (defined('DEBUG') && DEBUG && $requested_university_id !== '') {
+    //     error_log("Events API: Üniversite filtresi aktif - Requested ID: '{$requested_university_id}'");
+    // }
     
     // Tek bir etkinlik detayı isteniyorsa
     if (isset($_GET['id']) && !empty($_GET['id'])) {
@@ -639,24 +644,31 @@ try {
         $limit = isset($_GET['limit']) ? max(1, min(200, (int)$_GET['limit'])) : 200; // Default 200, max 200
         $offset = isset($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
         
-        // Debug
-        error_log("Events API: Fetching all events. Requested University: '$requested_university_id'");
+        // Debug log (her zaman - sorun tespiti için)
+        error_log("Events API: Fetching all events. Requested University ID: '{$requested_university_id}'");
         
         $community_folders = glob($communities_dir . '/*', GLOB_ONLYDIR);
+        if ($community_folders === false) {
+            $community_folders = [];
+        }
+        
+        $excluded_dirs = ['.', '..', 'assets', 'public', 'templates', 'system', 'docs'];
         
         foreach ($community_folders as $folder_path) {
-            try {
-                $community_id = basename($folder_path);
-            if ($community_id === '.' || $community_id === '..') continue;
-
-            $db_path = $folder_path . '/unipanel.sqlite';
-            if (!file_exists($db_path)) {
+            $community_id = basename($folder_path);
+            if (in_array($community_id, $excluded_dirs)) {
                 continue;
             }
             
             try {
-                // Connection pool kullan (10k kullanıcı için kritik)
-                $connResult = ConnectionPool::getConnection($db_path, true);
+
+                $db_path = $folder_path . '/unipanel.sqlite';
+                if (!file_exists($db_path)) {
+                    continue;
+                }
+                
+                // Connection pool kullan (read-only mode - WAL/shm sorunları için)
+                $connResult = ConnectionPool::getConnection($db_path, false);
                 if (!$connResult) {
                     continue;
                 }
@@ -673,26 +685,35 @@ try {
                 }
                 $community_name = $settings['club_name'] ?? ucwords(str_replace('_', ' ', $community_id));
 
-                // Üniversite filtresi (isteğe bağlı)
+                // Üniversite filtresi (kampanyalar.php'deki sistemle aynı)
                 if ($requested_university_id !== '') {
                     $community_university_name = $settings['university'] ?? $settings['organization'] ?? '';
                     $community_university_id = normalize_university_id($community_university_name);
                     
+                    // Debug log (her zaman - sorun tespiti için)
+                    error_log("Events API: Community '{$community_id}' - Requested ID: '{$requested_university_id}', Community Uni Name: '{$community_university_name}' -> Normalized ID: '{$community_university_id}'");
+                    
+                    // Eğer üniversite eşleşmiyorsa geç (kampanyalar.php'deki sistemle aynı)
                     if ($community_university_id === '' || $community_university_id !== $requested_university_id) {
-                        ConnectionPool::releaseConnection($db_path, $poolId, true);
+                        error_log("Events API: Community '{$community_id}' SKIPPED - Üniversite eşleşmedi (Requested: '{$requested_university_id}' vs Community: '{$community_university_id}')");
+                        ConnectionPool::releaseConnection($db_path, $poolId, false);
                         continue;
                     }
+                    
+                    error_log("Events API: Community '{$community_id}' MATCHED - Üniversite filtresi geçti");
                 }
                 
                 // Etkinlikleri çek
                 $query = $db->prepare("SELECT * FROM events WHERE club_id = 1 ORDER BY date DESC, time DESC");
                 if (!$query) {
-                    ConnectionPool::releaseConnection($db_path, $poolId, true);
+                    error_log("Events API: Failed to prepare query for community {$community_id}: " . $db->lastErrorMsg());
+                    ConnectionPool::releaseConnection($db_path, $poolId, false);
                     continue;
                 }
                 $result = $query->execute();
                 if (!$result) {
-                    ConnectionPool::releaseConnection($db_path, $poolId, true);
+                    error_log("Events API: Failed to execute query for community {$community_id}: " . $db->lastErrorMsg());
+                    ConnectionPool::releaseConnection($db_path, $poolId, false);
                     continue;
                 }
                 
@@ -850,22 +871,19 @@ try {
                     ];
                 }
                 
-                ConnectionPool::releaseConnection($db_path, $poolId, true);
+                // Bağlantıyı pool'a geri ver
+                ConnectionPool::releaseConnection($db_path, $poolId, false);
             } catch (Exception $e) {
+                error_log("Events API: Error processing community {$community_id}: " . $e->getMessage());
                 // Hata durumunda bağlantıyı release et
                 if (isset($poolId) && isset($db_path)) {
                     try {
-                        ConnectionPool::releaseConnection($db_path, $poolId, true);
-                    } catch (Exception $releaseError) {}
+                        ConnectionPool::releaseConnection($db_path, $poolId, false);
+                    } catch (Exception $releaseError) {
+                        error_log("Events API: Error releasing connection: " . $releaseError->getMessage());
+                    }
                 }
                 continue;
-            }
-            } catch (Throwable $t) {
-                error_log("Events API: Fatal Loop Error for path '{$folder_path}': " . $t->getMessage());
-                // Release if needed
-                 if (isset($poolId) && isset($db_path)) {
-                    try { ConnectionPool::releaseConnection($db_path, $poolId, true); } catch (Throwable $e) {}
-                }
             }
         }
     }

@@ -47,6 +47,43 @@ use UniPanel\Core\Cache;
 
 $publicCache = Cache::getInstance(__DIR__ . '/../system/cache');
 
+/**
+ * University filter helpers (shared behavior with api/communities.php and api/universities.php)
+ */
+function normalize_university_id($value) {
+    $value = trim((string)$value);
+    if ($value === '') {
+        return '';
+    }
+    // Türkçe karakter desteği için mb_strtolower kullan
+    $normalized = mb_strtolower($value, 'UTF-8');
+    // Boşluk, tire ve alt çizgi karakterlerini kaldır
+    $normalized = str_replace([' ', '-', '_'], '', $normalized);
+    return $normalized;
+}
+
+function get_requested_university_id() {
+    // Accept both university_id (preferred) and university (name) for compatibility.
+    $raw = '';
+    if (isset($_GET['university_id'])) {
+        $raw = (string)$_GET['university_id'];
+    } elseif (isset($_GET['university'])) {
+        $raw = (string)$_GET['university'];
+    }
+
+    $raw = trim($raw);
+    if ($raw === '' || $raw === 'all') {
+        return '';
+    }
+
+    $raw = basename($raw);
+    if (strpos($raw, '..') !== false || strpos($raw, '/') !== false || strpos($raw, '\\') !== false) {
+        return '';
+    }
+
+    return normalize_university_id($raw);
+}
+
 function build_base_url() {
     static $base = null;
     if ($base !== null) {
@@ -90,14 +127,26 @@ function build_absolute_url($path) {
 // Veritabanı bağlantısı
 function get_community_db($community_id) {
     $communities_dir = __DIR__ . '/../communities/';
-    $community_folders = glob($communities_dir . '*', GLOB_ONLYDIR);
+    $community_folders = glob($communities_dir . '/*', GLOB_ONLYDIR);
+    if ($community_folders === false) {
+        $community_folders = [];
+    }
+    
+    $excluded_dirs = ['.', '..', 'assets', 'public', 'templates', 'system', 'docs'];
     
     foreach ($community_folders as $folder) {
+        $community_folder_id = basename($folder);
+        if (in_array($community_folder_id, $excluded_dirs)) {
+            continue;
+        }
+        
         $db_path = $folder . '/unipanel.sqlite';
         if (file_exists($db_path)) {
             try {
                 // Connection pool kullan (10k kullanıcı için kritik)
-                $connResult = ConnectionPool::getConnection($db_path, true);
+                // NOT: Bazı DB'ler WAL/shm nedeniyle READONLY modda açılamıyor.
+                // Üniversite filtresi / listeleme için RW açıp sadece SELECT yapıyoruz.
+                $connResult = ConnectionPool::getConnection($db_path, false);
                 if (!$connResult) {
                     continue;
                 }
@@ -117,11 +166,11 @@ function get_community_db($community_id) {
                     ];
                 }
                 // Eşleşme bulunamadı, bağlantıyı pool'a geri ver
-                ConnectionPool::releaseConnection($db_path, $poolId, true);
+                ConnectionPool::releaseConnection($db_path, $poolId, false);
             } catch (Exception $e) {
                 // Hata durumunda bağlantıyı release et
                 if (isset($poolId)) {
-                    ConnectionPool::releaseConnection($db_path, $poolId, true);
+                    ConnectionPool::releaseConnection($db_path, $poolId, false);
                 }
                 error_log("find_community_db_by_id error: " . $e->getMessage());
                 continue;
@@ -142,7 +191,7 @@ function find_community_db($community_id) {
         if (file_exists($db_path)) {
             try {
                 // Connection pool kullan (10k kullanıcı için kritik)
-                $connResult = ConnectionPool::getConnection($db_path, true);
+                $connResult = ConnectionPool::getConnection($db_path, false);
                 if ($connResult) {
                     return [
                         'db' => $connResult['db'],
@@ -159,14 +208,24 @@ function find_community_db($community_id) {
     }
     
     // Folder name bulunamadıysa, tüm klasörleri tara ve clubs tablosunda ara
-    $community_folders = glob($communities_dir . '*', GLOB_ONLYDIR);
+    $community_folders = glob($communities_dir . '/*', GLOB_ONLYDIR);
+    if ($community_folders === false) {
+        $community_folders = [];
+    }
+    
+    $excluded_dirs = ['.', '..', 'assets', 'public', 'templates', 'system', 'docs'];
     
     foreach ($community_folders as $folder) {
+        $community_folder_id = basename($folder);
+        if (in_array($community_folder_id, $excluded_dirs)) {
+            continue;
+        }
+        
         $db_path = $folder . '/unipanel.sqlite';
         if (file_exists($db_path)) {
             try {
                 // Connection pool kullan (10k kullanıcı için kritik)
-                $connResult = ConnectionPool::getConnection($db_path, true);
+                $connResult = ConnectionPool::getConnection($db_path, false);
                 if (!$connResult) {
                     continue;
                 }
@@ -208,7 +267,7 @@ function find_community_db($community_id) {
                     }
                 }
                 // Bağlantıyı pool'a geri ver (eşleşme bulunamadı)
-                ConnectionPool::releaseConnection($db_path, $poolId, true);
+                ConnectionPool::releaseConnection($db_path, $poolId, false);
             } catch (Exception $e) {
                 continue;
             }
@@ -254,6 +313,7 @@ try {
     // community_id string olarak gelebilir (folder name), integer'a çevirmeye çalışma
     $community_id = isset($_GET['community_id']) ? sanitizeCommunityId(trim($_GET['community_id'])) : null;
     $product_id = isset($_GET['id']) ? (int)$_GET['id'] : null;
+    $requested_university_id = get_requested_university_id();
     
     // Tek bir ürün detayı
     if ($method === 'GET' && $product_id) {
@@ -479,6 +539,21 @@ try {
         $community_folder = $db_result['folder'];
         $poolId = $db_result['pool_id'] ?? null;
         $dbPath = $db_result['db_path'] ?? null;
+
+        // Üniversite bilgisini al (listeye eklemek için)
+        $community_university_name = null;
+        try {
+            $settings_query = $db->query("SELECT setting_key, setting_value FROM settings WHERE club_id = 1");
+            if ($settings_query) {
+                $settings = [];
+                while ($rowSetting = $settings_query->fetchArray(SQLITE3_ASSOC)) {
+                    $settings[$rowSetting['setting_key']] = $rowSetting['setting_value'];
+                }
+                $community_university_name = $settings['university'] ?? $settings['organization'] ?? null;
+            }
+        } catch (Exception $e) {
+            $community_university_name = null;
+        }
         
         // products tablosunun var olup olmadığını kontrol et
         $old_exceptions = $db->enableExceptions(false);
@@ -545,6 +620,7 @@ try {
             $row['id'] = (string)$row['id'];
             // community_id ekle (folder name)
             $row['community_id'] = $community_folder;
+            $row['university'] = $community_university_name;
             
                         // Image path'i düzelt (API'den erişilebilir URL) - Çoklu görsel desteği
                         if (!empty($row['image_path']) && $community_folder) {
@@ -701,37 +777,93 @@ try {
         $offset = isset($_GET['offset']) ? max(0, (int)$_GET['offset']) : 0;
         
         $communities_dir = __DIR__ . '/../communities/';
-        $community_folders = glob($communities_dir . '*', GLOB_ONLYDIR);
+        $community_folders = glob($communities_dir . '/*', GLOB_ONLYDIR);
+        if ($community_folders === false) {
+            $community_folders = [];
+        }
+        
+        $excluded_dirs = ['.', '..', 'assets', 'public', 'templates', 'system', 'docs'];
         $all_products = [];
         $total_count = 0; // Toplam ürün sayısı
         
         foreach ($community_folders as $folder) {
+            $community_id = basename($folder);
+            if (in_array($community_id, $excluded_dirs)) {
+                continue;
+            }
             $db_path = $folder . '/unipanel.sqlite';
             if (file_exists($db_path)) {
                 try {
                     // Connection pool kullan (10k kullanıcı için kritik)
-                    $connResult = ConnectionPool::getConnection($db_path, true);
+                    $connResult = ConnectionPool::getConnection($db_path, false);
                     if (!$connResult) {
                         continue;
                     }
                     $db = $connResult['db'];
                     $poolId = $connResult['pool_id'];
+
+                    // Üniversite filtresi varsa topluluğu erken ele
+                    $community_folder = basename($folder);
+                    $community_university_name = null;
+                    // Üniversite filtresi (kampanyalar.php'deki sistemle aynı)
+                    if ($requested_university_id !== '') {
+                        try {
+                            $settings_query = $db->query("SELECT setting_key, setting_value FROM settings WHERE club_id = 1");
+                            $settings = [];
+                            if ($settings_query) {
+                                while ($srow = $settings_query->fetchArray(SQLITE3_ASSOC)) {
+                                    $settings[$srow['setting_key']] = $srow['setting_value'];
+                                }
+                            }
+                            $community_university_name = $settings['university'] ?? $settings['organization'] ?? '';
+                            $community_university_id = normalize_university_id($community_university_name);
+                            
+                            // Debug log (her zaman - sorun tespiti için)
+                            error_log("Products API: Community '{$community_id}' - Requested ID: '{$requested_university_id}', Community Uni Name: '{$community_university_name}' -> Normalized ID: '{$community_university_id}'");
+                            
+                            // Eğer üniversite eşleşmiyorsa geç (kampanyalar.php'deki sistemle aynı)
+                            if ($community_university_id === '' || $community_university_id !== $requested_university_id) {
+                                error_log("Products API: Community '{$community_id}' SKIPPED - Üniversite eşleşmedi (Requested: '{$requested_university_id}' vs Community: '{$community_university_id}')");
+                                ConnectionPool::releaseConnection($db_path, $poolId, false);
+                                continue;
+                            }
+                            
+                            error_log("Products API: Community '{$community_id}' MATCHED - Üniversite filtresi geçti");
+                        } catch (Exception $e) {
+                            ConnectionPool::releaseConnection($db_path, $poolId, false);
+                            continue;
+                        }
+                    } else {
+                        // Filtre yoksa yine de üniversite adını eklemek için bir kere oku (hata olursa null)
+                        try {
+                            $settings_query = $db->query("SELECT setting_key, setting_value FROM settings WHERE club_id = 1");
+                            $settings = [];
+                            if ($settings_query) {
+                                while ($srow = $settings_query->fetchArray(SQLITE3_ASSOC)) {
+                                    $settings[$srow['setting_key']] = $srow['setting_value'];
+                                }
+                            }
+                            $community_university_name = $settings['university'] ?? $settings['organization'] ?? null;
+                        } catch (Exception $e) {
+                            $community_university_name = null;
+                        }
+                    }
                     
                     // products tablosunun var olup olmadığını kontrol et
                     $table_check = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='products'");
                     if (!$table_check || !$table_check->fetchArray()) {
-                        ConnectionPool::releaseConnection($db_path, $poolId, true);
+                        ConnectionPool::releaseConnection($db_path, $poolId, false);
                         continue;
                     }
                     
                     $result = $db->query("SELECT * FROM products WHERE status = 'active' ORDER BY created_at DESC");
-                    $community_folder = basename($folder);
                     
                     while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
                         // ID'yi string'e çevir (Swift için)
                         $row['id'] = (string)$row['id'];
                         // community_id ekle (folder name)
                         $row['community_id'] = $community_folder;
+                        $row['university'] = $community_university_name;
                         
                         // Image path'i düzelt (API'den erişilebilir URL) - Çoklu görsel desteği
                         if (!empty($row['image_path']) && !empty($community_folder)) {
@@ -830,7 +962,7 @@ try {
                     }
                     
                     // Connection pool'a geri ver
-                    ConnectionPool::releaseConnection($db_path, $poolId, true);
+                    ConnectionPool::releaseConnection($db_path, $poolId, false);
                 } catch (Exception $e) {
                     error_log("Products API Error (all products): " . $e->getMessage());
                     continue;

@@ -50,7 +50,7 @@ use UniPanel\Core\Cache;
 $publicCache = Cache::getInstance(__DIR__ . '/../system/cache');
 
 /**
- * University filter helpers (shared behavior with api/events.php and api/universities.php)
+ * University filter helpers (shared behavior with api/events.php, api/campaigns.php and api/universities.php)
  */
 function normalize_university_id($value) {
     $value = trim((string)$value);
@@ -62,6 +62,28 @@ function normalize_university_id($value) {
     // Boşluk, tire ve alt çizgi karakterlerini kaldır
     $normalized = str_replace([' ', '-', '_'], '', $normalized);
     return $normalized;
+}
+
+function get_requested_university_id() {
+    // Accept both university_id (preferred) and university (name) for compatibility.
+    $raw = '';
+    if (isset($_GET['university_id'])) {
+        $raw = (string)$_GET['university_id'];
+    } elseif (isset($_GET['university'])) {
+        $raw = (string)$_GET['university'];
+    }
+
+    $raw = trim($raw);
+    if ($raw === '' || $raw === 'all') {
+        return '';
+    }
+
+    $raw = basename($raw);
+    if (strpos($raw, '..') !== false || strpos($raw, '/') !== false || strpos($raw, '\\') !== false) {
+        return '';
+    }
+
+    return normalize_university_id($raw);
 }
 
 // Public index.php'deki get_all_communities fonksiyonunu kopyala
@@ -318,45 +340,60 @@ function sendResponse($success, $data = null, $message = null, $error = null, $p
 // Error handling - tüm hataları yakala
 try {
     $communities_dir = __DIR__ . '/../communities';
+    $requested_university_id = get_requested_university_id();
     
-    // Üniversite filtresi varsa
-    if (isset($_GET['university_id']) && !empty($_GET['university_id']) && $_GET['university_id'] !== 'all') {
-        // Üniversite filtresi için authentication zorunlu
-        if (!$currentUser) {
-            http_response_code(401);
-            sendResponse(false, null, null, 'Üniversite filtresini kullanmak için giriş yapmanız gerekiyor.');
+    // Üniversite filtresi varsa (kampanyalar.php'deki sistemle aynı)
+    if ($requested_university_id !== '') {
+        // Log file for detailed debugging
+        $log_file = __DIR__ . '/../logs/communities_api_debug.log';
+        $log_enabled = true;
+        
+        function write_communities_log($message) {
+            global $log_file, $log_enabled;
+            if (!$log_enabled) return;
+            $timestamp = date('Y-m-d H:i:s');
+            file_put_contents($log_file, "[{$timestamp}] {$message}\n", FILE_APPEND);
         }
         
-        // University ID için özel sanitization (Türkçe karakterlere izin ver)
-        $university_id = trim($_GET['university_id']);
-        // Path traversal koruması
-        $university_id = basename($university_id);
-        if (strpos($university_id, '..') !== false || strpos($university_id, '/') !== false || strpos($university_id, '\\') !== false) {
-            sendResponse(false, null, null, 'Geçersiz üniversite ID formatı');
-        }
-        // HTML encoding koruması
-        $university_id = htmlspecialchars($university_id, ENT_QUOTES, 'UTF-8');
+        // Clear log at start of request
+        file_put_contents($log_file, "=== Communities API Debug Started ===\n");
+        
+        // Debug log (her zaman - sorun tespiti için)
+        error_log("Communities API: Üniversite filtresi aktif - Requested ID: '{$requested_university_id}'");
+        write_communities_log("Requested university_id (normalized): '{$requested_university_id}'");
         $all_communities = [];
         $community_folders = glob($communities_dir . '/*', GLOB_ONLYDIR);
+        if ($community_folders === false) {
+            $community_folders = [];
+        }
+        
+        $excluded_dirs = ['.', '..', 'assets', 'public', 'templates', 'system', 'docs'];
         $formatted_communities = [];
+        
+        write_communities_log("Scanning " . count($community_folders) . " community folders");
         
         foreach ($community_folders as $folder_path) {
             $community_id = basename($folder_path);
-            if ($community_id === '.' || $community_id === '..' || in_array($community_id, ['assets', 'public', 'templates', 'system', 'docs'])) continue;
-
-            $db_path = $folder_path . '/unipanel.sqlite';
-            if (!file_exists($db_path)) {
+            if (in_array($community_id, $excluded_dirs)) {
+                write_communities_log("Skipping excluded directory: {$community_id}");
                 continue;
             }
-            
-            try {
-                // Connection pool kullan
-                $connResult = ConnectionPool::getConnection($db_path, true);
-                if (!$connResult) {
+
+                $db_path = $folder_path . '/unipanel.sqlite';
+                if (!file_exists($db_path)) {
+                    write_communities_log("Skipping community '{$community_id}' - database not found");
                     continue;
                 }
-                $db = $connResult['db'];
-                $poolId = $connResult['pool_id'];
+                
+                try {
+                    // Connection pool kullan (read-only mode - WAL/shm sorunları için)
+                    $connResult = ConnectionPool::getConnection($db_path, false);
+                    if (!$connResult) {
+                        write_communities_log("ERROR: Could not get connection for community '{$community_id}'");
+                        continue;
+                    }
+                    $db = $connResult['db'];
+                    $poolId = $connResult['pool_id'];
                 
                 // Settings tablosunu kontrol et
                 $settings_query = $db->query("SELECT setting_key, setting_value FROM settings WHERE club_id = 1");
@@ -367,15 +404,25 @@ try {
                     }
                 }
                 
-                // Üniversite kontrolü
+                // Üniversite filtresi (kampanyalar.php'deki sistemle aynı)
                 $community_university_name = $settings['university'] ?? $settings['organization'] ?? '';
                 $community_university_id = normalize_university_id($community_university_name);
                 
-                // Eğer üniversite eşleşmiyorsa geç
-                if ($community_university_id !== $university_id) {
-                     ConnectionPool::releaseConnection($db_path, $poolId, true);
-                     continue;
+                // Debug log (her zaman - sorun tespiti için)
+                error_log("Communities API: Community '{$community_id}' - Requested ID: '{$requested_university_id}', Community Uni Name: '{$community_university_name}' -> Normalized ID: '{$community_university_id}'");
+                write_communities_log("Community '{$community_id}' - University Name: '{$community_university_name}' -> Normalized ID: '{$community_university_id}'");
+                
+                // Eğer üniversite eşleşmiyorsa geç (kampanyalar.php'deki sistemle aynı)
+                if ($community_university_id === '' || $community_university_id !== $requested_university_id) {
+                    error_log("Communities API: Community '{$community_id}' SKIPPED - Üniversite eşleşmedi (Requested: '{$requested_university_id}' vs Community: '{$community_university_id}')");
+                    write_communities_log("Community '{$community_id}' SKIPPED - Mismatch (Requested: '{$requested_university_id}' vs Community: '{$community_university_id}')");
+                    ConnectionPool::releaseConnection($db_path, $poolId, false);
+                    continue;
                 }
+                
+                // Debug log (her zaman - sorun tespiti için)
+                error_log("Communities API: Community '{$community_id}' MATCHED - Üniversite filtresi geçti");
+                write_communities_log("✓ Community '{$community_id}' MATCHED - University filter passed");
                 
                 // Eşleşti! Şimdi diğer bilgileri topla
                 
@@ -474,13 +521,30 @@ try {
                     'qr_code_url' => $qr_code_url
                 ];
 
-                ConnectionPool::releaseConnection($db_path, $poolId, true);
-                
-            } catch (Exception $e) {
-                if (isset($poolId) && isset($db_path)) ConnectionPool::releaseConnection($db_path, $poolId, true);
-                error_log("Communities API Filter Error: " . $e->getMessage());
-                continue;
+                    // Bağlantıyı pool'a geri ver
+                    ConnectionPool::releaseConnection($db_path, $poolId, false);
+                } catch (Exception $e) {
+                    error_log("Communities API Filter Error for '{$community_id}': " . $e->getMessage());
+                    write_communities_log("ERROR processing community '{$community_id}': " . $e->getMessage());
+                    // Hata durumunda bağlantıyı release et
+                    if (isset($poolId) && isset($db_path)) {
+                        try {
+                            ConnectionPool::releaseConnection($db_path, $poolId, false);
+                        } catch (Exception $releaseError) {
+                            error_log("Communities API: Error releasing connection: " . $releaseError->getMessage());
+                            write_communities_log("ERROR releasing connection: " . $releaseError->getMessage());
+                        }
+                    }
+                    continue;
+                }
             }
+        
+        write_communities_log("=== SUMMARY ===");
+        write_communities_log("Requested university_id (normalized): '{$requested_university_id}'");
+        write_communities_log("Total communities found: " . count($formatted_communities));
+        
+        if (count($formatted_communities) === 0) {
+            write_communities_log("WARNING: No communities matched the filter!");
         }
         
         sendResponse(true, $formatted_communities);

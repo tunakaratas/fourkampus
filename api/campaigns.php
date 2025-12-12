@@ -380,10 +380,17 @@ try {
     } else {
         // Tüm toplulukların kampanyalarını getir
         $community_folders = glob($communities_dir . '/*', GLOB_ONLYDIR);
+        if ($community_folders === false) {
+            $community_folders = [];
+        }
+        
+        $excluded_dirs = ['.', '..', 'assets', 'public', 'templates', 'system', 'docs'];
         
         foreach ($community_folders as $folder_path) {
             $community_id = basename($folder_path);
-            if ($community_id === '.' || $community_id === '..') continue;
+            if (in_array($community_id, $excluded_dirs)) {
+                continue;
+            }
 
             $db_path = $folder_path . '/unipanel.sqlite';
             if (!file_exists($db_path)) {
@@ -441,10 +448,17 @@ try {
                 if ($requested_university_id !== '') {
                     $community_university_name = $settings['university'] ?? $settings['organization'] ?? '';
                     $community_university_id = normalize_university_id($community_university_name);
+                    
+                    // Debug log (her zaman - sorun tespiti için)
+                    error_log("Campaigns API: Community '{$community_id}' - Requested ID: '{$requested_university_id}', Community Uni Name: '{$community_university_name}' -> Normalized ID: '{$community_university_id}'");
+                    
                     if ($community_university_id === '' || $community_university_id !== $requested_university_id) {
+                        error_log("Campaigns API: Community '{$community_id}' SKIPPED - Üniversite eşleşmedi (Requested: '{$requested_university_id}' vs Community: '{$community_university_id}')");
                         ConnectionPool::releaseConnection($db_path, $poolId, false);
                         continue;
                     }
+                    
+                    error_log("Campaigns API: Community '{$community_id}' MATCHED - Üniversite filtresi geçti");
                 }
                 
                 // Kampanyaları çek
