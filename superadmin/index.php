@@ -5314,7 +5314,7 @@ foreach ($community_details as $details) {
                     <!-- Başkan Ekle/Düzenle Modal -->
                     <div id="addPresidentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto" style="display: none;">
                         <div class="flex items-center justify-center min-h-screen p-4">
-                        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">
+                            <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">
                             <div class="p-6 border-b border-gray-200">
                                 <div class="flex items-center justify-between">
                                     <h3 class="text-2xl font-bold text-gray-800">Topluluk Başkanı</h3>
