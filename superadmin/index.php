@@ -7264,6 +7264,7 @@ function loadMoreSuperadminEvents() {
                 document.getElementById('editCommunityStatus').value = (communityData.status === 'active' || !communityData.status) ? 'active' : 'inactive';
                 
                 // Modal'ı göster
+                modal.style.display = 'flex';
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
             } catch (error) {
@@ -7379,18 +7380,27 @@ function loadMoreSuperadminEvents() {
                 document.getElementById('smsPackageCommunityFolder').value = communityFolder;
                 
                 // Plan formunu sıfırla
-                document.querySelector('input[name="plan_tier"][value="standard"]').checked = true;
-                document.getElementById('planMonths').value = '6';
-                updatePlanDetails();
+                const standardPlan = document.querySelector('input[name="plan_tier"][value="standard"]');
+                if (standardPlan) standardPlan.checked = true;
+                const planMonths = document.getElementById('planMonths');
+                if (planMonths) planMonths.value = '6';
+                if (typeof window.updatePlanDetails === 'function') {
+                    window.updatePlanDetails();
+                }
                 
                 // SMS formunu sıfırla
-                document.getElementById('assignSmsPackageForm').reset();
-                document.getElementById('smsPackageCommunityFolder').value = communityFolder;
+                const smsForm = document.getElementById('assignSmsPackageForm');
+                if (smsForm) smsForm.reset();
+                const smsFolder = document.getElementById('smsPackageCommunityFolder');
+                if (smsFolder) smsFolder.value = communityFolder;
                 
                 // Plan sekmesini göster
-                switchTab('plan');
+                if (typeof window.switchTab === 'function') {
+                    window.switchTab('plan');
+                }
                 
                 // Modal'ı göster
+                modal.style.display = 'flex';
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
             } catch (error) {
@@ -7826,7 +7836,7 @@ function loadMoreSuperadminEvents() {
                     </div>
                     
                     <div class="flex justify-end space-x-3 pt-4">
-                        <button type="button" onclick="closeCreateModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150">
+                        <button type="button" onclick="window.closeCreateModal()" class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150">
                             İptal
                         </button>
                         <button type="submit" class="px-6 py-2 text-white color-primary rounded-lg font-semibold hover-primary transition duration-150">
