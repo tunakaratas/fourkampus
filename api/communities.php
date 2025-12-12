@@ -69,8 +69,11 @@ function get_requested_university_id() {
     $raw = '';
     if (isset($_GET['university_id'])) {
         $raw = (string)$_GET['university_id'];
+        // URL decode - Swift'ten gelen encoded değeri decode et
+        $raw = urldecode($raw);
     } elseif (isset($_GET['university'])) {
         $raw = (string)$_GET['university'];
+        $raw = urldecode($raw);
     }
 
     $raw = trim($raw);
