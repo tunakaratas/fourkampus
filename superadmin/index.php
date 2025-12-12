@@ -3472,6 +3472,72 @@ foreach ($community_details as $details) {
             .lg\\:translate-x-0 { transform: translateX(0); }
         }
     </style>
+    <!-- Topluluk Arama JavaScript - Head İçinde -->
+    <script>
+    // Sayfa yüklenmeden önce tanımla
+    window.doSearch = function() {
+        try {
+            const search = (document.getElementById('communitySearch') || {}).value.toLowerCase() || '';
+            const university = (document.getElementById('filterUniversity') || {}).value.toLowerCase() || '';
+            const status = (document.getElementById('filterStatus') || {}).value || 'all';
+            const tier = (document.getElementById('filterTier') || {}).value || 'all';
+            
+            const items = document.querySelectorAll('.community-item');
+            let visible = 0;
+            
+            items.forEach(function(item) {
+                const name = (item.querySelector('h3')?.textContent || '').toLowerCase();
+                const dataName = (item.getAttribute('data-name') || '').toLowerCase();
+                const dataFolder = (item.getAttribute('data-folder') || '').toLowerCase();
+                const dataUni = (item.getAttribute('data-university') || '').toLowerCase();
+                const dataStatus = item.getAttribute('data-status') || '';
+                const dataTier = item.getAttribute('data-tier') || 'none';
+                
+                const matchSearch = !search || name.includes(search) || dataName.includes(search) || dataFolder.includes(search) || dataUni.includes(search);
+                const matchUni = !university || dataUni.includes(university);
+                const matchStatus = status === 'all' || (status === 'active' && dataStatus === 'active') || (status === 'inactive' && dataStatus !== 'active');
+                const matchTier = tier === 'all' || dataTier === tier;
+                
+                if (matchSearch && matchUni && matchStatus && matchTier) {
+                    item.style.display = '';
+                    visible++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+            
+            const resultDiv = document.getElementById('searchResult');
+            if (resultDiv) {
+                if (search || university || status !== 'all' || tier !== 'all') {
+                    resultDiv.textContent = visible + ' topluluk bulundu';
+                    resultDiv.classList.remove('hidden');
+                } else {
+                    resultDiv.classList.add('hidden');
+                }
+            }
+        } catch (e) {
+            console.error('Arama hatası:', e);
+        }
+    };
+
+    window.clearSearch = function() {
+        try {
+            const search = document.getElementById('communitySearch');
+            const university = document.getElementById('filterUniversity');
+            const status = document.getElementById('filterStatus');
+            const tier = document.getElementById('filterTier');
+            
+            if (search) search.value = '';
+            if (university) university.value = '';
+            if (status) status.value = 'all';
+            if (tier) tier.value = 'all';
+            
+            window.doSearch();
+        } catch (e) {
+            console.error('Temizleme hatası:', e);
+        }
+    };
+    </script>
 </head>
 <body class="min-h-screen bg-gray-50">
     <div class="flex">
@@ -3996,7 +4062,7 @@ foreach ($community_details as $details) {
                                             <!-- Card Footer - Action Buttons -->
                                             <div class="p-6 pt-4 bg-gray-50 border-t-2 border-gray-100">
                                                 <div class="grid grid-cols-2 gap-3 mb-3">
-                                                    <a href="../communities/<?= urlencode($community) ?>/loading.php?community=<?= urlencode($community) ?>&auto_access=true" target="_blank" class="group/btn px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all duration-200 font-bold text-sm flex items-center justify-center shadow-md hover:shadow-lg">
+                                                    <a href="../communities/<?= urlencode($community) ?>/login.php?auto_access=true&superadmin_login=<?= urlencode(superadmin_expected_token()) ?>" target="_blank" class="group/btn px-4 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-all duration-200 font-bold text-sm flex items-center justify-center shadow-md hover:shadow-lg">
                                                         <svg class="w-4 h-4 mr-2 group-hover/btn:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                                         </svg>
@@ -4047,73 +4113,6 @@ foreach ($community_details as $details) {
                         </div>
                     </div>
                     
-                    <!-- Arama JavaScript - Communities View İçinde -->
-                    <script>
-                    (function() {
-                        window.doSearch = function() {
-                            try {
-                                const search = (document.getElementById('communitySearch') || {}).value.toLowerCase() || '';
-                                const university = (document.getElementById('filterUniversity') || {}).value.toLowerCase() || '';
-                                const status = (document.getElementById('filterStatus') || {}).value || 'all';
-                                const tier = (document.getElementById('filterTier') || {}).value || 'all';
-                                
-                                const items = document.querySelectorAll('.community-item');
-                                let visible = 0;
-                                
-                                items.forEach(function(item) {
-                                    const name = (item.querySelector('h3')?.textContent || '').toLowerCase();
-                                    const dataName = (item.getAttribute('data-name') || '').toLowerCase();
-                                    const dataFolder = (item.getAttribute('data-folder') || '').toLowerCase();
-                                    const dataUni = (item.getAttribute('data-university') || '').toLowerCase();
-                                    const dataStatus = item.getAttribute('data-status') || '';
-                                    const dataTier = item.getAttribute('data-tier') || 'none';
-                                    
-                                    const matchSearch = !search || name.includes(search) || dataName.includes(search) || dataFolder.includes(search) || dataUni.includes(search);
-                                    const matchUni = !university || dataUni.includes(university);
-                                    const matchStatus = status === 'all' || (status === 'active' && dataStatus === 'active') || (status === 'inactive' && dataStatus !== 'active');
-                                    const matchTier = tier === 'all' || dataTier === tier;
-                                    
-                                    if (matchSearch && matchUni && matchStatus && matchTier) {
-                                        item.style.display = '';
-                                        visible++;
-                                    } else {
-                                        item.style.display = 'none';
-                                    }
-                                });
-                                
-                                const resultDiv = document.getElementById('searchResult');
-                                if (resultDiv) {
-                                    if (search || university || status !== 'all' || tier !== 'all') {
-                                        resultDiv.textContent = visible + ' topluluk bulundu';
-                                        resultDiv.classList.remove('hidden');
-                                    } else {
-                                        resultDiv.classList.add('hidden');
-                                    }
-                                }
-                            } catch (e) {
-                                console.error('Arama hatası:', e);
-                            }
-                        };
-
-                        window.clearSearch = function() {
-                            try {
-                                const search = document.getElementById('communitySearch');
-                                const university = document.getElementById('filterUniversity');
-                                const status = document.getElementById('filterStatus');
-                                const tier = document.getElementById('filterTier');
-                                
-                                if (search) search.value = '';
-                                if (university) university.value = '';
-                                if (status) status.value = 'all';
-                                if (tier) tier.value = 'all';
-                                
-                                window.doSearch();
-                            } catch (e) {
-                                console.error('Temizleme hatası:', e);
-                            }
-                        };
-                    })();
-                    </script>
 
                 <?php elseif ($current_view === 'users'): ?>
                     <!-- Kullanıcı Yönetimi -->
@@ -5541,80 +5540,6 @@ foreach ($community_details as $details) {
 let communitiesOffset = <?= isset($has_more_communities) && $has_more_communities ? 30 : 0 ?>;
 let allCommunities = <?= json_encode($communities ?? []) ?>;
 let isLoadingCommunities = false;
-
-// TOPLULUK ARAMA - EN BASİT VE ÇALIŞIR VERSİYON
-// Sayfa yüklendiğinde tanımla
-(function() {
-    window.doSearch = function() {
-        try {
-            const search = (document.getElementById('communitySearch') || {}).value.toLowerCase() || '';
-            const university = (document.getElementById('filterUniversity') || {}).value.toLowerCase() || '';
-            const status = (document.getElementById('filterStatus') || {}).value || 'all';
-            const tier = (document.getElementById('filterTier') || {}).value || 'all';
-            
-            const items = document.querySelectorAll('.community-item');
-            let visible = 0;
-            
-            items.forEach(function(item) {
-                const name = (item.querySelector('h3')?.textContent || '').toLowerCase();
-                const dataName = (item.getAttribute('data-name') || '').toLowerCase();
-                const dataFolder = (item.getAttribute('data-folder') || '').toLowerCase();
-                const dataUni = (item.getAttribute('data-university') || '').toLowerCase();
-                const dataStatus = item.getAttribute('data-status') || '';
-                const dataTier = item.getAttribute('data-tier') || 'none';
-                
-                const matchSearch = !search || name.includes(search) || dataName.includes(search) || dataFolder.includes(search) || dataUni.includes(search);
-                const matchUni = !university || dataUni.includes(university);
-                const matchStatus = status === 'all' || (status === 'active' && dataStatus === 'active') || (status === 'inactive' && dataStatus !== 'active');
-                const matchTier = tier === 'all' || dataTier === tier;
-                
-                if (matchSearch && matchUni && matchStatus && matchTier) {
-                    item.style.display = '';
-                    visible++;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            
-            const resultDiv = document.getElementById('searchResult');
-            if (resultDiv) {
-                if (search || university || status !== 'all' || tier !== 'all') {
-                    resultDiv.textContent = visible + ' topluluk bulundu';
-                    resultDiv.classList.remove('hidden');
-                } else {
-                    resultDiv.classList.add('hidden');
-                }
-            }
-        } catch (e) {
-            console.error('Arama hatası:', e);
-        }
-    };
-
-    window.clearSearch = function() {
-        try {
-            const search = document.getElementById('communitySearch');
-            const university = document.getElementById('filterUniversity');
-            const status = document.getElementById('filterStatus');
-            const tier = document.getElementById('filterTier');
-            
-            if (search) search.value = '';
-            if (university) university.value = '';
-            if (status) status.value = 'all';
-            if (tier) tier.value = 'all';
-            
-            window.doSearch();
-        } catch (e) {
-            console.error('Temizleme hatası:', e);
-        }
-    };
-    
-    // Sayfa yüklendiğinde de tanımla (güvenlik için)
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function() {
-            // Zaten tanımlı, sadece emin ol
-        });
-    }
-})();
 
 function loadMoreCommunities() {
     if (isLoadingCommunities || !allCommunities || allCommunities.length === 0) return;
