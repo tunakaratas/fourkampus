@@ -5382,7 +5382,7 @@ foreach ($community_details as $details) {
                                     <button type="submit" class="flex-1 px-4 py-2.5 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-150 font-semibold">
                                         Kaydet
                                     </button>
-                                    <button type="button" onclick="closeAddPresidentModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 font-semibold">
+                                        <button type="button" onclick="window.closeAddPresidentModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 font-semibold">
                                         İptal
                                     </button>
                                 </div>
@@ -6962,7 +6962,7 @@ function loadMoreSuperadminEvents() {
                         <button type="submit" class="flex-1 px-4 py-2.5 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-150 text-sm font-medium">
                             Planı Ata
                         </button>
-                        <button type="button" onclick="closeAssignPlanSmsModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 text-sm">
+                        <button type="button" onclick="window.closeAssignPlanSmsModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 text-sm">
                             İptal
                         </button>
                     </div>
@@ -7025,7 +7025,7 @@ function loadMoreSuperadminEvents() {
                         <button type="submit" class="flex-1 px-4 py-2.5 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-150 text-sm font-medium">
                             SMS Paketini Tahsis Et
                         </button>
-                        <button type="button" onclick="closeAssignPlanSmsModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 text-sm">
+                        <button type="button" onclick="window.closeAssignPlanSmsModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 text-sm">
                             İptal
                         </button>
                     </div>
@@ -7133,7 +7133,7 @@ function loadMoreSuperadminEvents() {
                     <button type="submit" class="flex-1 px-4 py-2.5 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-150 text-sm font-medium">
                         Kaydet
                     </button>
-                    <button type="button" onclick="closeEditCommunityModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 text-sm">
+                    <button type="button" onclick="window.closeEditCommunityModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 text-sm">
                         İptal
                     </button>
                 </div>
@@ -7280,17 +7280,7 @@ function loadMoreSuperadminEvents() {
             }
         }
         
-        function closeEditCommunityModal() {
-            try {
-                const modal = document.getElementById('editCommunityModal');
-                if (modal) {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
-                }
-            } catch (error) {
-                console.error('closeEditCommunityModal hatası:', error);
-            }
-        }
+        // closeEditCommunityModal zaten window objesinde tanımlı (satır 7530), duplicate kaldırıldı
 
         function deleteCommunity(community) {
             if (!confirm('Bu topluluğu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!')) {
