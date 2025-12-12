@@ -7034,6 +7034,86 @@ function loadMoreSuperadminEvents() {
         </div>
     </div>
 
+    <!-- Başkan Ekle/Düzenle Modal - Global (tüm sayfalarda görünür) -->
+    <div id="addPresidentModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-2xl font-bold text-gray-800">Topluluk Başkanı</h3>
+                        <button onclick="window.closeAddPresidentModal()" class="text-gray-400 hover:text-gray-600 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <form method="POST" action="index.php?view=communities" id="addPresidentForm" class="p-6">
+                    <?= get_csrf_field() ?>
+                    <input type="hidden" name="action" value="create_president">
+                    <input type="hidden" name="community_folder" id="presidentCommunityFolder">
+                    
+                    <div class="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <p class="text-sm text-gray-600">
+                            <span class="font-medium">Topluluk:</span> 
+                            <span id="presidentCommunityName" class="text-purple-700 font-semibold"></span>
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <!-- Başkan Adı Soyadı -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Başkan Adı Soyadı <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="president_name" id="presidentName" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Örn: Ahmet Yılmaz">
+                        </div>
+                        
+                        <!-- E-posta ve Telefon - Yan Yana -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">E-posta</label>
+                                <input type="email" name="president_email" id="presidentEmail" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="ornek@email.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Telefon</label>
+                                <input type="tel" name="president_phone" id="presidentPhone" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="5XXXXXXXXX">
+                            </div>
+                        </div>
+                        
+                        <!-- Öğrenci No ve Bölüm - Yan Yana -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Öğrenci No</label>
+                                <input type="text" name="president_student_id" id="presidentStudentId" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="Örn: 202012345">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Bölüm</label>
+                                <select name="president_department" id="presidentDepartment" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                                    <option value="">Bölüm Seçiniz</option>
+                                    <?php
+                                    // Mevcut departments listesini kullan
+                                    foreach ($departments as $dept): ?>
+                                        <option value="<?= htmlspecialchars($dept) ?>"><?= htmlspecialchars($dept) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3 mt-6">
+                        <button type="submit" class="flex-1 px-4 py-2.5 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition duration-150 font-semibold">
+                            Kaydet
+                        </button>
+                        <button type="button" onclick="window.closeAddPresidentModal()" class="px-4 py-2.5 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition duration-150 font-semibold">
+                            İptal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Topluluk Düzenleme Modalı -->
     <div id="editCommunityModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl my-8 transform transition-all">
