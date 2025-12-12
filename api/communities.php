@@ -379,11 +379,21 @@ try {
             global $log_file, $log_enabled;
             if (!$log_enabled) return;
             $timestamp = date('Y-m-d H:i:s');
-            file_put_contents($log_file, "[{$timestamp}] {$message}\n", FILE_APPEND);
+            // Log dizinini oluştur (yoksa)
+            $log_dir = dirname($log_file);
+            if (!is_dir($log_dir)) {
+                @mkdir($log_dir, 0777, true);
+            }
+            @file_put_contents($log_file, "[{$timestamp}] {$message}\n", FILE_APPEND | LOCK_EX);
         }
         
         // Clear log at start of request
-        file_put_contents($log_file, "=== Communities API Debug Started ===\n");
+        // Log dizinini oluştur (yoksa)
+        $log_dir = dirname($log_file);
+        if (!is_dir($log_dir)) {
+            @mkdir($log_dir, 0777, true);
+        }
+        @file_put_contents($log_file, "=== Communities API Debug Started ===\n", LOCK_EX);
         
         // Debug log (her zaman - sorun tespiti için)
         error_log("Communities API: Üniversite filtresi aktif - Requested ID: '{$requested_university_id}'");
