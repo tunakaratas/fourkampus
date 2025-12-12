@@ -100,7 +100,8 @@ function get_requested_university_id() {
     }
 
     // Debug log
-    error_log("Communities API get_requested_university_id: Raw input: '{$_GET['university_id'] ?? ''}' -> After decode: '{$raw}' -> Normalized: '" . normalize_university_id($raw) . "'");
+    $raw_input = isset($_GET['university_id']) ? $_GET['university_id'] : (isset($_GET['university']) ? $_GET['university'] : '');
+    error_log("Communities API get_requested_university_id: Raw input: '{$raw_input}' -> After decode: '{$raw}' -> Normalized: '" . normalize_university_id($raw) . "'");
 
     return normalize_university_id($raw);
 }
