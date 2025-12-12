@@ -6912,8 +6912,13 @@ function loadMoreSuperadminEvents() {
             }
             
             // CSRF token'ı al
-            const csrfInput = document.querySelector('input[name="csrf_token"]');
+            const csrfInput = document.getElementById('csrf_token') || document.querySelector('input[name="csrf_token"]');
             const csrfToken = csrfInput ? csrfInput.value : '';
+            
+            if (!csrfToken) {
+                alert('Güvenlik hatası: CSRF token bulunamadı. Sayfayı yenileyip tekrar deneyin.');
+                return;
+            }
             
             // Form oluştur ve submit et
             const form = document.createElement('form');
@@ -6933,13 +6938,11 @@ function loadMoreSuperadminEvents() {
             form.appendChild(folderInput);
             
             // CSRF token ekle
-            if (csrfToken) {
-                const csrfInputField = document.createElement('input');
-                csrfInputField.type = 'hidden';
-                csrfInputField.name = 'csrf_token';
-                csrfInputField.value = csrfToken;
-                form.appendChild(csrfInputField);
-            }
+            const csrfInputField = document.createElement('input');
+            csrfInputField.type = 'hidden';
+            csrfInputField.name = 'csrf_token';
+            csrfInputField.value = csrfToken;
+            form.appendChild(csrfInputField);
             
             document.body.appendChild(form);
             form.submit();
