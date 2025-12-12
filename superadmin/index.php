@@ -2575,6 +2575,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $community_name = trim($_POST['community_name'] ?? '');
             $university = trim($_POST['university'] ?? '');
             $community_code = trim($_POST['community_code'] ?? '');
+            $admin_username = trim($_POST['admin_username'] ?? '');
+            $admin_password = trim($_POST['admin_password'] ?? '');
             $status = $_POST['status'] ?? 'active';
             
             if ($folder && isValidCommunityName($folder)) {
@@ -2597,7 +2599,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             $stmt->execute();
                         }
                         
-                        if ($community_code) {
+                        if ($community_code !== '') {
                             $stmt = $db->prepare("INSERT OR REPLACE INTO settings (club_id, setting_key, setting_value) VALUES (1, 'community_code', ?)");
                             $stmt->bindValue(1, $community_code, SQLITE3_TEXT);
                             $stmt->execute();
@@ -2607,6 +2609,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $stmt = $db->prepare("INSERT OR REPLACE INTO settings (club_id, setting_key, setting_value) VALUES (1, 'status', ?)");
                         $stmt->bindValue(1, $status, SQLITE3_TEXT);
                         $stmt->execute();
+                        
+                        // Admin kullanıcı adı güncelleme
+                        if ($admin_username) {
+                            // Admins tablosunu kontrol et
+                            $admin_table_exists = (bool) @$db->querySingle("SELECT name FROM sqlite_master WHERE type='table' AND name='admins'");
+                            if ($admin_table_exists) {
+                                $stmt = $db->prepare("UPDATE admins SET username = ? WHERE club_id = 1");
+                                $stmt->bindValue(1, $admin_username, SQLITE3_TEXT);
+                                $stmt->execute();
+                            }
+                        }
+                        
+                        // Admin şifre güncelleme (sadece şifre girildiyse)
+                        if ($admin_password && !empty(trim($admin_password))) {
+                            $admin_table_exists = (bool) @$db->querySingle("SELECT name FROM sqlite_master WHERE type='table' AND name='admins'");
+                            if ($admin_table_exists) {
+                                $hashed_password = password_hash($admin_password, PASSWORD_DEFAULT);
+                                $stmt = $db->prepare("UPDATE admins SET password_hash = ? WHERE club_id = 1");
+                                $stmt->bindValue(1, $hashed_password, SQLITE3_TEXT);
+                                $stmt->execute();
+                            }
+                        }
                         
                         $db->close();
                         $success = "Topluluk başarıyla güncellendi!";
@@ -7042,11 +7066,14 @@ function loadMoreSuperadminEvents() {
                 
                 // Form alanlarını doldur
                 document.getElementById('editCommunityFolder').value = communityFolder;
+                document.getElementById('editCommunityFolderDisplay').value = communityFolder;
                 document.getElementById('editCommunityFolderName').textContent = 'Klasör: ' + communityFolder;
                 document.getElementById('editCommunityName').value = communityData.name || '';
                 document.getElementById('editCommunityUniversity').value = communityData.university || '';
-                document.getElementById('editCommunityCode').value = communityData.code || '';
-                document.getElementById('editCommunityStatus').value = communityData.status === 'active' ? 'active' : 'inactive';
+                document.getElementById('editCommunityCode').value = communityData.community_code || communityData.code || '';
+                document.getElementById('editCommunityAdminUsername').value = (communityData.admin && communityData.admin.username) ? communityData.admin.username : '';
+                document.getElementById('editCommunityAdminPassword').value = ''; // Şifre gösterilmez
+                document.getElementById('editCommunityStatus').value = (communityData.status === 'active' || !communityData.status) ? 'active' : 'inactive';
                 
                 // Modal'ı göster
                 modal.classList.remove('hidden');
