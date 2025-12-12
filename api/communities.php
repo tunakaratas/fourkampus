@@ -395,7 +395,12 @@ try {
             if (!is_dir($log_dir)) {
                 @mkdir($log_dir, 0777, true);
             }
-            @file_put_contents($log_file, "[{$timestamp}] {$message}\n", FILE_APPEND | LOCK_EX);
+            // Log dosyasına yazmayı dene
+            $result = @file_put_contents($log_file, "[{$timestamp}] {$message}\n", FILE_APPEND | LOCK_EX);
+            // Eğer yazma başarısız olursa, error_log'a da yaz
+            if ($result === false) {
+                error_log("Communities API: Log dosyasına yazılamadı: {$log_file} - Mesaj: {$message}");
+            }
         }
         
         // Clear log at start of request
