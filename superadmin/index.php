@@ -3736,7 +3736,7 @@ foreach ($community_details as $details) {
                                                 <svg class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                                 </svg>
-                                                <button onclick="if(typeof filterCommunities === 'function') filterCommunities();" class="absolute right-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 text-sm font-semibold">
+                                                <button id="searchCommunityBtn" onclick="if(typeof window.filterCommunities === 'function') { window.filterCommunities(); } return false;" class="absolute right-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 text-sm font-semibold">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                                     </svg>
@@ -3753,7 +3753,7 @@ foreach ($community_details as $details) {
                                                 <svg class="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-blue-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                                                 </svg>
-                                                <button onclick="if(typeof filterCommunities === 'function') filterCommunities();" class="absolute right-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 text-sm font-semibold">
+                                                <button id="searchUniversityBtn" onclick="if(typeof window.filterCommunities === 'function') { window.filterCommunities(); } return false;" class="absolute right-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 flex items-center gap-2 shadow-md hover:shadow-lg transform hover:scale-105 text-sm font-semibold">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                                     </svg>
@@ -5573,8 +5573,6 @@ let isLoadingCommunities = false;
             }
         });
         
-        console.log('Gösterilen topluluk sayısı:', visibleCount);
-        
         // Sonuç sayısını güncelle
         if (filteredCount) {
             const hasActiveFilters = searchTerm || universityTerm || statusFilter !== 'all' || tierFilter !== 'all';
@@ -5678,19 +5676,15 @@ let isLoadingCommunities = false;
     
     // Sayfa yüklendiğinde başlat
     function init() {
-        console.log('Filtreleme sistemi başlatılıyor...');
-        
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(function() {
                     setupAllListeners();
-                    console.log('Event listener\'lar kuruldu');
                 }, 500);
             });
         } else {
             setTimeout(function() {
                 setupAllListeners();
-                console.log('Event listener\'lar kuruldu (DOM zaten yüklü)');
             }, 500);
         }
     }
@@ -5703,7 +5697,6 @@ let isLoadingCommunities = false;
         const communitiesListContainer = document.getElementById('communitiesList');
         if (communitiesListContainer) {
             const observer = new MutationObserver(function() {
-                console.log('DOM değişikliği tespit edildi, arama yeniden çalıştırılıyor...');
                 performSearch();
             });
             
