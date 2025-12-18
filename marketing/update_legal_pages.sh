@@ -38,7 +38,7 @@ HEADER_HTML='    <!-- Layered Header -->
         <div class="header-bottom-layer">
             <div class="header-bottom-content">
                 <a href="index.html" class="header-logo">
-                    <img src="../nobackground_logo.png" alt="Four Kampüs" class="header-logo-img">
+                    <img src="../assets/images/brand/nobackground_logo.png" alt="Four Kampüs" class="header-logo-img">
                     <span>Four Kampüs</span>
                 </a>
                 <ul class="header-nav-menu">

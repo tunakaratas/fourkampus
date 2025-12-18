@@ -4205,7 +4205,7 @@ $partner_logos = get_partner_logos();
             <div class="flex flex-col items-center justify-center p-4 mb-8 border-b border-gray-300 dark:border-gray-700">
                 <!-- Ana Logo ve İşbirliği Logosu -->
                 <div class="flex items-center justify-center logo-container">
-                    <img src="assets/images/logo_tr.png" alt="Four Software Logo" class="w-16 h-16">
+                    <img src="assets/images/brand/logo_tr.png" alt="Four Software Logo" class="w-16 h-16">
                     
                     <?php if (!empty($partner_logos)): ?>
                         <?php $partner_logo = $partner_logos[0]; ?>
@@ -7440,7 +7440,7 @@ $partner_logos = get_partner_logos();
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('ACİL BİLDİRİM: ' + notification.title, {
                 body: notification.message,
-                icon: 'assets/images/logo_tr.png',
+                icon: 'assets/images/brand/logo_tr.png',
                 tag: 'urgent-notification'
             });
         }
@@ -7488,7 +7488,7 @@ $partner_logos = get_partner_logos();
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(title, {
                 body: message,
-                icon: 'assets/images/logo_tr.png'
+                icon: 'assets/images/brand/logo_tr.png'
             });
         }
         
@@ -7712,7 +7712,7 @@ $partner_logos = get_partner_logos();
                         // Test bildirimi gönder
                         new Notification('Bildirim Sistemi Aktif', {
                             body: 'Artık yeni bildirimler alacaksınız!',
-                            icon: 'assets/images/logo_tr.png'
+                            icon: 'assets/images/brand/logo_tr.png'
                         });
                     } else {
                         showNotification('Bildirim izni reddedildi', 'Bildirimleri tarayıcı ayarlarından açabilirsiniz.', 'warning');
@@ -8057,7 +8057,7 @@ $partner_logos = get_partner_logos();
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(notification.title, {
                 body: notification.message,
-                icon: 'assets/images/logo_tr.png'
+                icon: 'assets/images/brand/logo_tr.png'
             });
         }
     }

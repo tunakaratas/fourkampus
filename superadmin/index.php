@@ -1087,7 +1087,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                                     }
                                     @chmod($public_dir, SUPERADMIN_PUBLIC_DIR_PERMS);
                                     
-                                    $logo_source = __DIR__ . '/../assets/images/logo_tr.png';
+                                    $logo_source = __DIR__ . '/../assets/images/brand/logo_tr.png';
                                     $logo_target_dir = $full_path . '/assets/images/';
                                     $logo_target = $logo_target_dir . 'logo_tr.png';
                                     
@@ -1742,9 +1742,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                                         @mkdir($full_path . '/assets/videos/events', SUPERADMIN_PUBLIC_DIR_PERMS, true);
                                         
                                         // Logo kopyala
-                                        $logo_source = __DIR__ . '/../assets/images/logo_tr.png';
+                                        $logo_source = __DIR__ . '/../assets/images/brand/logo_tr.png';
                                         if (file_exists($logo_source)) {
-                                            copy($logo_source, $full_path . '/assets/images/logo_tr.png');
+                                            copy($logo_source, $full_path . '/assets/images/brand/logo_tr.png');
                                         }
                                         
                                         // Veritabanı oluştur

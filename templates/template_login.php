@@ -2504,7 +2504,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                         <div class="auth-brand-logo">
                             <?php 
                             // Logo yolunu hesapla - basit ve güvenilir yol
-                            $logo_path = dirname(__DIR__) . '/nobackground_logo.png';
+                            $logo_path = dirname(__DIR__) . '/assets/images/brand/nobackground_logo.png';
                             
                             // REQUEST_URI'den base path'i çıkar
                             $request_uri = $_SERVER['REQUEST_URI'] ?? '';
@@ -2528,7 +2528,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                             
                             // Logo URL'i oluştur
                             if (file_exists($logo_path)) {
-                                $logo_url = $protocol . '://' . $host . $base_path . 'nobackground_logo.png';
+                                $logo_url = $protocol . '://' . $host . $base_path . 'assets/images/brand/nobackground_logo.png';
                             } else {
                                 $logo_url = 'https://www.caddedoner.com/foursoftware-light.png';
                             }

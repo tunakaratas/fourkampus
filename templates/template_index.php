@@ -7307,7 +7307,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
             <div class="flex flex-col items-center justify-center p-4 mb-8 border-b border-gray-300">
                 <!-- Ana Logo ve Four Kampüs İsmi -->
                 <div class="flex flex-col items-center justify-center logo-container">
-                    <img src="assets/images/logo_tr.png" alt="Four Kampüs Logo" class="w-16 h-16 mb-2">
+                    <img src="assets/images/brand/logo_tr.png" alt="Four Kampüs Logo" class="w-16 h-16 mb-2">
                     <h2 class="text-lg font-bold text-gray-800">Four Kampüs</h2>
                 </div>
             </div>
@@ -19142,7 +19142,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification('ACİL BİLDİRİM: ' + notification.title, {
                 body: notification.message,
-                icon: 'assets/images/logo_tr.png',
+                icon: 'assets/images/brand/logo_tr.png',
                 tag: 'urgent-notification'
             });
         }
@@ -19190,7 +19190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(title, {
                 body: message,
-                icon: 'assets/images/logo_tr.png'
+                icon: 'assets/images/brand/logo_tr.png'
             });
         }
         
@@ -19456,7 +19456,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                         // Test bildirimi gönder
                         new Notification('Bildirim Sistemi Aktif', {
                             body: 'Artık yeni bildirimler alacaksınız!',
-                            icon: 'assets/images/logo_tr.png'
+                            icon: 'assets/images/brand/logo_tr.png'
                         });
                     } else {
                         showNotification('Bildirim izni reddedildi', 'Bildirimleri tarayıcı ayarlarından açabilirsiniz.', 'warning');
@@ -19826,7 +19826,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         if ('Notification' in window && Notification.permission === 'granted') {
             new Notification(notification.title, {
                 body: notification.message,
-                icon: 'assets/images/logo_tr.png'
+                icon: 'assets/images/brand/logo_tr.png'
             });
         }
     }

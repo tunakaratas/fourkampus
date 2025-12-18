@@ -183,10 +183,10 @@ for ($i = 0; $i < 30; $i++) {
         @mkdir($fullPath . '/assets/videos/events', SUPERADMIN_PUBLIC_DIR_PERMS, true);
         
         // Logo kopyala (varsa)
-        $logoSource = BASE_PATH . '/assets/images/logo_tr.png';
+        $logoSource = BASE_PATH . '/assets/images/brand/logo_tr.png';
         if (file_exists($logoSource)) {
             @mkdir($fullPath . '/assets/images', SUPERADMIN_PUBLIC_DIR_PERMS, true);
-            copy($logoSource, $fullPath . '/assets/images/logo_tr.png');
+            copy($logoSource, $fullPath . '/assets/images/brand/logo_tr.png');
         }
         
         // Veritabanı oluştur
