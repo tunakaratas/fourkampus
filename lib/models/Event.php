@@ -52,6 +52,46 @@ class Event {
             return [];
         }
     }
+
+    /**
+     * Etkinlikleri sayfalı getir (Lazy Loading için)
+     * 
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function getPaginated($limit = 20, $offset = 0) {
+        try {
+            $table_check = @$this->db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='events'");
+            if (!$table_check || !$table_check->fetchArray()) {
+                return [];
+            }
+            
+            $stmt = @$this->db->prepare("
+                SELECT * FROM events 
+                WHERE club_id = ? 
+                ORDER BY date DESC, time DESC
+                LIMIT ? OFFSET ?
+            ");
+            if (!$stmt) return [];
+            
+            $stmt->bindValue(1, $this->clubId, SQLITE3_INTEGER);
+            $stmt->bindValue(2, (int)$limit, SQLITE3_INTEGER);
+            $stmt->bindValue(3, (int)$offset, SQLITE3_INTEGER);
+            
+            $result = $stmt->execute();
+            if (!$result) return [];
+            
+            $events = [];
+            while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+                $events[] = $row;
+            }
+            return $events;
+        } catch (\Exception $e) {
+            error_log("Event::getPaginated() error: " . $e->getMessage());
+            return [];
+        }
+    }
     
     /**
      * ID'ye göre etkinlik getir

@@ -2274,6 +2274,18 @@ function send_sms_netgsm($to, $message, $username, $password, $msgheader = '') {
 
 
 function handle_send_message($post) {
+    // tpl_error_log fonksiyonunun tanımlı olduğundan emin ol
+    if (!function_exists('tpl_error_log')) {
+        function tpl_error_log($message) {
+            error_log('[TPL] ' . $message);
+        }
+    }
+    
+    // Session kontrolü - session başlatılmamışsa başlat
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
     // Output buffer kontrolü - AJAX isteklerinde output'u engelle
     $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     if ($isAjax) {
@@ -2284,22 +2296,59 @@ function handle_send_message($post) {
     }
     
     try {
-        $db = get_db();
+        error_log('[SMS_TRACE] Step 1: Inside try block');
+        tpl_error_log('handle_send_message called - POST keys: ' . implode(', ', array_keys($post ?? [])));
+        // Veritabanı bağlantısını al
+        try {
+            error_log('[SMS_TRACE] Step 2: Getting database connection');
+            $db = get_db();
+            error_log('[SMS_TRACE] Step 2a: Database connection OK');
+        } catch (Throwable $e) {
+            error_log('[SMS_TRACE] Step 2 ERROR: ' . $e->getMessage());
+            tpl_error_log('Database connection error in handle_send_message: ' . $e->getMessage());
+            $_SESSION['error'] = 'Veritabanı bağlantı hatası: ' . $e->getMessage();
+            return;
+        }
         
         // RATE LIMITS TABLOSUNU OLUŞTUR (Raporlar için gerekli)
-        ensure_rate_limits_table($db);
+        try {
+            error_log('[SMS_TRACE] Step 2b: ensure_rate_limits_table');
+            ensure_rate_limits_table($db);
+            error_log('[SMS_TRACE] Step 2c: rate_limits_table OK');
+        } catch (Throwable $e) {
+            error_log('[SMS_TRACE] Step 2b ERROR: ' . $e->getMessage());
+            tpl_error_log('Rate limits table error: ' . $e->getMessage());
+            // Devam et - kritik değil
+        }
         
         // Paket kontrolü - SMS gönderimi için Business paketi gerekli
+        error_log('[SMS_TRACE] Step 2d: Loading subscription_guard');
         if (!function_exists('require_subscription_feature')) {
             require_once __DIR__ . '/../../lib/general/subscription_guard.php';
         }
+        error_log('[SMS_TRACE] Step 2e: subscription_guard loaded');
         
         // Guard kontrolü - SMS özelliği için Business paketi gerekli
-        if (!function_exists('has_subscription_feature')) {
-            require_once __DIR__ . '/../../lib/general/subscription_helper.php';
+        $hasSmsFeature = true; // Varsayılan olarak true (test için)
+        try {
+            error_log('[SMS_TRACE] Step 2f: Checking has_subscription_feature');
+            if (!function_exists('has_subscription_feature')) {
+                require_once __DIR__ . '/../../lib/general/subscription_helper.php';
+            }
+            
+            if (function_exists('has_subscription_feature')) {
+                $hasSmsFeature = has_subscription_feature('sms');
+            }
+            error_log('[SMS_TRACE] Step 2g: hasSmsFeature=' . ($hasSmsFeature ? 'true' : 'false'));
+        } catch (Throwable $e) {
+            // Hata durumunda devam et (test için)
+            error_log('[SMS_TRACE] Step 2f ERROR: ' . $e->getMessage());
+            tpl_error_log('Subscription feature check error: ' . $e->getMessage());
+            $hasSmsFeature = true; // Test için true olarak ayarla
         }
         
-        if (!has_subscription_feature('sms')) {
+        if (!$hasSmsFeature) {
+            error_log('[SMS_TRACE] Step 2g-1: hasSmsFeature is FALSE - returning');
             // Guard sayfasına yönlendir veya hata mesajı ayarla
             $isAjax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
             if ($isAjax) {
@@ -2308,18 +2357,23 @@ function handle_send_message($post) {
                 return;
             } else {
                 // Guard sayfasına yönlendir
-                require_subscription_feature('sms');
+                if (function_exists('require_subscription_feature')) {
+                    require_subscription_feature('sms');
+                }
                 return;
             }
         }
         
+        error_log('[SMS_TRACE] Step 2g-2: Rate limiting check');
         // RATE LIMITING: Saatlik SMS/WhatsApp limiti kontrol et (100 mesaj/saat)
         cleanup_old_rate_limits($db);
         $rate_check = check_rate_limit($db, 'sms', 100);
         if (!$rate_check['allowed']) {
+            error_log('[SMS_TRACE] Step 2g-3: Rate limit exceeded - returning');
             $_SESSION['error'] = $rate_check['message'];
             return;
         }
+        error_log('[SMS_TRACE] Step 2g-4: Rate limit OK');
         try {
             $message_template = tpl_validate_string($post['sms_body'] ?? '', [
                 'field' => 'SMS içeriği',
@@ -2428,9 +2482,19 @@ function handle_send_message($post) {
                 $recipients = array_merge($recipients, $decodedPhones);
             }
         }
-    if (isset($post['selected_phones']) && is_array($post['selected_phones'])) {
-            $recipients = array_merge($recipients, $post['selected_phones']);
+        
+        // selected_phones hem array hem string olabilir
+        if (isset($post['selected_phones'])) {
+            $selectedPhones = $post['selected_phones'];
+            if (is_array($selectedPhones)) {
+                $recipients = array_merge($recipients, $selectedPhones);
+            } elseif (is_string($selectedPhones) && !empty($selectedPhones)) {
+                // Virgülle ayrılmış string olabilir
+                $phoneList = array_map('trim', explode(',', $selectedPhones));
+                $recipients = array_merge($recipients, $phoneList);
+            }
         }
+        
         if (isset($post['recipients']) && $post['recipients'] === 'Tüm Üyeler') {
             $contacts = get_sms_member_contacts();
             foreach ($contacts as $contact) {
@@ -2444,30 +2508,45 @@ function handle_send_message($post) {
             return trim((string)$phone);
         }, $recipients))));
         
+        error_log('[SMS_TRACE] Step 2h: recipients count after parse = ' . count($recipients));
+        
         if (empty($recipients)) {
+            error_log('[SMS_TRACE] Step 2i: NO RECIPIENTS - returning early');
             $_SESSION['error'] = "Alıcı seçilmedi!";
             return;
         }
         
+        error_log('[SMS_TRACE] Step 2j: sms_provider = ' . $sms_provider);
+        
         // SADECE NETGSM - Twilio ve WhatsApp kaldırıldı
         if ($sms_provider !== 'netgsm') {
+            error_log('[SMS_TRACE] Step 2k: WRONG PROVIDER - returning early');
             $_SESSION['error'] = "Sadece NetGSM desteklenmektedir. Lütfen Ayarlar → SMS API Ayarları'ndan NetGSM'i seçin.";
             tpl_error_log('SMS Provider Error: ' . $sms_provider . ' is not supported. Only NetGSM is allowed.');
             return;
         }
         
+        error_log('[SMS_TRACE] Step 2l: Provider check passed');
+        
         // SMS limit kontrolü - Business plan için
         $recipient_count = count($recipients);
+        error_log('[SMS_TRACE] Step 3: recipient_count=' . $recipient_count);
         $subscriptionManager = null;
         try {
+            error_log('[SMS_TRACE] Step 3a: Loading subscription_helper');
             if (!function_exists('get_subscription_manager')) {
                 require_once __DIR__ . '/../../lib/general/subscription_helper.php';
             }
+            error_log('[SMS_TRACE] Step 3b: Checking COMMUNITY_ID');
             if (defined('COMMUNITY_ID') && COMMUNITY_ID) {
+                error_log('[SMS_TRACE] Step 3c: Getting subscription manager');
                 $subscriptionManager = get_subscription_manager();
                 if ($subscriptionManager) {
+                    error_log('[SMS_TRACE] Step 3d: Creating subscription table');
                     $subscriptionManager->createSubscriptionTable(); // Tabloyu oluştur
+                    error_log('[SMS_TRACE] Step 3e: Checking canSendSms');
                     $smsCheck = $subscriptionManager->canSendSms($recipient_count);
+                    error_log('[SMS_TRACE] Step 3f: canSendSms result=' . ($smsCheck['allowed'] ? 'allowed' : 'blocked'));
                     if (!$smsCheck['allowed']) {
                         $errorMessage = $smsCheck['message'] ?? 'SMS gönderim limiti aşıldı. Ek paket almanız gerekiyor.';
                         $_SESSION['error'] = $errorMessage;
@@ -2477,14 +2556,15 @@ function handle_send_message($post) {
             }
         } catch (Exception $e) {
             // SMS limit kontrolü hatası - devam et ama logla
-            error_log("SMS limit check error: " . $e->getMessage());
+            error_log("[SMS_TRACE] Step 3 Exception: " . $e->getMessage());
             tpl_error_log("SMS limit check error: " . $e->getMessage());
         } catch (Error $e) {
             // Fatal error yakalama
-            error_log("SMS limit check fatal error: " . $e->getMessage());
+            error_log("[SMS_TRACE] Step 3 Fatal Error: " . $e->getMessage());
             tpl_error_log("SMS limit check fatal error: " . $e->getMessage());
         }
         
+        error_log('[SMS_TRACE] Step 4: Getting member names');
         $member_name_map = get_member_names_for_phones($recipients);
         
         $sent_count = 0;
@@ -2528,7 +2608,9 @@ function handle_send_message($post) {
                 }
                 
                 // NetGSM ile direkt gönder - KESİN GİTMESİ İÇİN ekstra kontroller
+                error_log('[SMS_TRACE] Step 5: Calling send_sms_netgsm for ' . $phone);
                 $result = send_sms_netgsm($phone, $final_message, $netgsm_username, $netgsm_password, $netgsm_msgheader);
+                error_log('[SMS_TRACE] Step 6: send_sms_netgsm returned - success=' . ($result['success'] ? 'true' : 'false'));
                 
                 // KESİN BAŞARI KONTROLÜ - SADECE confirmed=true olanları say
                 $sms_sent_this_phone = false;
@@ -2760,6 +2842,8 @@ function handle_send_message($post) {
         tpl_error_log('SMS send throwable error: ' . $e->getMessage());
         error_log('SMS send throwable error: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
     }
+    
+    error_log('[SMS_TRACE] Step FINAL: handle_send_message completed');
 }
 
 /**

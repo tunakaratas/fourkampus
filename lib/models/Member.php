@@ -52,6 +52,46 @@ class Member {
             return [];
         }
     }
+
+    /**
+     * Üyeleri sayfalı getir (Lazy Loading için)
+     * 
+     * @param int $limit
+     * @param int $offset
+     * @return array
+     */
+    public function getPaginated($limit = 50, $offset = 0) {
+        try {
+            $table_check = @$this->db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='members'");
+            if (!$table_check || !$table_check->fetchArray()) {
+                return [];
+            }
+            
+            $stmt = @$this->db->prepare("
+                SELECT * FROM members 
+                WHERE club_id = ? 
+                ORDER BY registration_date DESC, full_name ASC
+                LIMIT ? OFFSET ?
+            ");
+            if (!$stmt) return [];
+            
+            $stmt->bindValue(1, $this->clubId, SQLITE3_INTEGER);
+            $stmt->bindValue(2, (int)$limit, SQLITE3_INTEGER);
+            $stmt->bindValue(3, (int)$offset, SQLITE3_INTEGER);
+            
+            $result = $stmt->execute();
+            if (!$result) return [];
+            
+            $members = [];
+            while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+                $members[] = $row;
+            }
+            return $members;
+        } catch (\Exception $e) {
+            error_log("Member::getPaginated() error: " . $e->getMessage());
+            return [];
+        }
+    }
     
     /**
      * ID'ye göre üye getir

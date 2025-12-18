@@ -26,14 +26,17 @@ function write_stub(string $filePath, string $view, bool $isPublic = false): boo
 {
     $directory = dirname($filePath);
     if (!is_dir($directory)) {
-        if (!mkdir($directory, 0777, true) && !is_dir($directory)) {
+        // Suppress mkdir warnings - they're not critical
+        if (!@mkdir($directory, 0777, true) && !is_dir($directory)) {
+            // Directory creation failed and doesn't exist - silently fail
             return false;
         }
         @chmod($directory, 0777);
     }
 
     $content = build_stub_content($view, $isPublic);
-    $result = file_put_contents($filePath, $content);
+    // Suppress warnings - these are not critical for operation
+    $result = @file_put_contents($filePath, $content);
 
     if ($result === false) {
         return false;

@@ -59,3 +59,15 @@ xcuserdata/
 # Backup files
 *.bak
 *.backup
+
+# System cache
+system/cache/
+
+# Debug/Test scripts
+test_*.php
+debug_*.php
+
+# Duplicate folders/backups
+* 2/
+* 3/
+* 4/
