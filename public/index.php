@@ -40,7 +40,7 @@ $publicCache = Cache::getInstance(__DIR__ . '/../system/cache');
 
 // Kullanıcı bilgilerini getir
 function get_user_profile($user_id) {
-    $db_path = __DIR__ . '/unipanel.sqlite';
+    $db_path = __DIR__ . '/fourkampus.sqlite';
     
     if (!file_exists($db_path)) {
         return null;
@@ -78,7 +78,7 @@ function get_user_profile($user_id) {
 
 // Kullanıcı bildirimlerini getir
 function get_user_notifications($user_id) {
-    $db_path = __DIR__ . '/unipanel.sqlite';
+    $db_path = __DIR__ . '/fourkampus.sqlite';
     
     if (!file_exists($db_path)) {
         return [];
@@ -108,7 +108,7 @@ function get_user_notifications($user_id) {
 
 // Kullanıcı bilgilerini güncelle
 function update_user_profile($user_id, $data) {
-    $db_path = __DIR__ . '/unipanel.sqlite';
+    $db_path = __DIR__ . '/fourkampus.sqlite';
     
     if (!file_exists($db_path)) {
         return ['success' => false, 'message' => 'Veritabanı bulunamadı'];
@@ -293,7 +293,7 @@ function get_all_communities($useCache = true) {
             continue;
         }
         
-        $db_path = $communities_dir . '/' . $dir . '/unipanel.sqlite';
+        $db_path = $communities_dir . '/' . $dir . '/fourkampus.sqlite';
         if (!file_exists($db_path)) {
             continue;
         }
@@ -456,7 +456,7 @@ function get_public_market_products($limit = 36) {
             continue;
         }
         
-        $db_path = $folder . '/unipanel.sqlite';
+        $db_path = $folder . '/fourkampus.sqlite';
         if (!file_exists($db_path)) {
             continue;
         }
@@ -530,7 +530,7 @@ function get_public_market_products($limit = 36) {
             $image_url = null;
             if (!empty($row['image_path'])) {
                 // image_path formatı: assets/images/products/product_xxx.jpg
-                // Oluşturulacak URL: /unipanel/communities/{dirName}/assets/images/products/product_xxx.jpg
+                // Oluşturulacak URL: /fourkampus/communities/{dirName}/assets/images/products/product_xxx.jpg
                 $image_path = ltrim($row['image_path'], '/');
                 $image_url = build_public_asset_url('communities/' . $dirName . '/' . $image_path);
             }
@@ -607,10 +607,10 @@ function get_public_base_url() {
     // Script'in çalıştığı dizini bul (public klasörü)
     $scriptPath = $_SERVER['SCRIPT_NAME'] ?? '';
     
-    // /unipanel/public/index.php -> /unipanel
+    // /fourkampus/public/index.php -> /fourkampus
     // /public/index.php -> root
-    if (strpos($scriptPath, '/unipanel/public') !== false) {
-        $basePath = '/unipanel';
+    if (strpos($scriptPath, '/fourkampus/public') !== false) {
+        $basePath = '/fourkampus';
     } elseif (strpos($scriptPath, '/public') !== false) {
         // /public/index.php -> base path'i bul
         $basePath = str_replace('/public', '', dirname($scriptPath));
@@ -662,7 +662,7 @@ function get_public_events($limit = 8) {
         if (!is_dir($folder)) {
             continue;
         }
-        $db_path = $folder . '/unipanel.sqlite';
+        $db_path = $folder . '/fourkampus.sqlite';
         if (!file_exists($db_path)) {
             continue;
         }
@@ -833,7 +833,7 @@ function get_public_campaigns($limit = 6) {
     
     foreach ($community_folders as $folder) {
         $dirName = basename($folder);
-        $db_path = $folder . '/unipanel.sqlite';
+        $db_path = $folder . '/fourkampus.sqlite';
         if (!file_exists($db_path)) {
             continue;
         }
@@ -966,7 +966,7 @@ function get_community_data($community_id) {
         return null;
     }
     
-    $db_path = __DIR__ . '/../communities/' . $community_id . '/unipanel.sqlite';
+    $db_path = __DIR__ . '/../communities/' . $community_id . '/fourkampus.sqlite';
     
     if (!file_exists($db_path)) {
         return null;
@@ -1129,7 +1129,7 @@ function get_event_media($event_id, $community_id) {
     }
     
     $media = ['images' => [], 'videos' => []];
-    $db_path = __DIR__ . '/../communities/' . $community_id . '/unipanel.sqlite';
+    $db_path = __DIR__ . '/../communities/' . $community_id . '/fourkampus.sqlite';
     
     if (!file_exists($db_path)) {
         return $media;
@@ -1506,7 +1506,7 @@ function open_community_db($community_id) {
         return null;
     }
     
-    $db_path = __DIR__ . '/../communities/' . $community_id . '/unipanel.sqlite';
+    $db_path = __DIR__ . '/../communities/' . $community_id . '/fourkampus.sqlite';
     if (!file_exists($db_path)) {
         return null;
     }
@@ -1923,7 +1923,7 @@ function get_event_detail_data($community_id, $event_id) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniPanel - Topluluk Portalı</title>
+    <title>Four Kampüs - Topluluk Portalı</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <?php include __DIR__ . '/../templates/partials/tailwind_cdn_loader.php'; ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2442,7 +2442,7 @@ function get_event_detail_data($community_id, $event_id) {
                         </div>
                         <div>
                             <div class="text-lg sm:text-xl lg:text-2xl font-extrabold leading-none transition-colors" style="color: var(--text-primary);">
-                                UniPanel
+                                Four Kampüs
                             </div>
                             <p class="text-xs font-normal hidden sm:block mt-0.5" style="color: var(--text-secondary);">Topluluk Portalı</p>
                         </div>
@@ -4898,7 +4898,7 @@ function get_event_detail_data($community_id, $event_id) {
             }
         }
         
-        const MARKET_CART_STORAGE_KEY = 'unipanel_market_cart';
+        const MARKET_CART_STORAGE_KEY = 'fourkampus_market_cart';
         let marketCartInitialized = false;
         let marketCartState = { items: [] };
         
@@ -5451,9 +5451,9 @@ function get_event_detail_data($community_id, $event_id) {
             // QR kod içeriği
             let qrContentText = '';
             if (type === 'community') {
-                qrContentText = 'unifour://community/' + id;
+                qrContentText = 'fourkampus://community/' + id;
             } else if (type === 'event') {
-                qrContentText = 'unifour://event/' + (communityId || id) + '/' + id;
+                qrContentText = 'fourkampus://event/' + (communityId || id) + '/' + id;
             }
             qrContent.textContent = qrContentText;
             

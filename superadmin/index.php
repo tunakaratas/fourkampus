@@ -1,6 +1,6 @@
 <?php
 // =================================================================
-// SUPERADMIN PANELİ - Tam Özellikli Topluluk Yönetim Sistemi
+// SUPERADMIN PANELİ - Four Kampüs Topluluk Yönetim Sistemi
 // =================================================================
 
 $superadminConfig = require __DIR__ . '/config.php';
@@ -422,7 +422,7 @@ function getDiskUsagePercentage($total_space, $free_space) {
 
 // --- YAPILANDIRMA ---
 const COMMUNITIES_DIR = __DIR__ . '/../communities/';
-const SUPERADMIN_DB = __DIR__ . '/../unipanel.sqlite';
+const SUPERADMIN_DB = __DIR__ . '/../fourkampus.sqlite';
 
 // --- LOG SİSTEMİ FONKSİYONLARI ---
 function initLogDatabase() {
@@ -678,7 +678,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         if (empty($community_folder) || empty($president_name)) {
             $error = "Topluluk klasörü ve başkan adı zorunludur!";
         } else {
-            $db_path = COMMUNITIES_DIR . $community_folder . '/unipanel.sqlite';
+            $db_path = COMMUNITIES_DIR . $community_folder . '/fourkampus.sqlite';
             if (!file_exists($db_path)) {
                 $error = "Topluluk veritabanı bulunamadı!";
             } else {
@@ -757,7 +757,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         
         // Her hedef topluluğa bildirim gönder
         foreach ($target_list as $community) {
-            $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
+            $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
             if (file_exists($db_path)) {
                 try {
                     $db = new SQLite3($db_path);
@@ -977,7 +977,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                 $dirs = scandir(COMMUNITIES_DIR);
                 foreach ($dirs as $dir) {
                     if ($dir === '.' || $dir === '..') continue;
-                    $db_path = COMMUNITIES_DIR . $dir . '/unipanel.sqlite';
+                    $db_path = COMMUNITIES_DIR . $dir . '/fourkampus.sqlite';
                     if (file_exists($db_path)) {
                         try {
                             $check_db = new SQLite3($db_path);
@@ -1125,7 +1125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                                     @chmod($full_path . '/assets/images', SUPERADMIN_PUBLIC_DIR_PERMS);
                                     @chmod($full_path . '/assets/videos', SUPERADMIN_PUBLIC_DIR_PERMS);
                                     
-                                    $db_path = $full_path . '/unipanel.sqlite';
+                                    $db_path = $full_path . '/fourkampus.sqlite';
                                     $db = new SQLite3($db_path);
                                     
                                     $db->exec("CREATE TABLE IF NOT EXISTS admins (
@@ -1364,7 +1364,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                                                     'smtp_port' => (string)($smtp_config['port'] ?? 587),
                                                     'smtp_secure' => $smtp_config['encryption'] ?? 'tls',
                                                     'smtp_from_email' => $smtp_config['from_email'] ?? ($smtp_config['username'] ?? 'admin@foursoftware.com.tr'),
-                                                    'smtp_from_name' => $smtp_config['from_name'] ?? 'UniFour'
+                                                    'smtp_from_name' => $smtp_config['from_name'] ?? 'Four Kampüs'
                                                 ];
                                                 
                                                 foreach ($smtp_settings as $key => $value) {
@@ -1543,7 +1543,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                         $dirs = scandir(COMMUNITIES_DIR);
                         foreach ($dirs as $dir) {
                             if ($dir === '.' || $dir === '..') continue;
-                            $check_db_path = COMMUNITIES_DIR . $dir . '/unipanel.sqlite';
+                            $check_db_path = COMMUNITIES_DIR . $dir . '/fourkampus.sqlite';
                             if (file_exists($check_db_path)) {
                                 try {
                                     $check_db = new SQLite3($check_db_path);
@@ -1578,7 +1578,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                     $db->close();
                 } else {
                     $community_path = COMMUNITIES_DIR . $folder_name;
-                    $db_path = $community_path . '/unipanel.sqlite';
+                    $db_path = $community_path . '/fourkampus.sqlite';
                     
                     // Klasör varsa ama veritabanı yoksa (kayıt sırasında oluşturulmuş), sadece veritabanını oluştur
                     if (is_dir($community_path) && !file_exists($db_path)) {
@@ -1748,7 +1748,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                                         }
                                         
                                         // Veritabanı oluştur
-                                        $db_path = $full_path . '/unipanel.sqlite';
+                                        $db_path = $full_path . '/fourkampus.sqlite';
                                         $community_db = new SQLite3($db_path);
                                         $community_db->exec('PRAGMA journal_mode = WAL');
                                         
@@ -2059,7 +2059,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'verif
         exit;
     }
 
-    $dbPath = COMMUNITIES_DIR . $communityFolder . '/unipanel.sqlite';
+    $dbPath = COMMUNITIES_DIR . $communityFolder . '/fourkampus.sqlite';
     if (!file_exists($dbPath)) {
         header("Location: ?view=verification_admin&error=" . urlencode('Topluluk veritabanı bulunamadı.'));
         exit;
@@ -2375,7 +2375,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'assign_plan') {
         $error = "Geçersiz ay sayısı! (1-120 arası olmalı)";
     } else {
         $community_path = COMMUNITIES_DIR . $community_folder;
-        $db_path = $community_path . '/unipanel.sqlite';
+        $db_path = $community_path . '/fourkampus.sqlite';
         
         if (!is_dir($community_path)) {
             $error = "Topluluk klasörü bulunamadı!";
@@ -2450,7 +2450,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'assign_sms_package') {
         $error = "Geçersiz SMS paketi seçimi!";
     } else {
         $community_path = COMMUNITIES_DIR . $community_folder;
-        $db_path = $community_path . '/unipanel.sqlite';
+        $db_path = $community_path . '/fourkampus.sqlite';
         
         if (!is_dir($community_path)) {
             $error = "Topluluk klasörü bulunamadı!";
@@ -2525,7 +2525,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!isValidCommunityName($community)) {
                     $error = "Geçersiz topluluk adı!";
                 } else {
-                    $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
+                    $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
                     if (file_exists($db_path)) {
                         $db = new SQLite3($db_path);
                         $stmt = $db->prepare("UPDATE members SET is_banned = 1, ban_reason = ? WHERE id = ?");
@@ -2548,7 +2548,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!isValidCommunityName($community)) {
                     $error = "Geçersiz topluluk adı!";
                 } else {
-                    $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
+                    $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
                     if (file_exists($db_path)) {
                         $db = new SQLite3($db_path);
                         $stmt = $db->prepare("UPDATE members SET is_banned = 0, ban_reason = NULL WHERE id = ?");
@@ -2568,7 +2568,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (!isValidCommunityName($community)) {
                 $error = "Geçersiz topluluk adı!";
             } else {
-                $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
+                $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
                 
                 if (file_exists($db_path)) {
                     try {
@@ -2591,7 +2591,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (!isValidCommunityName($community)) {
                 $error = "Geçersiz topluluk adı!";
             } else {
-                $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
+                $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
                 
                 if (file_exists($db_path)) {
                     try {
@@ -2618,7 +2618,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $status = $_POST['status'] ?? 'active';
             
             if ($folder && isValidCommunityName($folder)) {
-                $db_path = COMMUNITIES_DIR . $folder . '/unipanel.sqlite';
+                $db_path = COMMUNITIES_DIR . $folder . '/fourkampus.sqlite';
                 
                 if (file_exists($db_path)) {
                     try {
@@ -2878,7 +2878,7 @@ if (empty($communities) && is_dir(COMMUNITIES_DIR)) {
             $communities[] = $dir;
             
             // Topluluk detaylarını al
-            $db_path = COMMUNITIES_DIR . $dir . '/unipanel.sqlite';
+            $db_path = COMMUNITIES_DIR . $dir . '/fourkampus.sqlite';
             if (file_exists($db_path)) {
                 try {
                     // Veritabanı dosyasının yazma izinlerini kontrol et ve düzelt
@@ -3223,7 +3223,7 @@ foreach ($community_details as $details) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperAdmin | Tam Özellikli Admin Paneli</title>
+    <title>Four Kampüs | SuperAdmin Paneli</title>
     <?php include __DIR__ . '/../templates/partials/tailwind_cdn_loader.php'; ?>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -3456,7 +3456,7 @@ foreach ($community_details as $details) {
         <aside class="fixed inset-y-0 left-0 z-30 w-64 bg-sidebar transform -translate-x-full lg:translate-x-0 transition duration-200 ease-in-out shadow-xl border-r border-gray-200">
             <div class="h-full flex flex-col p-4">
                 <div class="flex flex-col items-center justify-center p-4 mb-4 border-b border-gray-200">
-                    <img src="https://www.caddedoner.com/foursoftware-light.png" alt="Four Community Logo" class="w-16 h-16 mb-2">
+                    <img src="https://www.caddedoner.com/foursoftware-light.png" alt="Four Kampüs Logo" class="w-16 h-16 mb-2">
                     <h2 class="text-xl font-bold text-gray-800">SuperAdmin</h2>
                 </div>
                 <nav class="flex-1 space-y-2">
@@ -4068,7 +4068,7 @@ foreach ($community_details as $details) {
                     $community_name = ucwords(str_replace('_', ' ', $selected_community));
                     
                     if (is_dir($community_path)) {
-                        $db_path = $community_path . '/unipanel.sqlite';
+                        $db_path = $community_path . '/fourkampus.sqlite';
                         if (file_exists($db_path)) {
                             try {
                                 $db = new SQLite3($db_path);
@@ -4203,7 +4203,7 @@ foreach ($community_details as $details) {
                     $community_events = [];
                     
                     foreach ($communities as $community) {
-                        $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
+                        $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
                         if (file_exists($db_path)) {
                             try {
                                 $db = new SQLite3($db_path);
@@ -5552,7 +5552,7 @@ function loadMoreSuperadminEvents() {
                     $verificationItems = [];
 
                     foreach ($communities as $communityFolder) {
-                        $db_path = COMMUNITIES_DIR . $communityFolder . '/unipanel.sqlite';
+                        $db_path = COMMUNITIES_DIR . $communityFolder . '/fourkampus.sqlite';
                         if (!file_exists($db_path)) {
                             continue;
                         }
@@ -6134,10 +6134,10 @@ function loadMoreSuperadminEvents() {
                                                         // Eğer relative path ise (yüklenen fotoğraf), tam path'e çevir
                                                         if (strpos($image_src, '/assets/images/ads/') === 0) {
                                                             // Superadmin panelinden erişim için tam path
-                                                            $image_src = '/unipanel' . $image_src;
+                                                            $image_src = '/fourkampus' . $image_src;
                                                         } elseif (strpos($image_src, 'http://') !== 0 && strpos($image_src, 'https://') !== 0) {
                                                             // Eğer sadece dosya adı ise
-                                                            $image_src = '/unipanel/assets/images/ads/' . basename($image_src);
+                                                            $image_src = '/fourkampus/assets/images/ads/' . basename($image_src);
                                                         }
                                                         ?>
                                                         <img src="<?= htmlspecialchars($image_src) ?>" alt="<?= htmlspecialchars($ad['title']) ?>" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(to bottom right, #6366f1, #8b5cf6)'">
@@ -6521,9 +6521,9 @@ function loadMoreSuperadminEvents() {
                                     let previewUrl = imageUrl;
                                     // Eğer relative path ise tam URL'e çevir
                                     if (previewUrl.startsWith('/assets/images/ads/')) {
-                                        previewUrl = '/unipanel' + previewUrl;
+                                        previewUrl = '/fourkampus' + previewUrl;
                                     } else if (!previewUrl.startsWith('http://') && !previewUrl.startsWith('https://')) {
-                                        previewUrl = '/unipanel/assets/images/ads/' + previewUrl;
+                                        previewUrl = '/fourkampus/assets/images/ads/' + previewUrl;
                                     }
                                     imagePreview.innerHTML = '<img src="' + previewUrl + '" alt="Önizleme" class="w-32 h-32 object-cover rounded-lg border border-gray-300" onerror="this.style.display=\'none\'">';
                                 } else {
@@ -6538,9 +6538,9 @@ function loadMoreSuperadminEvents() {
                                     let previewUrl = logoUrl;
                                     // Eğer relative path ise tam URL'e çevir
                                     if (previewUrl.startsWith('/assets/images/ads/')) {
-                                        previewUrl = '/unipanel' + previewUrl;
+                                        previewUrl = '/fourkampus' + previewUrl;
                                     } else if (!previewUrl.startsWith('http://') && !previewUrl.startsWith('https://')) {
-                                        previewUrl = '/unipanel/assets/images/ads/' + previewUrl;
+                                        previewUrl = '/fourkampus/assets/images/ads/' + previewUrl;
                                     }
                                     logoPreview.innerHTML = '<img src="' + previewUrl + '" alt="Logo Önizleme" class="w-32 h-32 object-cover rounded-lg border border-gray-300" onerror="this.style.display=\'none\'">';
                                 } else {
@@ -6589,7 +6589,7 @@ function loadMoreSuperadminEvents() {
                     // Topluluk ayarlarını topla
                     $community_settings = [];
                     foreach ($communities as $community) {
-                        $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
+                        $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
                         if (file_exists($db_path)) {
                             try {
                                 $db = new SQLite3($db_path);
@@ -6630,7 +6630,7 @@ function loadMoreSuperadminEvents() {
                                         <div class="space-y-3">
                                             <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                                                 <span class="text-blue-700">Sistem Adı</span>
-                                                <span class="text-blue-600 font-semibold">Four Community SuperAdmin</span>
+                                                <span class="text-blue-600 font-semibold">Four Kampüs SuperAdmin</span>
                                             </div>
                                             <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                                                 <span class="text-blue-700">Versiyon</span>
@@ -6775,7 +6775,7 @@ function loadMoreSuperadminEvents() {
                                                         </div>
                                                         <div class="flex justify-between">
                                                             <span class="text-gray-600">Boyut:</span>
-                                                            <span class="font-medium"><?= round(filesize(COMMUNITIES_DIR . $community . '/unipanel.sqlite') / 1024, 1) ?> KB</span>
+                                                            <span class="font-medium"><?= round(filesize(COMMUNITIES_DIR . $community . '/fourkampus.sqlite') / 1024, 1) ?> KB</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -7984,7 +7984,7 @@ if ($updateBoardMembers) {
     $maxCommunities = 50; // Her seferinde max 50 topluluk güncelle
     
     foreach (array_slice($communities, 0, $maxCommunities) as $community) {
-        $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
+        $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
         
         if (!file_exists($db_path)) {
             $skipped++;

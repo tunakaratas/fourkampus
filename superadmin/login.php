@@ -150,7 +150,7 @@ function superadmin_send_verification_sms(string $phone, string $code): array {
     }
     
     $message = sprintf(
-        'UniFour SuperAdmin Güvenli Giriş Kodunuz: %s. Bu kod 10 dakika boyunca geçerlidir. Paylaşmayın.',
+        'Four Kampüs SuperAdmin Güvenli Giriş Kodunuz: %s. Bu kod 10 dakika boyunca geçerlidir. Paylaşmayın.',
         $code
     );
     
@@ -376,7 +376,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SuperAdmin Girişi - UniPanel</title>
+    <title>SuperAdmin Girişi - Four Kampüs</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -759,7 +759,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                             <i class="fas fa-shield-alt"></i>
                         </div>
                         <div>
-                            <h1>UniFour</h1>
+                            <h1>Four Kampüs</h1>
                             <p>SuperAdmin Paneli</p>
                         </div>
                     </div>
@@ -878,7 +878,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 <?php endif; ?>
                 
                 <div class="text-center mt-4">
-                    <p class="text-gray-500 text-xs">© 2025 UniFour - Tüm hakları saklıdır</p>
+                    <p class="text-gray-500 text-xs">© 2025 Four Kampüs - Tüm hakları saklıdır</p>
                 </div>
             </div>
         </div>

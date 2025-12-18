@@ -114,7 +114,7 @@ if (!function_exists('tpl_load_default_credentials')) {
                 'username' => '',
                 'password' => '',
                 'from_email' => '',
-                'from_name' => 'UniPanel',
+                'from_name' => 'Four Kampüs',
                 'encryption' => 'tls',
             ],
             'netgsm' => [
@@ -163,7 +163,7 @@ if (!function_exists('tpl_seed_default_comm_settings')) {
             'smtp_username' => $smtp['username'] ?? '',
             'smtp_password' => $smtp['password'] ?? '',
             'smtp_from_email' => $smtp['from_email'] ?? ($smtp['username'] ?? ''),
-            'smtp_from_name' => $smtp['from_name'] ?? 'UniPanel',
+            'smtp_from_name' => $smtp['from_name'] ?? 'Four Kampüs',
             'sms_provider' => 'netgsm',
             'netgsm_username' => $netgsm['username'] ?? '',
             'netgsm_password' => $netgsm['password'] ?? '',
@@ -1895,22 +1895,22 @@ function get_club_name() {
         // Önce settings tablosunun var olup olmadığını kontrol et
         $table_check = @$db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='settings'");
         if (!$table_check || !$table_check->fetchArray()) {
-            return 'UniPanel Kulübü';
+            return 'Four Kampüs Kulübü';
         }
         
         $stmt = @$db->prepare("SELECT setting_value FROM settings WHERE setting_key = 'club_name' AND club_id = :club_id");
         if (!$stmt) {
-            return 'UniPanel Kulübü';
+            return 'Four Kampüs Kulübü';
         }
     $stmt->bindValue(':club_id', CLUB_ID, SQLITE3_INTEGER);
     $result = $stmt->execute();
         if (!$result) {
-            return 'UniPanel Kulübü';
+            return 'Four Kampüs Kulübü';
         }
     $club_name = $result->fetchArray()[0] ?? null;
-    return $club_name ?: 'UniPanel Kulübü';
+    return $club_name ?: 'Four Kampüs Kulübü';
     } catch (Exception $e) {
-        return 'UniPanel Kulübü';
+        return 'Four Kampüs Kulübü';
     }
 }
 
@@ -12548,7 +12548,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             <div class="bg-white border border-gray-200 rounded-lg divide-y divide-gray-200">
                                                 <div class="flex justify-between items-center py-4 px-6">
                                                     <span class="text-gray-600">Versiyon</span>
-                                                    <span class="text-purple-600 font-medium">UniPanel v1.0</span>
+                                                    <span class="text-purple-600 font-medium">Four Kampüs v1.0</span>
                                                 </div>
                                                 <div class="flex justify-between items-center py-4 px-6">
                                                     <span class="text-gray-600">Veritabanı</span>
@@ -12703,12 +12703,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     <div class="space-y-8 text-gray-700">
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">1. Genel Bilgiler</h3>
-                                            <p class="text-gray-600 leading-relaxed">UniPanel, üniversite toplulukları için geliştirilmiş bir yönetim sistemidir. Bu gizlilik sözleşmesi, sisteminizin verilerini nasıl topladığımızı, kullandığımızı ve koruduğumuzu açıklar.</p>
+                                            <p class="text-gray-600 leading-relaxed">Four Kampüs, üniversite toplulukları için geliştirilmiş bir yönetim sistemidir. Bu gizlilik sözleşmesi, sisteminizin verilerini nasıl topladığımızı, kullandığımızı ve koruduğumuzu açıklar.</p>
                                             </section>
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">2. Toplanan Veriler</h3>
-                                            <p class="text-gray-600 mb-3">UniPanel sistemi aşağıdaki kişisel verileri toplar ve işler:</p>
+                                            <p class="text-gray-600 mb-3">Four Kampüs sistemi aşağıdaki kişisel verileri toplar ve işler:</p>
                                             <ul class="space-y-2 text-gray-600">
                                                 <li class="flex items-start">
                                                     <span class="text-purple-600 mr-2">•</span>
@@ -12735,7 +12735,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">3. Veri Güvenliği</h3>
-                                            <p class="text-gray-600 mb-3">UniPanel, verilerinizin güvenliğini sağlamak için aşağıdaki önlemleri alır:</p>
+                                            <p class="text-gray-600 mb-3">Four Kampüs, verilerinizin güvenliğini sağlamak için aşağıdaki önlemleri alır:</p>
                                             <ul class="space-y-2 text-gray-600">
                                                 <li class="flex items-start">
                                                     <span class="text-purple-600 mr-2">•</span>
@@ -12771,7 +12771,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">5. Veri Paylaşımı</h3>
-                                            <p class="text-gray-600 mb-3">UniPanel, verilerinizi üçüncü taraflarla paylaşmaz. Verileriniz sadece:</p>
+                                            <p class="text-gray-600 mb-3">Four Kampüs, verilerinizi üçüncü taraflarla paylaşmaz. Verileriniz sadece:</p>
                                             <ul class="space-y-2 text-gray-600">
                                                 <li class="flex items-start">
                                                     <span class="text-purple-600 mr-2">•</span>
@@ -12813,7 +12813,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">7. Çerezler</h3>
-                                            <p class="text-gray-600 leading-relaxed">UniPanel, oturum yönetimi için çerezler kullanır. Bu çerezler sadece sistem işlevselliği için gereklidir ve üçüncü taraf çerezler kullanılmaz.</p>
+                                            <p class="text-gray-600 leading-relaxed">Four Kampüs, oturum yönetimi için çerezler kullanır. Bu çerezler sadece sistem işlevselliği için gereklidir ve üçüncü taraf çerezler kullanılmaz.</p>
                                             </section>
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
@@ -12833,7 +12833,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     <div class="space-y-8 text-gray-700">
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">1. Genel Koşullar</h3>
-                                            <p class="text-gray-600 leading-relaxed">UniPanel sistemini kullanarak aşağıdaki şartları kabul etmiş sayılırsınız. Bu şartlara uymamanız durumunda hesabınız askıya alınabilir veya sonlandırılabilir.</p>
+                                            <p class="text-gray-600 leading-relaxed">Four Kampüs sistemini kullanarak aşağıdaki şartları kabul etmiş sayılırsınız. Bu şartlara uymamanız durumunda hesabınız askıya alınabilir veya sonlandırılabilir.</p>
                                             </section>
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
@@ -12892,12 +12892,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">4. İçerik Sorumluluğu</h3>
-                                            <p class="text-gray-600 leading-relaxed">Yüklediğiniz tüm içeriklerden (etkinlikler, görseller, videolar, mesajlar) siz sorumlusunuz. UniPanel, yüklenen içeriklerin doğruluğunu veya yasallığını garanti etmez.</p>
+                                            <p class="text-gray-600 leading-relaxed">Yüklediğiniz tüm içeriklerden (etkinlikler, görseller, videolar, mesajlar) siz sorumlusunuz. Four Kampüs, yüklenen içeriklerin doğruluğunu veya yasallığını garanti etmez.</p>
                                             </section>
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">5. Lisans ve Kullanım Süresi</h3>
-                                            <p class="text-gray-600 mb-3">UniPanel Professional Sürüm 365 günlük lisans ile sağlanır:</p>
+                                            <p class="text-gray-600 mb-3">Four Kampüs Professional Sürüm 365 günlük lisans ile sağlanır:</p>
                                             <ul class="space-y-2 text-gray-600">
                                                 <li class="flex items-start">
                                                     <span class="text-purple-600 mr-2">•</span>
@@ -12920,17 +12920,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">6. Veri Yedekleme</h3>
-                                            <p class="text-gray-600 leading-relaxed">Verilerinizin yedeklenmesinden topluluk yöneticisi sorumludur. UniPanel otomatik yedekleme özelliği sunar ancak ek yedekleme önerilir.</p>
+                                            <p class="text-gray-600 leading-relaxed">Verilerinizin yedeklenmesinden topluluk yöneticisi sorumludur. Four Kampüs otomatik yedekleme özelliği sunar ancak ek yedekleme önerilir.</p>
                                             </section>
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">7. Hizmet Kesintileri</h3>
-                                            <p class="text-gray-600 leading-relaxed">UniPanel, bakım veya teknik sorunlar nedeniyle hizmet kesintileri yaşayabilir. Bu durumlarda önceden bildirim yapılmasına çalışılır ancak garanti edilmez.</p>
+                                            <p class="text-gray-600 leading-relaxed">Four Kampüs, bakım veya teknik sorunlar nedeniyle hizmet kesintileri yaşayabilir. Bu durumlarda önceden bildirim yapılmasına çalışılır ancak garanti edilmez.</p>
                                             </section>
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">8. Değişiklikler</h3>
-                                            <p class="text-gray-600 leading-relaxed">UniPanel, bu kullanım şartlarını önceden haber vermeksizin değiştirme hakkını saklı tutar. Değişiklikler sistem içinde duyurulur.</p>
+                                            <p class="text-gray-600 leading-relaxed">Four Kampüs, bu kullanım şartlarını önceden haber vermeksizin değiştirme hakkını saklı tutar. Değişiklikler sistem içinde duyurulur.</p>
                                             </section>
                                             
                                         <section class="border-l-4 border-purple-500 pl-6">

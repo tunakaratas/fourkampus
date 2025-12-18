@@ -20,11 +20,11 @@ $webUrl = '';
 $fallbackUrl = '';
 
 if ($type === 'community' && !empty($id)) {
-    $deepLink = 'unifour://community/' . urlencode($id);
+    $deepLink = 'fourkampus://community/' . urlencode($id);
     $webUrl = '/communities/' . urlencode($id) . '/';
     $fallbackUrl = $webUrl;
 } elseif ($type === 'event' && !empty($id) && !empty($community_id)) {
-    $deepLink = 'unifour://event/' . urlencode($community_id) . '/' . urlencode($id);
+    $deepLink = 'fourkampus://event/' . urlencode($community_id) . '/' . urlencode($id);
     $webUrl = '/communities/' . urlencode($community_id) . '/?view=events&event_id=' . urlencode($id);
     $fallbackUrl = $webUrl;
 } else {
@@ -171,7 +171,7 @@ $fullDeepLink = $deepLink;
                     }, 500);
                 } else if (isAndroid) {
                     // Android için intent URL'i dene
-                    var intentUrl = 'intent://' + deepLink.replace('unifour://', '') + '#Intent;scheme=unifour;package=com.unifour.app;end';
+                    var intentUrl = 'intent://' + deepLink.replace('fourkampus://', '') + '#Intent;scheme=fourkampus;package=com.fourkampus.app;end';
                     window.location.href = intentUrl;
                     
                     setTimeout(function() {

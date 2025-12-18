@@ -144,10 +144,10 @@ if (!defined('COMMUNITY_BASE_PATH')) {
 // Her topluluk kendi veritabanını kullanmalı
 if (defined('COMMUNITY_BASE_PATH')) {
     // Topluluk klasörü belirlenmişse, o klasördeki veritabanını kullan
-    $DB_PATH = COMMUNITY_BASE_PATH . '/unipanel.sqlite';
+    $DB_PATH = COMMUNITY_BASE_PATH . '/fourkampus.sqlite';
 } else {
     // Fallback: Mevcut script'in bulunduğu klasördeki veritabanını kullan
-    $DB_PATH = __DIR__ . '/unipanel.sqlite';
+    $DB_PATH = __DIR__ . '/fourkampus.sqlite';
     
     // Eğer mevcut klasör communities/ içindeyse, o topluluğun veritabanını kullan
     $script_dir = dirname($_SERVER['SCRIPT_FILENAME'] ?? __FILE__);
@@ -160,7 +160,7 @@ if (defined('COMMUNITY_BASE_PATH')) {
         if (!empty($parts[0])) {
             $community_path = dirname(__DIR__) . '/communities/' . $parts[0];
             if (is_dir($community_path)) {
-                $DB_PATH = $community_path . '/unipanel.sqlite';
+                $DB_PATH = $community_path . '/fourkampus.sqlite';
             }
         }
     }
@@ -440,7 +440,7 @@ function get_club_name() {
             $folder_name = $parts[0] ?? '';
             
             if (!empty($folder_name)) {
-                $superadmin_db = dirname(__DIR__) . '/unipanel.sqlite';
+                $superadmin_db = dirname(__DIR__) . '/fourkampus.sqlite';
                 if (file_exists($superadmin_db)) {
                     $super_db = new SQLite3($superadmin_db);
                     $super_db->exec('PRAGMA journal_mode = WAL');
@@ -460,9 +460,9 @@ function get_club_name() {
             }
         }
         
-        return 'UniPanel Kulübü';
+        return 'Four Kampüs Kulübü';
     } catch (Exception $e) {
-        return 'UniPanel Kulübü';
+        return 'Four Kampüs Kulübü';
     }
 }
 
@@ -526,11 +526,11 @@ try {
         
         if (!empty($folder_name)) {
             // Veritabanı dosyası var mı kontrol et
-            $db_path = dirname(__DIR__) . '/communities/' . $folder_name . '/unipanel.sqlite';
+            $db_path = dirname(__DIR__) . '/communities/' . $folder_name . '/fourkampus.sqlite';
             
             if (!file_exists($db_path)) {
                 // Veritabanı yoksa, superadmin veritabanında talep durumunu kontrol et
-                $superadmin_db = dirname(__DIR__) . '/unipanel.sqlite';
+                $superadmin_db = dirname(__DIR__) . '/fourkampus.sqlite';
                 if (file_exists($superadmin_db)) {
                     $super_db = new SQLite3($superadmin_db);
                     $super_db->exec('PRAGMA journal_mode = WAL');
@@ -708,7 +708,7 @@ function resolve_verification_phone(SQLite3 $db) {
     }
     
     if (!empty($folder_name)) {
-        $superadmin_db = dirname(__DIR__) . '/unipanel.sqlite';
+        $superadmin_db = dirname(__DIR__) . '/fourkampus.sqlite';
         if (file_exists($superadmin_db)) {
             try {
                 $super_db = new SQLite3($superadmin_db);
@@ -909,13 +909,13 @@ function send_login_verification_sms(SQLite3 $db, $admin_phone, $verification_co
         
         // Club name'i al (mesaj için)
         try {
-        $club_name = login_get_setting($db, 'club_name', 'UniPanel', false);
+        $club_name = login_get_setting($db, 'club_name', 'Four Kampüs', false);
         } catch (Exception $e) {
-            $club_name = 'UniPanel';
+            $club_name = 'Four Kampüs';
         }
         
         $message = sprintf(
-            "UniFour Güvenli Giriş Kodunuz: %s. Bu kod %s hesabınız için olup 10 dakika geçerlidir. Kimseyle paylaşmayın.",
+            "Four Kampüs Güvenli Giriş Kodunuz: %s. Bu kod %s hesabınız için olup 10 dakika geçerlidir. Kimseyle paylaşmayın.",
             $verification_code,
             $club_name
         );
@@ -977,7 +977,7 @@ function resolve_president_email(SQLite3 $db) {
     }
     
     if (!empty($folder_name)) {
-        $superadmin_db = dirname(__DIR__) . '/unipanel.sqlite';
+        $superadmin_db = dirname(__DIR__) . '/fourkampus.sqlite';
         if (file_exists($superadmin_db)) {
             try {
                 $super_db = new SQLite3($superadmin_db);
@@ -1094,7 +1094,7 @@ function send_login_notification_email(array $mail_data): void {
         }
         
         $club_name = login_get_setting($db_settings, 'club_name', 'Topluluk');
-        $smtp_from_name = login_get_setting($db_settings, 'smtp_from_name', 'UniFour');
+        $smtp_from_name = login_get_setting($db_settings, 'smtp_from_name', 'Four Kampüs');
         $smtp_from_email = login_get_setting($db_settings, 'smtp_from_email', '');
         $smtp_username = login_get_setting($db_settings, 'smtp_username', '');
         
@@ -2509,16 +2509,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                             // REQUEST_URI'den base path'i çıkar
                             $request_uri = $_SERVER['REQUEST_URI'] ?? '';
                             
-                            // /unipanel/ path'ini bul
-                            if (preg_match('#(/unipanel/)#', $request_uri, $matches)) {
+                            // /fourkampus/ path'ini bul
+                            if (preg_match('#(/fourkampus/)#', $request_uri, $matches)) {
                                 $base_path = $matches[1];
                             } else {
                                 // Fallback: script_name'den al
                                 $script_name = $_SERVER['SCRIPT_NAME'] ?? '';
-                                if (preg_match('#(/unipanel)#', $script_name, $matches)) {
+                                if (preg_match('#(/fourkampus)#', $script_name, $matches)) {
                                     $base_path = $matches[1] . '/';
                                 } else {
-                                    $base_path = '/unipanel/';
+                                    $base_path = '/fourkampus/';
                                 }
                             }
                             
@@ -2533,7 +2533,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                                 $logo_url = 'https://www.caddedoner.com/foursoftware-light.png';
                             }
                             ?>
-                            <img src="<?= htmlspecialchars($logo_url) ?>" alt="UniFour Logo" class="auth-logo-img" onerror="this.src='https://www.caddedoner.com/foursoftware-light.png'; this.onerror=null;">
+                            <img src="<?= htmlspecialchars($logo_url) ?>" alt="Four Kampüs Logo" class="auth-logo-img" onerror="this.src='https://www.caddedoner.com/foursoftware-light.png'; this.onerror=null;">
                         </div>
                         <div>
                             <h1><?= htmlspecialchars($club_name) ?></h1>
@@ -2542,7 +2542,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                     </div>
                     <div>
                         <h2 class="auth-headline">Güçlü topluluk deneyimini keşfedin</h2>
-                        <p class="auth-subheadline">Etkinliklerinizi yönetin, üyelerle iletişim kurun ve kampanyaları tek panelden takip edin. UniPanel ile topluluğunuzu bir üst seviyeye taşıyın.</p>
+                        <p class="auth-subheadline">Etkinliklerinizi yönetin, üyelerle iletişim kurun ve kampanyaları tek panelden takip edin. Four Kampüs ile topluluğunuzu bir üst seviyeye taşıyın.</p>
                     </div>
                     <ul class="auth-benefits">
                         <li><i class="fas fa-check"></i> Anlık bildirim ve duyuru yönetimi</li>
@@ -2728,7 +2728,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
 
 
                 <div class="text-center mt-4">
-                    <p class="text-gray-500 text-xs">© 2025 UniFour - Tüm hakları saklıdır</p>
+                    <p class="text-gray-500 text-xs">© 2025 Four Kampüs - Tüm hakları saklıdır</p>
                 </div>
             </div>
         </div>
