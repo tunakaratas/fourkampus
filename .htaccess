@@ -72,11 +72,22 @@ Options -Indexes
     Header set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# URL Rewriting - Community Routing
+# URL Rewriting - Marketing Frontpage & Community Routing
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /unipanel/
     
+    # 1. Marketing Frontpage Redirection
+    # Eğer root istenirse (fourkampus.com.tr/) direkt marketing klasöründeki index'i göster
+    RewriteRule ^$ marketing/index.html [L]
+    
+    # Dosya veya klasör mevcut değilse ve sistem klasörlerinden biri değilse marketing içinde ara
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} !^/unipanel/(api|communities|assets|superadmin|lib|system|tools|public|bootstrap|config|logs|marketing|admin-login\.php|qr-redirect\.php|favicon\.ico) [NC]
+    RewriteRule ^(.*)$ marketing/$1 [L]
+
+    # 2. Existing Community Routing
     # Allow direct access to PHP files in communities
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^communities/ - [L]
