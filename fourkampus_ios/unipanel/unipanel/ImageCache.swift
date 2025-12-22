@@ -250,12 +250,7 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
             if url.hasPrefix("http://") || url.hasPrefix("https://") {
                 fullURL = url
             } else {
-                #if DEBUG
                 let baseURL = "https://fourkampus.com.tr"
-                #endif
-                #else
-                let baseURL = "https://fourkampus.com.tr"
-                #endif
                 let cleanPath = url.hasPrefix("/") ? url : "/\(url)"
                 fullURL = "\(baseURL)\(cleanPath)"
             }
