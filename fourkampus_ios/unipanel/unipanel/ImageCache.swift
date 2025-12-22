@@ -251,13 +251,10 @@ struct CachedAsyncImage<Content: View, Placeholder: View>: View {
                 fullURL = url
             } else {
                 #if DEBUG
-                #if targetEnvironment(simulator)
-                let baseURL = "http://127.0.0.1/fourkampus"
-                #else
-                let baseURL = "http://localhost/fourkampus"
+                let baseURL = "https://fourkampus.com.tr"
                 #endif
                 #else
-                let baseURL = "https://foursoftware.com.tr/fourkampus"
+                let baseURL = "https://fourkampus.com.tr"
                 #endif
                 let cleanPath = url.hasPrefix("/") ? url : "/\(url)"
                 fullURL = "\(baseURL)\(cleanPath)"
