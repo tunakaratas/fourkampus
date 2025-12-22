@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gizlilik Politikası - UniFour</title>
-    <meta name="description" content="UniFour gizlilik politikası. Kişisel verilerinizin korunması ve güvenliği hakkında detaylı bilgiler.">
+    <title>Gizlilik Politikası - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs gizlilik politikası. Kişisel verilerinizin korunması ve güvenliği hakkında detaylı bilgiler.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -161,8 +161,8 @@
             <div class="legal-section">
                 <h2>1. Genel Bilgiler</h2>
                 <p>
-                    <strong>UniFour</strong> olarak, kişisel verilerinizin korunmasına büyük önem vermekteyiz. 
-                    Bu Gizlilik Politikası, UniFour platformunu kullanırken toplanan, işlenen ve saklanan 
+                    <strong>Four Kampüs</strong> olarak, kişisel verilerinizin korunmasına büyük önem vermekteyiz. 
+                    Bu Gizlilik Politikası, Four Kampüs platformunu kullanırken toplanan, işlenen ve saklanan 
                     kişisel verileriniz hakkında bilgi vermek amacıyla hazırlanmıştır.
                 </p>
                 <p>
@@ -174,11 +174,11 @@
             <div class="legal-section">
                 <h2>2. Veri Sorumlusu</h2>
                 <p>
-                    <strong>UniFour</strong> hizmetlerini sunan veri sorumlusu:
+                    <strong>Four Kampüs</strong> hizmetlerini sunan veri sorumlusu:
                 </p>
                 <div class="contact-info">
-                    <p><strong>Şirket Adı:</strong> UniFour</p>
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>Şirket Adı:</strong> Four Kampüs</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>
@@ -329,14 +329,14 @@
                     <li><strong>Rıza Geri Çekme:</strong> Verilen rızayı geri çekme</li>
                 </ul>
                 <p>
-                    Bu haklarınızı kullanmak için <strong>info@unifour.com</strong> adresine e-posta gönderebilirsiniz.
+                    Bu haklarınızı kullanmak için <strong>info@fourkampus.com.tr</strong> adresine e-posta gönderebilirsiniz.
                 </p>
             </div>
             
             <div class="legal-section">
                 <h2>11. Çocukların Gizliliği</h2>
                 <p>
-                    UniFour platformu 18 yaş altındaki kişilerden bilerek kişisel veri toplamamaktadır. 
+                    Four Kampüs platformu 18 yaş altındaki kişilerden bilerek kişisel veri toplamamaktadır. 
                     Eğer 18 yaş altında bir kişinin veri topladığımızı fark edersek, bu verileri derhal sileriz.
                 </p>
             </div>
@@ -366,7 +366,7 @@
                     bizimle iletişime geçebilirsiniz:
                 </p>
                 <div class="contact-info">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>

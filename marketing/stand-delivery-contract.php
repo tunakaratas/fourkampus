@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stant Teslimat Sözleşmesi - UniFour</title>
-    <meta name="description" content="UniFour stant teslimat sözleşmesi. Topluluk stantlarından elden teslimat için yasal sözleşme metni.">
+    <title>Stant Teslimat Sözleşmesi - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs stant teslimat sözleşmesi. Topluluk stantlarından elden teslimat için yasal sözleşme metni.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -188,7 +188,7 @@
             <div class="important-box">
                 <p>
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>ÖNEMLİ:</strong> UniFour sadece bir aracı platformdur. Teslimat sorumluluğu tamamen topluluğa aittir. 
+                    <strong>ÖNEMLİ:</strong> Four Kampüs sadece bir aracı platformdur. Teslimat sorumluluğu tamamen topluluğa aittir. 
                     Ürünlerle ilgili sorularınız için lütfen ilgili toplulukla iletişime geçiniz.
                 </p>
             </div>
@@ -197,21 +197,21 @@
                 <h2>1. Taraflar</h2>
                 <h3>1.1. Platform (Aracı)</h3>
                 <div class="contact-info">
-                    <p><strong>Platform Adı:</strong> UniFour</p>
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>Platform Adı:</strong> Four Kampüs</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>
                 
                 <h3>1.2. Satıcı (Topluluk)</h3>
                 <p>
-                    Ürünleri satan taraf, UniFour platformuna kayıtlı topluluklardır. Her topluluk 
+                    Ürünleri satan taraf, Four Kampüs platformuna kayıtlı topluluklardır. Her topluluk 
                     kendi ürünlerinin satışından ve teslimatından sorumludur.
                 </p>
                 
                 <h3>1.3. Alıcı (Müşteri)</h3>
                 <p>
-                    Bu sözleşme, UniFour platformu üzerinden topluluk stantlarından ürün satın alan 
+                    Bu sözleşme, Four Kampüs platformu üzerinden topluluk stantlarından ürün satın alan 
                     gerçek veya tüzel kişiler (Alıcı) ile ilgili topluluk (Satıcı) arasında 
                     düzenlenmiştir.
                 </p>
@@ -220,7 +220,7 @@
             <div class="legal-section">
                 <h2>2. Konu</h2>
                 <p>
-                    Bu sözleşmenin konusu, Alıcı'nın UniFour platformu üzerinden satın aldığı 
+                    Bu sözleşmenin konusu, Alıcı'nın Four Kampüs platformu üzerinden satın aldığı 
                     ürünlerin topluluk stantlarından elden teslim edilmesi ile ilgili tarafların 
                     hak ve yükümlülükleridir.
                 </p>
@@ -290,8 +290,8 @@
                 <h3>5.3. Teslimat Sorumluluğu</h3>
                 <div class="important-box">
                     <p>
-                        <strong>UniFour'un Sorumluluğu:</strong> UniFour sadece bir aracı platformdur. 
-                        Teslimat sorumluluğu tamamen topluluğa aittir. UniFour, teslimat süreci, 
+                        <strong>Four Kampüs'ün Sorumluluğu:</strong> Four Kampüs sadece bir aracı platformdur. 
+                        Teslimat sorumluluğu tamamen topluluğa aittir. Four Kampüs, teslimat süreci, 
                         stant konumu, teslimat tarihi veya ürün kalitesi konularında sorumluluk kabul etmez.
                     </p>
                 </div>
@@ -322,7 +322,7 @@
                     bildirimde bulunabilir:
                 </p>
                 <ul>
-                    <li>E-posta: info@unifour.com</li>
+                    <li>E-posta: info@fourkampus.com.tr</li>
                     <li>Telefon: +90 533 544 59 83</li>
                     <li>Platform üzerinden iletişim formu</li>
                     <li>İlgili toplulukla doğrudan iletişim</li>
@@ -358,7 +358,7 @@
                 <h3>8.2. Sorumluluk Sınırlaması</h3>
                 <div class="warning-box">
                     <p>
-                        <strong>UniFour'un Sorumluluğu:</strong> UniFour sadece bir aracı platformdur. 
+                        <strong>Four Kampüs'ün Sorumluluğu:</strong> Four Kampüs sadece bir aracı platformdur. 
                         Ürün kalitesi, teslimat, garanti ve iade konularında sorumluluk kabul etmez. 
                         Tüm sorumluluk ilgili topluluğa aittir.
                     </p>
@@ -400,7 +400,7 @@
                 
                 <div class="warning-box">
                     <p>
-                        <strong>Not:</strong> UniFour uyuşmazlıkların çözümünde taraf değildir. 
+                        <strong>Not:</strong> Four Kampüs uyuşmazlıkların çözümünde taraf değildir. 
                         Uyuşmazlıklar müşteri ile topluluk arasında çözülür.
                     </p>
                 </div>
@@ -421,7 +421,7 @@
                     Stant teslimat sözleşmesi hakkında sorularınız için:
                 </p>
                 <div class="contact-info">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>
@@ -430,7 +430,7 @@
                     <p>
                         <i class="fas fa-info-circle"></i>
                         <strong>Önemli:</strong> Ürünlerle ilgili sorularınız için lütfen ilgili 
-                        toplulukla iletişime geçiniz. UniFour sadece platform hizmeti sağlar.
+                        toplulukla iletişime geçiniz. Four Kampüs sadece platform hizmeti sağlar.
                     </p>
                 </div>
             </div>

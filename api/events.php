@@ -222,6 +222,7 @@ try {
     $communities_dir = __DIR__ . '/../communities';
     $all_events = [];
     $requested_university_id = get_requested_university_id();
+    $sort_param = isset($_GET['sort']) ? strtolower(trim((string)$_GET['sort'])) : '';
     
     // Debug log (her zaman - sorun tespiti için)
     // if (defined('DEBUG') && DEBUG && $requested_university_id !== '') {
@@ -285,6 +286,7 @@ try {
             $settings[$setting_row['setting_key']] = $setting_row['setting_value'];
         }
         $community_name = $settings['club_name'] ?? $community_id;
+        $community_university_name = $settings['university'] ?? $settings['organization'] ?? '';
         
         // Image ve video path
         $image_path = null;
@@ -368,11 +370,11 @@ try {
             // event_videos tablosu yoksa boş array
         }
         
-        $event = [
-            'id' => (string)$row['id'],
-            'title' => $row['title'] ?? '',
-            'description' => $row['description'] ?? null,
-            'date' => $row['date'] ?? '',
+            $event = [
+                'id' => (string)$row['id'],
+                'title' => $row['title'] ?? '',
+                'description' => $row['description'] ?? null,
+                'date' => $row['date'] ?? '',
             'start_time' => $row['time'] ?? '',
             'end_time' => $row['end_time'] ?? null,
             'time' => $row['time'] ?? '',
@@ -385,6 +387,7 @@ try {
             'videos' => $event_videos,
             'community_id' => $community_id,
             'community_name' => $community_name,
+            'university' => $row['university'] ?? $community_university_name,
             'category' => $row['category'] ?? 'Diğer',
             'capacity' => isset($row['capacity']) ? (int)$row['capacity'] : null,
             'registered_count' => (int)$registered_count,
@@ -402,6 +405,7 @@ try {
             'currency' => $row['currency'] ?? 'TRY',
             'has_survey' => $has_survey,
             'status' => $row['status'] ?? 'upcoming',
+            'created_at' => $row['created_at'] ?? null,
             'calendar_url' => $calendar_url,
             'qr_deep_link' => $qr_deep_link,
             'qr_code_url' => $qr_code_url
@@ -603,6 +607,7 @@ try {
                 'videos' => $event_videos,
                 'community_id' => $community_id,
                 'community_name' => $community_name,
+                'university' => $row['university'] ?? ($settings['university'] ?? $settings['organization'] ?? null),
                 'category' => $row['category'] ?? 'Diğer',
                 'capacity' => isset($row['capacity']) ? (int)$row['capacity'] : null,
                 'registered_count' => (int)$registered_count,
@@ -620,6 +625,7 @@ try {
                 'currency' => $row['currency'] ?? 'TRY',
                 'has_survey' => $has_survey,
                 'status' => $row['status'] ?? 'upcoming',
+                'created_at' => $row['created_at'] ?? null,
                 'calendar_url' => $calendar_url,
                 'qr_deep_link' => $qr_deep_link,
                 'qr_code_url' => $qr_code_url
@@ -687,24 +693,7 @@ try {
                     }
                 }
                 $community_name = $settings['club_name'] ?? ucwords(str_replace('_', ' ', $community_id));
-
-                // Üniversite filtresi (kampanyalar.php'deki sistemle aynı)
-                if ($requested_university_id !== '') {
-                    $community_university_name = $settings['university'] ?? $settings['organization'] ?? '';
-                    $community_university_id = normalize_university_id($community_university_name);
-                    
-                    // Debug log (her zaman - sorun tespiti için)
-                    error_log("Events API: Community '{$community_id}' - Requested ID: '{$requested_university_id}', Community Uni Name: '{$community_university_name}' -> Normalized ID: '{$community_university_id}'");
-                    
-                    // Eğer üniversite eşleşmiyorsa geç (kampanyalar.php'deki sistemle aynı)
-                    if ($community_university_id === '' || $community_university_id !== $requested_university_id) {
-                        error_log("Events API: Community '{$community_id}' SKIPPED - Üniversite eşleşmedi (Requested: '{$requested_university_id}' vs Community: '{$community_university_id}')");
-                        ConnectionPool::releaseConnection($db_path, $poolId, false);
-                        continue;
-                    }
-                    
-                    error_log("Events API: Community '{$community_id}' MATCHED - Üniversite filtresi geçti");
-                }
+                $community_university_name = $settings['university'] ?? $settings['organization'] ?? '';
                 
                 // Etkinlikleri çek
                 $query = $db->prepare("SELECT * FROM events WHERE club_id = 1 ORDER BY date DESC, time DESC");
@@ -833,6 +822,14 @@ try {
                         ];
                     }
                     
+                    $event_university = $row['university'] ?? $community_university_name;
+                    if ($requested_university_id !== '') {
+                        $event_university_id = normalize_university_id($event_university ?? '');
+                        if ($event_university_id === '' || $event_university_id !== $requested_university_id) {
+                            continue;
+                        }
+                    }
+                    
                     $all_events[] = [
                         'id' => (string)$row['id'],
                         'title' => $row['title'] ?? '',
@@ -850,7 +847,7 @@ try {
                         'videos' => $event_videos,
                         'community_id' => $community_id,
                         'community_name' => $community_name,
-                        'university' => $settings['university'] ?? $settings['organization'] ?? null,
+                        'university' => $event_university,
                         'category' => $row['category'] ?? 'Diğer',
                         'capacity' => isset($row['capacity']) ? (int)$row['capacity'] : null,
                         'registered_count' => (int)$registered_count,
@@ -868,6 +865,7 @@ try {
                         'currency' => $row['currency'] ?? 'TRY',
                         'has_survey' => $has_survey,
                         'status' => $row['status'] ?? 'upcoming',
+                        'created_at' => $row['created_at'] ?? null,
                         'calendar_url' => $calendar_url,
                         'qr_deep_link' => $qr_deep_link,
                         'qr_code_url' => $qr_code_url
@@ -891,12 +889,25 @@ try {
         }
     }
     
-    // Tüm etkinlikleri tarihe göre sırala (en yeni önce)
-    usort($all_events, function($a, $b) {
-        $dateA = ($a['date'] ?? '') . ' ' . ($a['time'] ?? '');
-        $dateB = ($b['date'] ?? '') . ' ' . ($b['time'] ?? '');
-        return strcmp($dateB, $dateA); // Descending order
-    });
+    // Tüm etkinlikleri sıralama (en yeni önce)
+    if ($sort_param === 'created_at') {
+        usort($all_events, function($a, $b) {
+            $createdA = $a['created_at'] ?? '';
+            $createdB = $b['created_at'] ?? '';
+            if ($createdA !== '' && $createdB !== '') {
+                return strcmp($createdB, $createdA);
+            }
+            $dateA = ($a['date'] ?? '') . ' ' . ($a['time'] ?? '');
+            $dateB = ($b['date'] ?? '') . ' ' . ($b['time'] ?? '');
+            return strcmp($dateB, $dateA);
+        });
+    } else {
+        usort($all_events, function($a, $b) {
+            $dateA = ($a['date'] ?? '') . ' ' . ($a['time'] ?? '');
+            $dateB = ($b['date'] ?? '') . ' ' . ($b['time'] ?? '');
+            return strcmp($dateB, $dateA); // Descending order
+        });
+    }
     
     // Toplam sayı
     $total_count = count($all_events);
@@ -935,4 +946,3 @@ try {
     http_response_code(500);
     sendResponse(false, null, null, 'İşlem sırasında bir hata oluştu: ' . $e->getMessage());
 }
-

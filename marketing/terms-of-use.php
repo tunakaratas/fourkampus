@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kullanım Şartları - UniFour</title>
-    <meta name="description" content="UniFour platform kullanım şartları ve kuralları.">
+    <title>Kullanım Şartları - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs platform kullanım şartları ve kuralları.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -163,7 +163,7 @@
             <div class="legal-section">
                 <h2>1. Genel Hükümler</h2>
                 <p>
-                    Bu Kullanım Şartları ("Şartlar"), UniFour platformunu ("Platform") kullanarak 
+                    Bu Kullanım Şartları ("Şartlar"), Four Kampüs platformunu ("Platform") kullanarak 
                     hizmetlerimizden yararlanan tüm kullanıcılar için geçerlidir. Platformu kullanarak, 
                     bu şartları kabul etmiş sayılırsınız.
                 </p>
@@ -219,7 +219,15 @@
             
             <div class="legal-section">
                 <h2>4. Market ve Ürün Satışı</h2>
-                <h3>4.1. Ürün Satış Kuralları</h3>
+                <div class="highlight-box">
+                    <p>
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Önemli:</strong> Four Kampüs platformu üzerindeki market bölümünde satılan fiziksel ürünler, 
+                        topluluklar tarafından satışa sunulmaktadır. Four Kampüs, bu ürünler için aracı konumundadır.
+                    </p>
+                </div>
+                
+                <h3>4.1. Topluluk Satış Kuralları</h3>
                 <ul>
                     <li>Yasaklı ürünler satılamaz (alkol, tütün, ilaç, silah vb.)</li>
                     <li>Ürün bilgileri doğru ve eksiksiz olmalıdır</li>
@@ -227,20 +235,27 @@
                     <li>Stok durumu güncel tutulmalıdır</li>
                 </ul>
                 
-                <h3>4.2. Satıcı Sorumlulukları</h3>
+                <h3>4.2. Topluluk Satıcı Sorumlulukları</h3>
                 <ul>
                     <li>Ürünlerin yasal ve güvenli olduğunu garanti etmek</li>
                     <li>Teslimat sürelerine uymak</li>
                     <li>Müşteri şikayetlerini zamanında yanıtlamak</li>
-                    <li>İade ve iptal politikalarına uymak</li>
+                    <li>İade ve iptal politikalarını belirlemek ve uygulamak</li>
                 </ul>
+                
+                <h3>4.3. Four Kampüs'ün Rolü</h3>
+                <p>
+                    Four Kampüs, topluluklar tarafından satılan ürünlerin kalitesi, teslimatı veya 
+                    iadesi konusunda sorumluluk kabul etmez. Platform, yalnızca satış altyapısı 
+                    sağlamaktadır. Sorunlar için doğrudan ilgili topluluk yönetimine başvurulmalıdır.
+                </p>
             </div>
             
             <div class="legal-section">
                 <h2>5. Fikri Mülkiyet Hakları</h2>
                 <h3>5.1. Platform İçeriği</h3>
                 <p>
-                    Platform üzerindeki tüm içerik, tasarım ve yazılım UniFour'a aittir. 
+                    Platform üzerindeki tüm içerik, tasarım ve yazılım Four Kampüs'e aittir. 
                     İzinsiz kopyalama, dağıtma veya kullanım yasaktır.
                 </p>
                 
@@ -254,7 +269,7 @@
             <div class="legal-section">
                 <h2>6. Hizmet Kesintileri ve Değişiklikler</h2>
                 <p>
-                    UniFour, platformu geliştirmek veya bakım yapmak için hizmeti geçici olarak 
+                    Four Kampüs, platformu geliştirmek veya bakım yapmak için hizmeti geçici olarak 
                     kesebilir. Bu durumda kullanıcılar önceden bilgilendirilir.
                 </p>
                 <div class="warning-box">
@@ -284,7 +299,7 @@
             <div class="legal-section">
                 <h2>8. Sorumluluk Sınırlaması</h2>
                 <p>
-                    UniFour, kullanıcıların paylaştığı içeriklerden veya üçüncü taraf hizmetlerinden 
+                    Four Kampüs, kullanıcıların paylaştığı içeriklerden veya üçüncü taraf hizmetlerinden 
                     kaynaklanan sorunlardan sorumlu değildir. Platform "olduğu gibi" sunulur.
                 </p>
             </div>
@@ -304,7 +319,7 @@
                     Kullanım şartları hakkında sorularınız için:
                 </p>
                 <div class="highlight-box">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>

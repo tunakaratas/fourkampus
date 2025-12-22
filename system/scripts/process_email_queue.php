@@ -70,7 +70,7 @@ function get_smtp_settings($db, $club_id) {
         
         $settings['smtp_username'] = getCredential('SMTP_USERNAME', '');
         $settings['smtp_password'] = getCredential('SMTP_PASSWORD', '');
-        $settings['smtp_host'] = getCredential('SMTP_HOST', 'smtp.gmail.com');
+        $settings['smtp_host'] = getCredential('SMTP_HOST', 'ms8.guzel.net.tr');
         $settings['smtp_port'] = getCredential('SMTP_PORT', '587');
         $settings['smtp_secure'] = getCredential('SMTP_SECURE', 'tls');
         
@@ -88,11 +88,11 @@ function get_smtp_settings($db, $club_id) {
 // Basit bir send_smtp_mail implementasyonu
 function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $config = []) {
     try {
-        $host = $config['host'] ?? 'smtp.gmail.com';
-        $port = (int)($config['port'] ?? 587);
-        $secure = strtolower($config['secure'] ?? 'tls');
-        $username = $config['username'] ?? '';
-        $password = $config['password'] ?? '';
+        $host = $config['host'] ?? $config['smtp_host'] ?? 'ms8.guzel.net.tr';
+        $port = (int)($config['port'] ?? $config['smtp_port'] ?? 587);
+        $secure = strtolower($config['secure'] ?? $config['smtp_secure'] ?? 'tls');
+        $username = $config['username'] ?? $config['smtp_username'] ?? '';
+        $password = $config['password'] ?? $config['smtp_password'] ?? '';
 
         if (!$host || !$port || !$username || !$password) {
             return false;
@@ -170,18 +170,23 @@ function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $confi
             return false;
         }
 
-        // MAIL FROM
-        fputs($fp, "MAIL FROM: <$from_email>\r\n");
-        $response = fgets($fp, 515);
+        // MAIL FROM her zaman sunucu kullanıcı adı ile aynı olmalı (Guzel Hosting vb. için)
+        $envelopeFrom = $username;
+        $write('MAIL FROM:<' . $envelopeFrom . '>');
+        $response = $read();
         if (substr($response, 0, 3) !== '250') {
+            $write('RSET');
+            $read();
             fclose($fp);
             return false;
         }
 
         // RCPT TO
-        fputs($fp, "RCPT TO: <$to>\r\n");
-        $response = fgets($fp, 515);
+        $write('RCPT TO:<' . $to . '>');
+        $response = $read();
         if (substr($response, 0, 3) !== '250') {
+            $write('RSET');
+            $read();
             fclose($fp);
             return false;
         }
@@ -195,11 +200,16 @@ function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $confi
         }
 
         // Email headers ve body
-        $headers = "From: $from_name <$from_email>\r\n";
+        $encodedFromName = '=?UTF-8?B?' . base64_encode($from_name) . '?=';
+        $headers = "From: $encodedFromName <$envelopeFrom>\r\n";
+        $headers .= "Reply-To: $from_email\r\n";
         $headers .= "To: <$to>\r\n";
-        $headers .= "Subject: $subject\r\n";
+        $headers .= "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n";
+        $headers .= "Date: " . date('r') . "\r\n";
+        $headers .= "Message-ID: <" . md5(uniqid(microtime(), true)) . "@" . $host . ">\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "X-Mailer: Four Kampüs Email Processor\r\n";
         $headers .= "\r\n";
 
         fputs($fp, $headers . $message . "\r\n.\r\n");
@@ -323,11 +333,11 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
     };
     
     try {
-        $host = $config['host'] ?? 'smtp.gmail.com';
-        $port = (int)($config['port'] ?? 587);
-        $secure = strtolower($config['secure'] ?? 'tls');
-        $username = $config['username'] ?? '';
-        $password = $config['password'] ?? '';
+        $host = $config['host'] ?? $config['smtp_host'] ?? 'ms8.guzel.net.tr';
+        $port = (int)($config['port'] ?? $config['smtp_port'] ?? 587);
+        $secure = strtolower($config['secure'] ?? $config['smtp_secure'] ?? 'tls');
+        $username = $config['username'] ?? $config['smtp_username'] ?? '';
+        $password = $config['password'] ?? $config['smtp_password'] ?? '';
 
         if (!$host || !$port || !$username || !$password) {
             error_log('SMTP config eksik (batch): host=' . ($host ?: 'EMPTY') . ', port=' . ($port ?: 'EMPTY'));
@@ -354,9 +364,11 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
 
         $read = function() use ($fp) {
             $data = '';
-            while ($str = fgets($fp, 515)) {
+            while (!feof($fp)) {
+                $str = fgets($fp, 515);
+                if ($str === false) break;
                 $data .= $str;
-                if (substr($str, 3, 1) === ' ') break;
+                if (strlen($str) >= 4 && substr($str, 3, 1) === ' ') break;
             }
             return $data;
         };
@@ -420,7 +432,8 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
             return $buildEarlyFailure();
         }
 
-        $envelopeFrom = (stripos($host, 'gmail.com') !== false) ? $username : $from_email;
+        // MAIL FROM her zaman sunucu kullanıcı adı ile aynı olmalı (Guzel Hosting vb. için)
+        $envelopeFrom = $username;
         
         foreach ($recipient_entries as $entry) {
             $to = $entry['email'];
@@ -439,11 +452,23 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
             $message_content = $is_html ? $individual_message : nl2br(htmlspecialchars($individual_message));
             $html_template = "<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'></head><body style='font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;'>" . $message_content . "</body></html>";
 
+            // SMTP Dot-stuffing ve line normalization
+            $html_template = str_replace(["\r\n", "\r", "\n"], "\n", $html_template);
+            $lines = explode("\n", $html_template);
+            foreach ($lines as &$line) {
+                if (strpos($line, '.') === 0) {
+                    $line = '.' . $line;
+                }
+            }
+            $html_template = implode("\r\n", $lines);
+
             try {
-                $write('MAIL FROM: <' . $envelopeFrom . '>');
+                $write('MAIL FROM:<' . $envelopeFrom . '>');
                 $mf = $read();
                 if (strpos($mf, '250') !== 0) {
                     error_log('MAIL FROM reddedildi: ' . trim($mf) . ' for ' . $to);
+                    $write('RSET');
+                    $read();
                     $failed_count++;
                     $failed_emails[] = $to;
                     if ($recipient_id) {
@@ -452,10 +477,12 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
                     continue;
                 }
                 
-                $write('RCPT TO: <' . $to . '>');
+                $write('RCPT TO:<' . $to . '>');
                 $rc = $read();
                 if (strpos($rc, '250') !== 0 && strpos($rc, '251') !== 0) {
                     error_log('RCPT TO reddedildi: ' . trim($rc) . ' Alıcı: ' . $to);
+                    $write('RSET');
+                    $read();
                     $failed_count++;
                     $failed_emails[] = $to;
                     if ($recipient_id) {
@@ -468,6 +495,8 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
                 $dt = $read();
                 if (strpos($dt, '354') !== 0) {
                     error_log('DATA kabul edilmedi: ' . trim($dt) . ' for ' . $to);
+                    $write('RSET');
+                    $read();
                     $failed_count++;
                     $failed_emails[] = $to;
                     if ($recipient_id) {
@@ -477,14 +506,18 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
                 }
 
                 $headers = [];
-                $headers[] = 'From: ' . sprintf('%s <%s>', $from_name, $from_email);
+                $encodedFromName = '=?UTF-8?B?' . base64_encode($from_name) . '?=';
+                $headers[] = 'From: ' . sprintf('%s <%s>', $encodedFromName, $envelopeFrom);
+                $headers[] = 'Reply-To: ' . $from_email;
                 $headers[] = 'To: ' . $to;
-                $headers[] = 'Subject: ' . $individual_subject;
+                $headers[] = 'Subject: =?UTF-8?B?' . base64_encode($individual_subject) . '?=';
+                $headers[] = 'Date: ' . date('r');
+                $headers[] = 'Message-ID: <' . md5(uniqid(microtime(), true)) . '@' . $host . '>';
                 $headers[] = 'MIME-Version: 1.0';
                 $headers[] = 'Content-Type: text/html; charset=UTF-8';
-                $headers[] = 'X-Mailer: UniPanel';
+                $headers[] = 'X-Mailer: Four Kampüs Email Processor';
 
-                $data = implode("\r\n", $headers) . "\r\n\r\n" . $html_template . "\r\n.\r\n";
+                $data = implode("\r\n", $headers) . "\r\n\r\n" . $html_template . "\r\n.";
                 $write($data);
                 $resp = $read();
                 

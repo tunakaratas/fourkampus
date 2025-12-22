@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Destek - UniFour</title>
-    <meta name="description" content="UniFour destek sayfası. Yardıma mı ihtiyacınız var? Bizimle iletişime geçin veya sık sorulan sorulara göz atın.">
+    <title>Destek - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs destek sayfası. Yardıma mı ihtiyacınız var? Bizimle iletişime geçin veya sık sorulan sorulara göz atın.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -269,22 +269,22 @@
                 
                 <div class="contact-grid">
                     <div class="contact-card">
-                        <a href="mailto:support@foursoftware.com.tr">
+                        <a href="mailto:support@fourkampus.com.tr">
                             <div class="contact-card-icon email">
                                 <i class="fas fa-envelope"></i>
                             </div>
                             <h3>E-posta</h3>
-                            <p>support@foursoftware.com.tr</p>
+                            <p>support@fourkampus.com.tr</p>
                         </a>
                     </div>
                     
                     <div class="contact-card">
-                        <a href="https://foursoftware.com.tr" target="_blank" rel="noopener noreferrer">
+                        <a href="https://fourkampus.com.tr" target="_blank" rel="noopener noreferrer">
                             <div class="contact-card-icon website">
                                 <i class="fas fa-globe"></i>
                             </div>
                             <h3>Web Sitesi</h3>
-                            <p>foursoftware.com.tr <i class="fas fa-external-link-alt" style="font-size: 0.75rem; margin-left: 0.25rem;"></i></p>
+                            <p>fourkampus.com.tr <i class="fas fa-external-link-alt" style="font-size: 0.75rem; margin-left: 0.25rem;"></i></p>
                         </a>
                     </div>
                 </div>
@@ -333,7 +333,7 @@
                         <i class="fas fa-chevron-down"></i>
                     </div>
                     <div class="faq-answer">
-                        <p>Yukarıdaki "Web Sitesi" kartına tıklayarak veya tarayıcınızda <strong>foursoftware.com.tr</strong> adresine giderek web sitemize erişebilirsiniz.</p>
+                        <p>Yukarıdaki "Web Sitesi" kartına tıklayarak veya tarayıcınızda <strong>fourkampus.com.tr</strong> adresine giderek web sitemize erişebilirsiniz.</p>
                     </div>
                 </div>
                 
@@ -370,7 +370,7 @@
             
             <!-- Uygulama Bilgisi -->
             <div class="app-info">
-                <p><strong>UniFour</strong> - Üniversite Toplulukları Platformu</p>
+                <p><strong>Four Kampüs</strong> - Üniversite Toplulukları Platformu</p>
                 <p style="font-size: 0.875rem;">Four Software tarafından geliştirilmiştir</p>
                 <p style="font-size: 0.875rem; color: #94a3b8;">© 2025 Tüm hakları saklıdır.</p>
             </div>

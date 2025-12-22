@@ -13,7 +13,7 @@ return [
         'username' => 'user@example.com',     // SMTP kullanıcı adı
         'password' => 'your-password-here',   // SMTP şifresi
         'from_email' => 'noreply@example.com', // Gönderen e-posta
-        'from_name' => 'UniPanel',            // Gönderen adı
+        'from_name' => 'Four Kampüs',            // Gönderen adı
         'encryption' => 'tls'                 // 'tls' veya 'ssl'
     ],
     
@@ -21,5 +21,12 @@ return [
         'username' => '8503022568',           // NetGSM kullanıcı adı (Abone No)
         'password' => 'your-netgsm-password', // NetGSM şifresi
         'msgheader' => '8503022568'           // Mesaj başlığı (genellikle kullanıcı adı ile aynı)
+    ],
+    
+    // AI Özellikleri için Groq API (Ücretsiz)
+    // API key almak için: https://console.groq.com/keys
+    'groq' => [
+        'api_key' => 'your-groq-api-key-here', // Groq API key
+        'model' => 'llama-3.3-70b-versatile'   // Kullanılacak model (varsayılan: llama-3.3-70b-versatile)
     ]
 ];

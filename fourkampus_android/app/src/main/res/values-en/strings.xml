@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Four Kampüs</string>
+    
+    <!-- Navigation -->
+    <string name="communities">Communities</string>
+    <string name="events">Events</string>
+    <string name="market">Market</string>
+    <string name="profile">Profile</string>
+    
+    <!-- Common Actions -->
+    <string name="share">Share</string>
+    <string name="reminder">Remind</string>
+    <string name="add_to_calendar">Add to Calendar</string>
+    <string name="open_in_maps">Open in Maps</string>
+    <string name="scan_qr">Scan QR Code</string>
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="close">Close</string>
+    
+    <!-- Language -->
+    <string name="language">Language</string>
+    <string name="language_selection">Language Selection</string>
+    <string name="current_language">Current language: %1$s</string>
+    <string name="turkish">Turkish</string>
+    <string name="english">English</string>
+    
+    <!-- Settings -->
+    <string name="settings">Settings</string>
+    <string name="notifications">Notifications</string>
+    <string name="enable_notifications">Enable Notifications</string>
+    <string name="enable_notifications_desc">Receive app notifications</string>
+    <string name="email_notifications">Email Notifications</string>
+    <string name="email_notifications_desc">Receive notifications via email</string>
+    <string name="push_notifications">Push Notifications</string>
+    <string name="push_notifications_desc">Receive instant notifications</string>
+    
+    <string name="appearance">Appearance</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="dark_mode_desc">Use dark theme</string>
+    
+    <string name="account">Account</string>
+    <string name="change_password">Change Password</string>
+    <string name="change_password_desc">Update your account password</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_desc">Manage your privacy settings</string>
+    
+    <string name="app_info">Application</string>
+    <string name="version">Version</string>
+    <string name="developer">Developer</string>
+    
+    <!-- Profile -->
+    <string name="change_photo">Change Photo</string>
+    <string name="biometric_auth">Biometric Login</string>
+    <string name="search_history">Search History</string>
+    <string name="advanced_filters">Advanced Filters</string>
+    
+    <!-- Auth -->
+    <string name="login">Login</string>
+    <string name="signup">Sign Up</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="logout">Logout</string>
+    <string name="no_account">Don\'t have an account? Sign Up</string>
+    <string name="has_account">Already have an account? Login</string>
+    
+    <!-- Common Messages -->
+    <string name="loading">Loading…</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="no_data">No data found</string>
+</resources>

@@ -1050,7 +1050,7 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
 ?>
 
 <?php if ($isStandardPlan): ?>
-<div class="rounded-2xl border border-amber-200 dark:border-amber-500/40 bg-gradient-to-br from-white via-amber-50 to-orange-50 dark:from-slate-900 dark:via-amber-900/20 dark:to-slate-900 px-5 py-5 mb-6 shadow-lg shadow-amber-100/50 dark:shadow-black/30">
+<div class="rounded-2xl border border-amber-200 bg-gradient-to-br from-white via-amber-50 to-orange-50 px-5 py-5 mb-6 shadow-lg shadow-amber-100/50">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div class="flex items-start gap-4">
             <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/30">
@@ -1060,21 +1060,21 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                 </svg>
             </div>
             <div class="space-y-2">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-300/70 dark:border-amber-400/50 bg-amber-50/80 dark:bg-amber-500/10 text-xs font-semibold text-amber-700 dark:text-amber-200">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-amber-300/70 bg-amber-50/80 text-xs font-semibold text-amber-700">
                     Standart Paket · Maks. <?= htmlspecialchars((string)$maxProductLimitLabel) ?> ürün
                 </div>
-                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Market ürün limiti</h3>
-                <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                <h3 class="text-lg font-semibold text-slate-900">Market ürün limiti</h3>
+                <p class="text-sm leading-relaxed text-slate-600">
                     Standart pakette en fazla <?= htmlspecialchars((string)$maxProductLimitLabel) ?> ürünü listelenir. Şu anda <strong><?= $currentProductCount ?></strong> ürününüz var ve <?php if ($maxProductLimit === -1): ?>sınırsız hakka sahipsiniz<?php else: ?><?= max(0, $marketLimitRemaining) ?> slot kaldı<?php endif; ?>. Sınırsız ürün eklemek için Professional veya Business paketine geçin.
                 </p>
-                <div class="flex flex-wrap gap-2 text-xs text-slate-600 dark:text-slate-300">
-                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 dark:bg-white/5 border border-amber-100/70 dark:border-white/10">
+                <div class="flex flex-wrap gap-2 text-xs text-slate-600">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 border border-amber-100/70">
                         <span class="text-amber-500">●</span> Yeni ürünler için Professional
                     </span>
-                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 dark:bg-white/5 border border-amber-100/70 dark:border-white/10">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 border border-amber-100/70">
                         <span class="text-amber-500">●</span> Ödeme bildirimleri
                     </span>
-                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 dark:bg-white/5 border border-amber-100/70 dark:border-white/10">
+                    <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 border border-amber-100/70">
                         <span class="text-amber-500">●</span> Sınırsız stok
                     </span>
                 </div>
@@ -1082,11 +1082,11 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
         </div>
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
             <?php if ($standardProductLimitReached): ?>
-                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200 font-semibold">
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-100 text-amber-800 font-semibold">
                     Limit Doldu (<?= $currentProductCount ?>/<?= htmlspecialchars((string)($maxProductLimit === -1 ? '∞' : $maxProductLimit)) ?>)
                 </span>
             <?php else: ?>
-                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 border border-amber-200 text-amber-700 dark:border-amber-500/40 dark:text-amber-100 font-semibold">
+                <span class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/80 border border-amber-200 text-amber-700 font-semibold">
                     Kalan Slot: <?= $marketLimitRemaining === -1 ? 'Sınırsız' : $marketLimitRemaining ?>
                 </span>
             <?php endif; ?>
@@ -1101,10 +1101,10 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
 
 <div data-view="market" class="max-w-full overflow-x-hidden">
     <!-- Tüm İçerik Tek Kart İçinde -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 section-card">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 section-card">
         <!-- Hata ve Başarı Mesajları -->
         <?php if (isset($_SESSION['error'])): ?>
-            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
+            <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
@@ -1114,7 +1114,7 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
         <?php endif; ?>
         
         <?php if (isset($_SESSION['message'])): ?>
-            <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
+            <div class="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
@@ -1124,69 +1124,69 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
         <?php endif; ?>
         
         <!-- Başlık -->
-        <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 dark:border-gray-700 pb-6">
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-gray-200 pb-6">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                    <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Market Yönetimi</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Topluluğunuzun ürünlerini yönetin ve satışa sunun</p>
+                    <h1 class="text-xl font-semibold text-gray-900">Market Yönetimi</h1>
+                    <p class="text-sm text-gray-500 mt-0.5">Topluluğunuzun ürünlerini yönetin ve satışa sunun</p>
                 </div>
             </div>
             <div class="flex flex-col gap-2 items-start">
-                <button onclick="window.openAddProductModal()" id="open-product-modal-btn" class="inline-flex items-center px-4 py-2 rounded-lg transition duration-200 font-medium shadow-sm <?= $standardProductLimitReached ? 'bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-500/40' : 'bg-indigo-600 text-white hover:bg-indigo-700' ?>">
+                <button onclick="window.openAddProductModal()" id="open-product-modal-btn" class="inline-flex items-center px-4 py-2 rounded-lg transition duration-200 font-medium shadow-sm <?= $standardProductLimitReached ? 'bg-amber-100 text-amber-800 border border-amber-200' : 'bg-indigo-600 text-white hover:bg-indigo-700' ?>">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Yeni Ürün Ekle
             </button>
                 <?php if ($standardProductLimitReached): ?>
-                <p class="text-xs font-semibold text-amber-700 dark:text-amber-200">Standart paketteki 2 ürün sınırına ulaştınız.</p>
+                <p class="text-xs font-semibold text-amber-700">Standart paketteki 2 ürün sınırına ulaştınız.</p>
                 <?php endif; ?>
             </div>
         </div>
 
         <!-- İstatistik Kartları -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Toplam Ürün</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><?= count($products) ?></p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Toplam Ürün</p>
+                        <p class="text-2xl font-bold text-gray-900"><?= count($products) ?></p>
                     </div>
-                    <div class="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Aktif Ürün</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><?= count(array_filter($products, fn($p) => $p['status'] === 'active')) ?></p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Aktif Ürün</p>
+                        <p class="text-2xl font-bold text-gray-900"><?= count(array_filter($products, fn($p) => $p['status'] === 'active')) ?></p>
                     </div>
-                    <div class="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </div>
                 </div>
             </div>
             
-            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 border border-gray-200 dark:border-gray-600">
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Toplam Stok</p>
-                        <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><?= array_sum(array_column($products, 'stock')) ?></p>
+                        <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Toplam Stok</p>
+                        <p class="text-2xl font-bold text-gray-900"><?= array_sum(array_column($products, 'stock')) ?></p>
                     </div>
-                    <div class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                         </svg>
                     </div>
@@ -1195,18 +1195,18 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
         </div>
 
         <!-- Ürün Listesi -->
-        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-600">
+        <div class="bg-gray-50 rounded-lg border border-gray-200">
+            <div class="p-6 border-b border-gray-200">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Ürünler</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">Ürünler</h3>
                     <div class="flex gap-2">
-                        <select id="category-filter" onchange="filterProducts()" class="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                        <select id="category-filter" onchange="filterProducts()" class="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900">
                             <option value="">Tüm Kategoriler</option>
                             <?php foreach ($categories as $cat): ?>
                                 <option value="<?= htmlspecialchars($cat) ?>"><?= htmlspecialchars($cat) ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <input type="text" id="product-search" onkeyup="filterProducts()" placeholder="Ürün ara..." class="px-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100">
+                        <input type="text" id="product-search" onkeyup="filterProducts()" placeholder="Ürün ara..." class="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white text-gray-900">
                     </div>
                 </div>
             </div>
@@ -1215,7 +1215,7 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
             <?php if (!empty($products)): ?>
                 <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <?php foreach ($products as $product): ?>
-                        <div class="product-card bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden hover:shadow-md transition duration-200" 
+                        <div class="product-card bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition duration-200" 
                              data-category="<?= htmlspecialchars($product['category']) ?>"
                              data-name="<?= htmlspecialchars(strtolower($product['name'])) ?>">
                             <?php 
@@ -1231,12 +1231,12 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                                 }
                             }
                             if ($display_image_url): ?>
-                                <div class="h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                                <div class="h-48 bg-gray-200 overflow-hidden">
                                     <img src="<?= htmlspecialchars($display_image_url) ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect fill=\'%23ddd\' width=\'200\' height=\'200\'/%3E%3Ctext fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\'%3EGörsel Yüklenemedi%3C/text%3E%3C/svg%3E';">
                                 </div>
                             <?php else: ?>
-                                <div class="h-48 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center">
-                                    <svg class="w-16 h-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="h-48 bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                                     </svg>
                                 </div>
@@ -1244,13 +1244,13 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                             
                             <div class="p-4">
                                 <div class="flex items-start justify-between mb-2">
-                                    <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100"><?= htmlspecialchars($product['name']) ?></h4>
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full <?= $product['status'] === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' ?>">
+                                    <h4 class="text-lg font-semibold text-gray-900"><?= htmlspecialchars($product['name']) ?></h4>
+                                    <span class="px-2 py-1 text-xs font-medium rounded-full <?= $product['status'] === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' ?>">
                                         <?= $product['status'] === 'active' ? 'Aktif' : 'Pasif' ?>
                                     </span>
                                 </div>
                                 
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2"><?= htmlspecialchars($product['description'] ?: 'Açıklama yok') ?></p>
+                                <p class="text-sm text-gray-600 mb-3 line-clamp-2"><?= htmlspecialchars($product['description'] ?: 'Açıklama yok') ?></p>
                                 
                                 <div class="flex items-center justify-between mb-3">
                                     <div>
@@ -1259,19 +1259,19 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                                             ? $product['total_price'] 
                                             : $product['price'];
                                         ?>
-                                        <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">₺<?= number_format($total_price, 2, ',', '.') ?></span>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        <span class="text-lg font-bold text-indigo-600">₺<?= number_format($total_price, 2, ',', '.') ?></span>
+                                        <div class="text-xs text-gray-500 mt-1">
                                             <div>KDV dahildir</div>
                                         </div>
                                     </div>
-                                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                                    <div class="text-sm text-gray-600">
                                         <span class="font-medium">Stok:</span> <?= $product['stock'] ?>
                                     </div>
                                 </div>
                                 
                                 <!-- Yasal Bilgilendirmeler -->
-                                <div class="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                                    <div class="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                <div class="mt-3 pt-3 border-t border-gray-200">
+                                    <div class="flex flex-wrap gap-2 text-xs text-gray-500">
                                         <span class="inline-flex items-center gap-1">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -1294,7 +1294,7 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                                 </div>
                                 
                                 <div class="flex items-center gap-2 mb-3">
-                                    <span class="px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400 rounded"><?= htmlspecialchars($product['category']) ?></span>
+                                    <span class="px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-800 rounded"><?= htmlspecialchars($product['category']) ?></span>
                                 </div>
                                 
                                 <div class="flex gap-2">
@@ -1313,11 +1313,11 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                 </div>
             <?php else: ?>
                 <div class="text-center py-12">
-                    <svg class="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                     </svg>
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Henüz ürün eklenmemiş</h4>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Topluluğunuzun ürünlerini eklemek için "Yeni Ürün Ekle" butonuna tıklayın.</p>
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Henüz ürün eklenmemiş</h4>
+                    <p class="text-sm text-gray-600 mb-4">Topluluğunuzun ürünlerini eklemek için "Yeni Ürün Ekle" butonuna tıklayın.</p>
                     <button onclick="window.openAddProductModal()" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200 font-medium">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -1339,7 +1339,7 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                 </button>
                 <div id="productsLoadingSpinner" class="hidden mt-4">
                     <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-                    <p class="text-gray-600 dark:text-gray-400 mt-2">Yükleniyor...</p>
+                    <p class="text-gray-600 mt-2">Yükleniyor...</p>
                 </div>
             </div>
             <?php endif; ?>
@@ -1350,11 +1350,11 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
 
 <!-- Ürün Ekleme Modal -->
 <div id="addProductModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Yeni Ürün Ekle</h3>
-                <button onclick="window.closeAddProductModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <h3 class="text-xl font-semibold text-gray-900">Yeni Ürün Ekle</h3>
+                <button onclick="window.closeAddProductModal()" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -1367,12 +1367,12 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
             <?= csrf_token_field() ?>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ürün Adı *</label>
-                <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ürün Adı *</label>
+                <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
             </div>
             
             <div>
-                <label class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                <label class="block text-sm font-semibold text-gray-800 mb-2">
                     Açıklama
                 </label>
                 <div class="mb-2">
@@ -1385,26 +1385,26 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                         <span>AI ile Oluştur</span>
                     </button>
                 </div>
-                <textarea name="description" id="add-product-description" rows="4" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"></textarea>
+                <textarea name="description" id="add-product-description" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"></textarea>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fiyat (₺) *</label>
-                    <input type="number" name="price" id="add-product-price" step="0.01" min="0" required oninput="calculateCommission('add')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">KDV dahil fiyat giriniz</p>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Fiyat (₺) *</label>
+                    <input type="number" name="price" id="add-product-price" step="0.01" min="0" required oninput="calculateCommission('add')" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
+                    <p class="text-xs text-gray-500 mt-1">KDV dahil fiyat giriniz</p>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stok Miktarı</label>
-                    <input type="number" name="stock" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Stok Miktarı</label>
+                    <input type="number" name="stock" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
                 </div>
             </div>
             
             <!-- Yasal Bilgilendirme -->
-            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <h4 class="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Yasal Bilgilendirme</h4>
-                <ul class="text-xs text-blue-800 dark:text-blue-200 space-y-1 list-disc list-inside">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-blue-900 mb-2">Yasal Bilgilendirme</h4>
+                <ul class="text-xs text-blue-800 space-y-1 list-disc list-inside">
                     <li>Ürün fiyatları KDV dahildir.</li>
                     <li>Tüketiciler 14 gün içinde cayma hakkına sahiptir.</li>
                     <li>Ürünler 2 yıl garanti kapsamındadır.</li>
@@ -1414,40 +1414,40 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Platform Komisyon Oranı</label>
-                <input type="text" value="<?= defined('FIXED_COMMISSION_RATE') ? FIXED_COMMISSION_RATE : 5.0 ?>%" readonly class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Sabit komisyon oranı (değiştirilemez)</p>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Platform Komisyon Oranı</label>
+                <input type="text" value="<?= defined('FIXED_COMMISSION_RATE') ? FIXED_COMMISSION_RATE : 5.0 ?>%" readonly class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
+                <p class="text-xs text-gray-500 mt-1">Sabit komisyon oranı (değiştirilemez)</p>
             </div>
             
             <!-- Komisyon Hesaplama Gösterimi -->
-            <div id="add-commission-preview" class="hidden bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Komisyon Hesaplaması</h4>
+            <div id="add-commission-preview" class="hidden bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h4 class="text-sm font-semibold text-gray-900 mb-3">Komisyon Hesaplaması</h4>
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Satış Fiyatı:</span>
-                        <span class="font-medium text-gray-900 dark:text-gray-100" id="add-base-price">₺0,00</span>
+                        <span class="text-gray-600">Satış Fiyatı:</span>
+                        <span class="font-medium text-gray-900" id="add-base-price">₺0,00</span>
                     </div>
                     <div class="flex justify-between" id="add-iyzico-row" style="display: none;">
-                        <span class="text-gray-600 dark:text-gray-400">İyzico Komisyonu:</span>
-                        <span class="font-medium text-orange-600 dark:text-orange-400" id="add-iyzico-commission">₺0,00</span>
+                        <span class="text-gray-600">İyzico Komisyonu:</span>
+                        <span class="font-medium text-orange-600" id="add-iyzico-commission">₺0,00</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Platform Komisyonu (%<?= defined('FIXED_COMMISSION_RATE') ? FIXED_COMMISSION_RATE : 5.0 ?>):</span>
-                        <span class="font-medium text-purple-600 dark:text-purple-400" id="add-platform-commission">₺0,00</span>
+                        <span class="text-gray-600">Platform Komisyonu (%<?= defined('FIXED_COMMISSION_RATE') ? FIXED_COMMISSION_RATE : 5.0 ?>):</span>
+                        <span class="font-medium text-purple-600" id="add-platform-commission">₺0,00</span>
                     </div>
-                    <div class="pt-2 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-                        <span class="font-semibold text-gray-900 dark:text-gray-100">Müşteri Ödeyeceği Toplam:</span>
-                        <span class="font-bold text-lg text-indigo-600 dark:text-indigo-400" id="add-total-price">₺0,00</span>
+                    <div class="pt-2 border-t border-gray-200 flex justify-between">
+                        <span class="font-semibold text-gray-900">Müşteri Ödeyeceği Toplam:</span>
+                        <span class="font-bold text-lg text-indigo-600" id="add-total-price">₺0,00</span>
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 italic">
+                    <div class="text-xs text-gray-500 italic">
                         * Komisyon fiyatın içinden alınır (üstüne eklenmez)
                     </div>
                 </div>
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
-                <input type="text" name="category" value="Genel" list="categories-list" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                <input type="text" name="category" value="Genel" list="categories-list" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
                 <datalist id="categories-list">
                     <?php foreach ($categories as $cat): ?>
                         <option value="<?= htmlspecialchars($cat) ?>">
@@ -1456,14 +1456,14 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ürün Görselleri (Maksimum 10)</label>
-                <input type="file" name="images[]" accept="image/*" multiple id="add-product-images-input" onchange="previewProductImages('add', this)" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">JPG, PNG, GIF veya WebP formatında (Max: 2MB per görsel, Maksimum 10 görsel)</p>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ürün Görselleri (Maksimum 10)</label>
+                <input type="file" name="images[]" accept="image/*" multiple id="add-product-images-input" onchange="previewProductImages('add', this)" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
+                <p class="text-xs text-gray-500 mt-1">JPG, PNG, GIF veya WebP formatında (Max: 2MB per görsel, Maksimum 10 görsel)</p>
                 <div id="add-product-images-preview" class="mt-3 grid grid-cols-3 gap-2"></div>
             </div>
             
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <button type="button" onclick="window.closeAddProductModal()" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button type="button" onclick="window.closeAddProductModal()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-200">
                     İptal
                 </button>
                 <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200 font-medium">
@@ -1476,11 +1476,11 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
 
 <!-- Ürün Düzenleme Modal -->
 <div id="editProductModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6 border-b border-gray-200 dark:border-gray-700">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-gray-200">
             <div class="flex items-center justify-between">
-                <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Ürün Düzenle</h3>
-                <button onclick="window.closeEditProductModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                <h3 class="text-xl font-semibold text-gray-900">Ürün Düzenle</h3>
+                <button onclick="window.closeEditProductModal()" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -1494,12 +1494,12 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
             <?= csrf_token_field() ?>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ürün Adı *</label>
-                <input type="text" name="name" id="edit-product-name" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ürün Adı *</label>
+                <input type="text" name="name" id="edit-product-name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
             </div>
             
             <div>
-                <label class="block text-sm font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                <label class="block text-sm font-semibold text-gray-800 mb-2">
                     Açıklama
                 </label>
                 <div class="mb-2">
@@ -1512,26 +1512,26 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
                         <span>AI ile Oluştur</span>
                     </button>
                 </div>
-                <textarea name="description" id="edit-product-description" rows="4" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"></textarea>
+                <textarea name="description" id="edit-product-description" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"></textarea>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Fiyat (₺) *</label>
-                    <input type="number" name="price" id="edit-product-price" step="0.01" min="0" required oninput="calculateCommission('edit')" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">KDV dahil fiyat giriniz</p>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Fiyat (₺) *</label>
+                    <input type="number" name="price" id="edit-product-price" step="0.01" min="0" required oninput="calculateCommission('edit')" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
+                    <p class="text-xs text-gray-500 mt-1">KDV dahil fiyat giriniz</p>
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Stok Miktarı</label>
-                    <input type="number" name="stock" id="edit-product-stock" min="0" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Stok Miktarı</label>
+                    <input type="number" name="stock" id="edit-product-stock" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
                 </div>
             </div>
             
             <!-- Yasal Bilgilendirme -->
-            <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <h4 class="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Yasal Bilgilendirme</h4>
-                <ul class="text-xs text-blue-800 dark:text-blue-200 space-y-1 list-disc list-inside">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 class="text-sm font-semibold text-blue-900 mb-2">Yasal Bilgilendirme</h4>
+                <ul class="text-xs text-blue-800 space-y-1 list-disc list-inside">
                     <li>Ürün fiyatları KDV dahildir.</li>
                     <li>Tüketiciler 14 gün içinde cayma hakkına sahiptir.</li>
                     <li>Ürünler 2 yıl garanti kapsamındadır.</li>
@@ -1541,40 +1541,40 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Platform Komisyon Oranı</label>
-                <input type="text" value="<?= defined('FIXED_COMMISSION_RATE') ? FIXED_COMMISSION_RATE : 5.0 ?>%" readonly class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Sabit komisyon oranı (değiştirilemez)</p>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Platform Komisyon Oranı</label>
+                <input type="text" value="<?= defined('FIXED_COMMISSION_RATE') ? FIXED_COMMISSION_RATE : 5.0 ?>%" readonly class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed">
+                <p class="text-xs text-gray-500 mt-1">Sabit komisyon oranı (değiştirilemez)</p>
             </div>
             
             <!-- Komisyon Hesaplama Gösterimi -->
-            <div id="edit-commission-preview" class="hidden bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Komisyon Hesaplaması</h4>
+            <div id="edit-commission-preview" class="hidden bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <h4 class="text-sm font-semibold text-gray-900 mb-3">Komisyon Hesaplaması</h4>
                 <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Satış Fiyatı:</span>
-                        <span class="font-medium text-gray-900 dark:text-gray-100" id="edit-base-price">₺0,00</span>
+                        <span class="text-gray-600">Satış Fiyatı:</span>
+                        <span class="font-medium text-gray-900" id="edit-base-price">₺0,00</span>
                     </div>
                     <div class="flex justify-between" id="edit-iyzico-row" style="display: none;">
-                        <span class="text-gray-600 dark:text-gray-400">İyzico Komisyonu:</span>
-                        <span class="font-medium text-orange-600 dark:text-orange-400" id="edit-iyzico-commission">₺0,00</span>
+                        <span class="text-gray-600">İyzico Komisyonu:</span>
+                        <span class="font-medium text-orange-600" id="edit-iyzico-commission">₺0,00</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-600 dark:text-gray-400">Platform Komisyonu (%<?= defined('FIXED_COMMISSION_RATE') ? FIXED_COMMISSION_RATE : 5.0 ?>):</span>
-                        <span class="font-medium text-purple-600 dark:text-purple-400" id="edit-platform-commission">₺0,00</span>
+                        <span class="text-gray-600">Platform Komisyonu (%<?= defined('FIXED_COMMISSION_RATE') ? FIXED_COMMISSION_RATE : 5.0 ?>):</span>
+                        <span class="font-medium text-purple-600" id="edit-platform-commission">₺0,00</span>
                     </div>
-                    <div class="pt-2 border-t border-gray-200 dark:border-gray-700 flex justify-between">
-                        <span class="font-semibold text-gray-900 dark:text-gray-100">Müşteri Ödeyeceği Toplam:</span>
-                        <span class="font-bold text-lg text-indigo-600 dark:text-indigo-400" id="edit-total-price">₺0,00</span>
+                    <div class="pt-2 border-t border-gray-200 flex justify-between">
+                        <span class="font-semibold text-gray-900">Müşteri Ödeyeceği Toplam:</span>
+                        <span class="font-bold text-lg text-indigo-600" id="edit-total-price">₺0,00</span>
                     </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400 italic">
+                    <div class="text-xs text-gray-500 italic">
                         * Komisyon fiyatın içinden alınır (üstüne eklenmez)
                     </div>
                 </div>
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
-                <input type="text" name="category" id="edit-product-category" list="categories-list-edit" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
+                <input type="text" name="category" id="edit-product-category" list="categories-list-edit" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
                 <datalist id="categories-list-edit">
                     <?php foreach ($categories as $cat): ?>
                         <option value="<?= htmlspecialchars($cat) ?>">
@@ -1583,22 +1583,22 @@ $maxProductLimitLabel = $maxProductLimit === -1 ? 'sınırsız' : $maxProductLim
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Durum</label>
-                <select name="status" id="edit-product-status" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Durum</label>
+                <select name="status" id="edit-product-status" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900">
                     <option value="active">Aktif</option>
                     <option value="inactive">Pasif</option>
                 </select>
             </div>
             
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ürün Görselleri (Maksimum 10)</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Ürün Görselleri (Maksimum 10)</label>
                 <div id="edit-product-images-preview" class="mb-2 grid grid-cols-3 gap-2"></div>
-                <input type="file" name="images[]" accept="image/*" multiple id="edit-product-images-input" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" onchange="previewProductImages('edit', this)">
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Yeni görseller yüklerseniz eski görseller değiştirilir (Maksimum 10 görsel)</p>
+                <input type="file" name="images[]" accept="image/*" multiple id="edit-product-images-input" class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900" onchange="previewProductImages('edit', this)">
+                <p class="text-xs text-gray-500 mt-1">Yeni görseller yüklerseniz eski görseller değiştirilir (Maksimum 10 görsel)</p>
             </div>
             
-            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <button type="button" onclick="window.closeEditProductModal()" class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
+            <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+                <button type="button" onclick="window.closeEditProductModal()" class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-200">
                     İptal
                 </button>
                 <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200 font-medium">
@@ -1725,19 +1725,19 @@ window.openEditProductModal = function(id, name, description, price, stock, cate
                     paths.forEach((path, index) => {
                         if (path) {
                             const imgUrl = path.startsWith('secure://') ? `index.php?action=product_media&file=${encodeURIComponent(path.replace('secure://products/', ''))}` : path;
-                            preview.innerHTML += `<div class="relative" data-old="true"><img src="${imgUrl}" alt="${name || 'Ürün'} ${index + 1}" class="w-full h-24 object-cover rounded-lg border border-gray-300 dark:border-gray-600" onerror="this.parentElement.remove()"></div>`;
+                            preview.innerHTML += `<div class="relative" data-old="true"><img src="${imgUrl}" alt="${name || 'Ürün'} ${index + 1}" class="w-full h-24 object-cover rounded-lg border border-gray-300" onerror="this.parentElement.remove()"></div>`;
                         }
                     });
                 } else if (typeof paths === 'string') {
                     // Tek string (eski format)
                     const imgUrl = paths.startsWith('secure://') ? `index.php?action=product_media&file=${encodeURIComponent(paths.replace('secure://products/', ''))}` : paths;
-                    preview.innerHTML = `<div class="relative" data-old="true"><img src="${imgUrl}" alt="${name || 'Ürün'}" class="w-full h-24 object-cover rounded-lg border border-gray-300 dark:border-gray-600" onerror="this.parentElement.remove()"></div>`;
+                    preview.innerHTML = `<div class="relative" data-old="true"><img src="${imgUrl}" alt="${name || 'Ürün'}" class="w-full h-24 object-cover rounded-lg border border-gray-300" onerror="this.parentElement.remove()"></div>`;
                 }
             } catch (e) {
                 // JSON parse hatası - tek string olarak kullan
                 const imgUrl = (typeof imagePaths === 'string' ? imagePaths : '').startsWith('secure://') ? `index.php?action=product_media&file=${encodeURIComponent((typeof imagePaths === 'string' ? imagePaths : '').replace('secure://products/', ''))}` : (typeof imagePaths === 'string' ? imagePaths : '');
                 if (imgUrl) {
-                    preview.innerHTML = `<div class="relative" data-old="true"><img src="${imgUrl}" alt="${name || 'Ürün'}" class="w-full h-24 object-cover rounded-lg border border-gray-300 dark:border-gray-600" onerror="this.parentElement.remove()"></div>`;
+                    preview.innerHTML = `<div class="relative" data-old="true"><img src="${imgUrl}" alt="${name || 'Ürün'}" class="w-full h-24 object-cover rounded-lg border border-gray-300" onerror="this.parentElement.remove()"></div>`;
                 }
             }
     }
@@ -2025,7 +2025,7 @@ window.createProductCard = function(product) {
     };
     
     const imageUrl = product.image_url || (product.image_path ? `index.php?action=product_media&file=${encodeURIComponent(product.image_path)}` : '');
-    const statusClass = product.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+    const statusClass = product.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800';
     const statusText = product.status === 'active' ? 'Aktif' : 'Pasif';
     
     // Değerleri önceden hazırla
@@ -2043,39 +2043,39 @@ window.createProductCard = function(product) {
     const productCommissionRate = parseFloat(product.commission_rate || 5.0);
     
     return `
-        <div class="product-card bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden hover:shadow-md transition duration-200" 
+        <div class="product-card bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition duration-200" 
              data-category="${escapeHtml(product.category || '')}"
              data-name="${escapeHtml((product.name || '').toLowerCase())}">
             ${imageUrl ? `
-                <div class="h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div class="h-48 bg-gray-200 overflow-hidden">
                     <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(product.name || '')}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\'%3E%3Crect fill=\'%23ddd\' width=\'200\' height=\'200\'/%3E%3Ctext fill=\'%23999\' font-family=\'sans-serif\' font-size=\'14\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dy=\'.3em\'%3EGörsel Yüklenemedi%3C/text%3E%3C/svg%3E';">
                 </div>
             ` : `
-                <div class="h-48 bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center">
-                    <svg class="w-16 h-16 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="h-48 bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                     </svg>
                 </div>
             `}
             <div class="p-4">
                 <div class="flex items-start justify-between mb-2">
-                    <h4 class="text-lg font-semibold text-gray-900 dark:text-gray-100">${escapeHtml(product.name || '')}</h4>
+                    <h4 class="text-lg font-semibold text-gray-900">${escapeHtml(product.name || '')}</h4>
                     <span class="px-2 py-1 text-xs font-medium rounded-full ${statusClass}">${statusText}</span>
                 </div>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">${escapeHtml(product.description || 'Açıklama yok')}</p>
+                <p class="text-sm text-gray-600 mb-3 line-clamp-2">${escapeHtml(product.description || 'Açıklama yok')}</p>
                 <div class="flex items-center justify-between mb-3">
                     <div>
-                        <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">₺${parseFloat(product.price || 0).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        <span class="text-lg font-bold text-indigo-600">₺${parseFloat(product.price || 0).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                     </div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                    <div class="text-sm text-gray-600">
                         <span class="font-medium">Stok:</span> ${product.stock || 0}
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <button data-product-id="${productId}" data-product-name="${escapeHtml(productName)}" data-product-desc="${escapeHtml(productDesc)}" data-product-price="${productPrice}" data-product-stock="${productStock}" data-product-category="${escapeHtml(productCategory)}" data-product-status="${escapeHtml(productStatus)}" data-product-image="${escapeHtml(productImageUrl)}" data-product-image-paths="${escapeHtml(productImagePathsJson)}" data-product-commission="${productCommissionRate}" class="edit-product-btn flex-1 px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors">
+                    <button data-product-id="${productId}" data-product-name="${escapeHtml(productName)}" data-product-desc="${escapeHtml(productDesc)}" data-product-price="${productPrice}" data-product-stock="${productStock}" data-product-category="${escapeHtml(productCategory)}" data-product-status="${escapeHtml(productStatus)}" data-product-image="${escapeHtml(productImageUrl)}" data-product-image-paths="${escapeHtml(productImagePathsJson)}" data-product-commission="${productCommissionRate}" class="edit-product-btn flex-1 px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg transition-colors">
                         Düzenle
                     </button>
-                    <button data-product-id="${productId}" data-product-name="${escapeHtml(productName)}" class="delete-product-btn px-3 py-2 text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                    <button data-product-id="${productId}" data-product-name="${escapeHtml(productName)}" class="delete-product-btn px-3 py-2 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors">
                             Sil
                         </button>
                 </div>
@@ -2136,7 +2136,7 @@ window.previewProductImages = function(mode, input) {
             imgDiv.className = 'relative';
             imgDiv.setAttribute('data-file-index', index);
             imgDiv.innerHTML = `
-                <img src="${e.target.result}" alt="Yeni görsel ${index + 1}" class="w-full h-24 object-cover rounded-lg border border-gray-300 dark:border-gray-600">
+                <img src="${e.target.result}" alt="Yeni görsel ${index + 1}" class="w-full h-24 object-cover rounded-lg border border-gray-300">
                 <button type="button" onclick="removeImagePreview(this, '${mode}')" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600">×</button>
             `;
             preview.appendChild(imgDiv);
@@ -2285,23 +2285,23 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!-- Yasal Bilgiler Footer -->
-<div class="mt-8 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+<div class="mt-8 bg-gray-50 rounded-xl border border-gray-200 p-6">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div>
-            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Yasal Bilgiler</h4>
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">Yasal Bilgiler</h4>
             <ul class="space-y-2 text-xs">
                 <li>
-                    <a href="https://foursoftware.net/marketing/stand-delivery-contract.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/stand-delivery-contract.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         Stant Teslimat Sözleşmesi
                     </a>
                 </li>
                 <li>
-                    <a href="https://foursoftware.net/marketing/cancellation-refund.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/cancellation-refund.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         İptal & İade Koşulları
                     </a>
                 </li>
                 <li>
-                    <a href="https://foursoftware.net/marketing/pre-information-form.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/pre-information-form.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         Ön Bilgilendirme Formu
                     </a>
                 </li>
@@ -2309,20 +2309,20 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         
         <div>
-            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Gizlilik & Güvenlik</h4>
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">Gizlilik & Güvenlik</h4>
             <ul class="space-y-2 text-xs">
                 <li>
-                    <a href="https://foursoftware.net/marketing/privacy-policy.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/privacy-policy.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         Gizlilik Politikası
                     </a>
                 </li>
                 <li>
-                    <a href="https://foursoftware.net/marketing/kvkk-aydinlatma-metni.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/kvkk-aydinlatma-metni.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         KVKK Aydınlatma Metni
                     </a>
                 </li>
                 <li>
-                    <a href="https://foursoftware.net/marketing/cookie-policy.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/cookie-policy.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         Çerez Politikası
                     </a>
                 </li>
@@ -2330,20 +2330,20 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         
         <div>
-            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Kullanım</h4>
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">Kullanım</h4>
             <ul class="space-y-2 text-xs">
                 <li>
-                    <a href="https://foursoftware.net/marketing/terms-of-use.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/terms-of-use.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         Kullanım Şartları
                     </a>
                 </li>
                 <li>
-                    <a href="https://foursoftware.net/marketing/consumer-rights.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/consumer-rights.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         Tüketici Hakları
                     </a>
                 </li>
                 <li>
-                    <a href="https://foursoftware.net/marketing/complaint-form.php" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition">
+                    <a href="https://fourkampus.com.tr/marketing/complaint-form.php" target="_blank" class="text-gray-600 hover:text-indigo-600 transition">
                         Şikayet Formu
                     </a>
                 </li>
@@ -2351,8 +2351,8 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
         
         <div>
-            <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">Bilgilendirme</h4>
-            <ul class="space-y-2 text-xs text-gray-600 dark:text-gray-400">
+            <h4 class="text-sm font-semibold text-gray-900 mb-3">Bilgilendirme</h4>
+            <ul class="space-y-2 text-xs text-gray-600">
                 <li>• Teslimat: Stant teslimatı - Topluluk stantından alınacak</li>
                 <li>• Garanti: 2 yıl</li>
                 <li>• İade: 14 gün içinde</li>
@@ -2361,15 +2361,15 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
     
-    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700 text-center">
+    <div class="mt-6 pt-6 border-t border-gray-200 text-center">
         <div class="flex flex-col items-center gap-2">
-            <p class="text-xs font-medium text-gray-600 dark:text-gray-400">
-                © <?= date('Y') ?> <span class="font-semibold text-indigo-600 dark:text-indigo-400">UniFour</span>
+            <p class="text-xs font-medium text-gray-600">
+                © <?= date('Y') ?> <span class="font-semibold text-indigo-600">Four Kampüs</span>
             </p>
-            <p class="text-xs text-gray-500 dark:text-gray-500">
+            <p class="text-xs text-gray-500">
                 Four Software tarafından geliştirilmiştir
             </p>
-            <p class="text-xs text-gray-400 dark:text-gray-600">
+            <p class="text-xs text-gray-400">
                 Tüm hakları saklıdır.
         </p>
         </div>

@@ -6,10 +6,10 @@
  * GET /api/events.php?id={id} - Tek bir etkinlik detayı
  */
 
-require_once __DIR__ . '/security_helper.php';
-require_once __DIR__ . '/../lib/autoload.php';
-require_once __DIR__ . '/auth_middleware.php';
-require_once __DIR__ . '/connection_pool.php';
+require_once __DIR__ . '/../security_helper.php';
+require_once __DIR__ . '/../../lib/autoload.php';
+require_once __DIR__ . '/../auth_middleware.php';
+require_once __DIR__ . '/../connection_pool.php';
 
 header('Content-Type: application/json; charset=utf-8');
 setSecureCORS();
@@ -42,10 +42,10 @@ $currentUser = optionalAuth();
 // Public index.php'deki fonksiyonları kullanmak için - Güvenli session ayarlarıyla
 configureSecureSession();
 
-require_once __DIR__ . '/../lib/core/Cache.php';
+require_once __DIR__ . '/../../lib/core/Cache.php';
 use UniPanel\Core\Cache;
 
-$publicCache = Cache::getInstance(__DIR__ . '/../system/cache');
+$publicCache = Cache::getInstance(__DIR__ . '/../../system/cache');
 
 /**
  * University filter helpers (shared behavior with api/communities.php and api/universities.php)
@@ -97,7 +97,7 @@ function get_requested_university_id() {
 
 // Kullanıcının üye olduğu toplulukları getir - members tablosundan e-posta ile kontrol
 function getUserCommunities($user_id, $user_email, $student_id = '') {
-    $communities_dir = __DIR__ . '/../communities';
+    $communities_dir = __DIR__ . '/../../communities';
     $user_communities = [];
     
     if (!is_dir($communities_dir)) {
@@ -178,7 +178,7 @@ function get_all_communities($useCache = true) {
         $cached = $publicCache->get($cacheKey);
         if ($cached !== null) return $cached;
     }
-    $communities_dir = __DIR__ . '/../communities';
+    $communities_dir = __DIR__ . '/../../communities';
     $communities = [];
     if (!is_dir($communities_dir)) return [];
     $dirs = scandir($communities_dir);
@@ -242,7 +242,7 @@ function sendResponse($success, $data = null, $message = null, $error = null) {
 }
 
 try {
-    $communities_dir = __DIR__ . '/../communities';
+    $communities_dir = __DIR__ . '/../../communities';
     $all_events = [];
     $requested_university_id = get_requested_university_id();
     
@@ -561,7 +561,8 @@ try {
             'qr_deep_link' => $qr_deep_link,
             'qr_code_url' => $qr_code_url,
             'is_member' => $is_member,
-            'membership_status' => $membership_status
+            'membership_status' => $membership_status,
+            'created_at' => $row['created_at'] ?? null
         ];
         
         // Bağlantıyı pool'a geri ver
@@ -777,7 +778,8 @@ try {
                 'status' => $row['status'] ?? 'upcoming',
                 'calendar_url' => $calendar_url,
                 'qr_deep_link' => $qr_deep_link,
-                'qr_code_url' => $qr_code_url
+                'qr_code_url' => $qr_code_url,
+                'created_at' => $row['created_at'] ?? null
             ];
         }
         
@@ -1022,7 +1024,8 @@ try {
                         'status' => $row['status'] ?? 'upcoming',
                         'calendar_url' => $calendar_url,
                         'qr_deep_link' => $qr_deep_link,
-                        'qr_code_url' => $qr_code_url
+                        'qr_code_url' => $qr_code_url,
+                        'created_at' => $row['created_at'] ?? null
                     ];
                 }
                 
@@ -1043,11 +1046,21 @@ try {
         }
     }
     
-    // Tüm etkinlikleri tarihe göre sırala (en yeni önce)
-    usort($all_events, function($a, $b) {
-        $dateA = ($a['date'] ?? '') . ' ' . ($a['time'] ?? '');
-        $dateB = ($b['date'] ?? '') . ' ' . ($b['time'] ?? '');
-        return strcmp($dateB, $dateA); // Descending order
+    // Sıralama
+    $sort = $_GET['sort'] ?? 'date';
+    
+    usort($all_events, function($a, $b) use ($sort) {
+        if ($sort === 'created_at') {
+            // Created At'e göre sırala (En yeni en üstte)
+            $dateA = $a['created_at'] ?? '';
+            $dateB = $b['created_at'] ?? '';
+            return strcmp($dateB, $dateA); // Descending
+        } else {
+            // Tarihe göre sırala (Varsayılan)
+            $dateA = ($a['date'] ?? '') . ' ' . ($a['time'] ?? '');
+            $dateB = ($b['date'] ?? '') . ' ' . ($b['time'] ?? '');
+            return strcmp($dateB, $dateA); // Descending order
+        }
     });
     
     // Toplam sayı

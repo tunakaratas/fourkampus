@@ -26,11 +26,11 @@ $smtp_config = $credentials['smtp'];
 $smtp_settings = [
     'smtp_username' => $smtp_config['username'] ?? '',
     'smtp_password' => $smtp_config['password'] ?? '',
-    'smtp_host' => $smtp_config['host'] ?? 'ms7.guzel.net.tr',
+    'smtp_host' => $smtp_config['host'] ?? 'ms8.guzel.net.tr',
     'smtp_port' => (string)($smtp_config['port'] ?? 587),
     'smtp_secure' => $smtp_config['encryption'] ?? 'tls',
-    'smtp_from_email' => $smtp_config['from_email'] ?? ($smtp_config['username'] ?? 'admin@foursoftware.com.tr'),
-    'smtp_from_name' => $smtp_config['from_name'] ?? 'UniFour'
+    'smtp_from_email' => $smtp_config['from_email'] ?? ($smtp_config['username'] ?? 'admin@fourkampus.com.tr'),
+    'smtp_from_name' => $smtp_config['from_name'] ?? 'Four Kampüs'
 ];
 
 echo "SMTP Ayarları:\n";

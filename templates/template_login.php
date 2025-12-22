@@ -55,6 +55,25 @@ const SESSION_PERSISTENT_LIFETIME = 60 * 60 * 24 * 7; // 7 gün
 
 
 // Session güvenlik ayarları
+// ÖNCE: Topluluk klasör adını bul ve benzersiz session name ayarla
+$script_dir_session = dirname($_SERVER['SCRIPT_FILENAME'] ?? __FILE__);
+$normalized_session = str_replace('\\', '/', $script_dir_session);
+$needle_session = '/communities/';
+$pos_session = strpos($normalized_session, $needle_session);
+$session_folder_name = 'default';
+
+if ($pos_session !== false) {
+    $after_session = substr($normalized_session, $pos_session + strlen($needle_session));
+    $parts_session = explode('/', $after_session);
+    if (!empty($parts_session[0])) {
+        $session_folder_name = $parts_session[0];
+    }
+}
+
+// Session name'i ayarla (boşlukları ve özel karakterleri temizle)
+$safe_session_name = 'FK_COMM_' . preg_replace('/[^a-zA-Z0-9]/', '', $session_folder_name);
+session_name($safe_session_name);
+
 if (session_status() === PHP_SESSION_NONE) {
     $is_secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
     $cookie_params = [
@@ -144,10 +163,19 @@ if (!defined('COMMUNITY_BASE_PATH')) {
 // Her topluluk kendi veritabanını kullanmalı
 if (defined('COMMUNITY_BASE_PATH')) {
     // Topluluk klasörü belirlenmişse, o klasördeki veritabanını kullan
-    $DB_PATH = COMMUNITY_BASE_PATH . '/fourkampus.sqlite';
+    // unipanel.sqlite varsa onu kullan (yeni standart), yoksa fourkampus.sqlite (yedek/eski)
+    if (file_exists(COMMUNITY_BASE_PATH . '/unipanel.sqlite')) {
+        $DB_PATH = COMMUNITY_BASE_PATH . '/unipanel.sqlite';
+    } else {
+        $DB_PATH = COMMUNITY_BASE_PATH . '/fourkampus.sqlite';
+    }
 } else {
     // Fallback: Mevcut script'in bulunduğu klasördeki veritabanını kullan
-    $DB_PATH = __DIR__ . '/fourkampus.sqlite';
+    if (file_exists(__DIR__ . '/unipanel.sqlite')) {
+        $DB_PATH = __DIR__ . '/unipanel.sqlite';
+    } else {
+        $DB_PATH = __DIR__ . '/fourkampus.sqlite';
+    }
     
     // Eğer mevcut klasör communities/ içindeyse, o topluluğun veritabanını kullan
     $script_dir = dirname($_SERVER['SCRIPT_FILENAME'] ?? __FILE__);
@@ -160,7 +188,11 @@ if (defined('COMMUNITY_BASE_PATH')) {
         if (!empty($parts[0])) {
             $community_path = dirname(__DIR__) . '/communities/' . $parts[0];
             if (is_dir($community_path)) {
-                $DB_PATH = $community_path . '/fourkampus.sqlite';
+                if (file_exists($community_path . '/unipanel.sqlite')) {
+                    $DB_PATH = $community_path . '/unipanel.sqlite';
+                } else {
+                    $DB_PATH = $community_path . '/fourkampus.sqlite';
+                }
             }
         }
     }
@@ -236,6 +268,222 @@ const LOGIN_SMS_COOLDOWN = 60; // seconds between verification SMS sends
 const CODE_VERIFICATION_MAX_ATTEMPTS = 5; // Max yanlış kod denemesi
 const CODE_VERIFICATION_LOCKOUT_TIME = 300; // 5 dakika lockout
 const SESSION_TIMEOUT_EXTEND = 60 * 60 * 24 * 7; // 7 gün - kod ekranında session uzatma
+
+// --- FORGOT PASSWORD HANDLERS ---
+if (isset($_POST['action']) && in_array($_POST['action'], ['forgot_send_code', 'forgot_verify_code', 'forgot_reset_password'])) {
+    
+    // Output buffer cleaning
+    while (ob_get_level()) {
+        ob_end_clean();
+    }
+    
+    // JSON Headers
+    header('Content-Type: application/json; charset=utf-8');
+    
+    try {
+        $db = get_db();
+        
+        if ($_POST['action'] === 'forgot_send_code') {
+            $username = trim($_POST['username'] ?? '');
+            $phone = trim($_POST['phone'] ?? ''); // User entered phone
+            
+            if (empty($username) || empty($phone)) {
+                throw new Exception('Kullanıcı adı ve telefon numarası zorunludur.');
+            }
+            
+            // 1. Verify username exists
+            $stmt = $db->prepare("SELECT id, username FROM admins WHERE username = ? AND club_id = ?");
+            $stmt->bindValue(1, $username, SQLITE3_TEXT);
+            $stmt->bindValue(2, CLUB_ID, SQLITE3_INTEGER);
+            $result = $stmt->execute();
+            $admin = $result->fetchArray(SQLITE3_ASSOC);
+            
+            if (!$admin) {
+                // Security: Fake delay to prevent enumeration
+                usleep(random_int(200000, 500000));
+                throw new Exception('Kullanıcı bilgileri doğrulanamadı.');
+            }
+            
+            // 2. Resolve admin phone
+            $admin_phone = resolve_verification_phone($db);
+            
+            // Normalize phones for comparison (remove spaces, leading +90, etc)
+            $normalized_input = preg_replace('/[^0-9]/', '', $phone);
+            $normalized_stored = preg_replace('/[^0-9]/', '', $admin_phone);
+            
+            // Basic normalization: if starts with 90, remove it, if starts with 0, remove it
+            function simple_normalize($p) {
+                if (substr($p, 0, 2) === '90') $p = substr($p, 2);
+                if (substr($p, 0, 1) === '0') $p = substr($p, 1);
+                return $p;
+            }
+            
+            if (simple_normalize($normalized_input) !== simple_normalize($normalized_stored)) {
+                 usleep(random_int(200000, 500000));
+                 throw new Exception('Girdiğiniz telefon numarası kayıtlı numara ile eşleşmiyor.');
+            }
+            
+            // 3. Generate and Send Code
+            $verification_code = (string)random_int(100000, 999999);
+            
+             // Use existing SMS function if available, otherwise manual NetGSM
+            if (function_exists('send_login_verification_sms')) {
+                $send_result = send_login_verification_sms($db, $admin_phone, $verification_code);
+                if (!$send_result || empty($send_result['success'])) {
+                    throw new Exception($send_result['error'] ?? 'SMS gönderilemedi.');
+                }
+            } else {
+                 // Fallback to direct NetGSM
+                  if (!function_exists('send_sms_netgsm')) {
+                    require_once __DIR__ . '/functions/communication.php';
+                }
+                 $message = "Four Kampus Sifre Sifirlama Kodunuz: $verification_code. Guvenliginiz icin kodu kimseyle paylasmayiniz.";
+                 $sms_result = send_sms_netgsm($admin_phone, $message);
+                 if (!$sms_result) {
+                     throw new Exception('SMS servisi yanıt vermedi.');
+                 }
+            }
+            
+             // 4. Save to session
+            $_SESSION['forgot_username'] = $username;
+            $_SESSION['forgot_code'] = $verification_code;
+            $_SESSION['forgot_code_time'] = time();
+            $_SESSION['forgot_verified'] = false;
+            
+            $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+            if ($is_ajax) {
+                echo json_encode(['success' => true]);
+                exit;
+            } else {
+                $success_redirect_url = '?view=forgot_verify';
+            }
+        }
+        
+        if ($_POST['action'] === 'forgot_verify_code') {
+            $code = trim($_POST['code'] ?? '');
+            
+            if (!isset($_SESSION['forgot_code']) || !isset($_SESSION['forgot_username'])) {
+                throw new Exception('Oturum zaman aşımına uğradı. Lütfen işlemi baştan başlatın.');
+            }
+            
+            if ((time() - $_SESSION['forgot_code_time']) > 300) { // 5 mins
+                throw new Exception('Doğrulama kodunun süresi doldu.');
+            }
+            
+            if ($code !== $_SESSION['forgot_code']) {
+                 throw new Exception('Hatalı doğrulama kodu.');
+            }
+            
+            $_SESSION['forgot_verified'] = true;
+            
+            $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+            if ($is_ajax) {
+                echo json_encode(['success' => true]);
+                exit;
+            } else {
+                $success_redirect_url = '?view=forgot_reset';
+            }
+        }
+        
+        if ($_POST['action'] === 'forgot_reset_password') {
+             $password = $_POST['password'] ?? '';
+             $password_confirm = $_POST['password_confirm'] ?? '';
+             $username = $_SESSION['forgot_username'] ?? '';
+             
+             if (!isset($_SESSION['forgot_verified']) || !$_SESSION['forgot_verified'] || empty($username)) {
+                 throw new Exception('Yetkisiz işlem.');
+             }
+             
+             if (empty($password) || strlen($password) < 6) {
+                 throw new Exception('Şifre en az 6 karakter olmalıdır.');
+             }
+             
+             if ($password !== $password_confirm) {
+                 throw new Exception('Şifreler eşleşmiyor.');
+             }
+             
+             $password_hash = password_hash($password, PASSWORD_DEFAULT);
+             
+             $stmt = $db->prepare("UPDATE admins SET password_hash = ? WHERE username = ? AND club_id = ?");
+             $stmt->bindValue(1, $password_hash, SQLITE3_TEXT);
+             $stmt->bindValue(2, $username, SQLITE3_TEXT);
+             $stmt->bindValue(3, CLUB_ID, SQLITE3_INTEGER);
+             $stmt->execute();
+             
+             // Clear session
+             unset($_SESSION['forgot_username'], $_SESSION['forgot_code'], $_SESSION['forgot_verified'], $_SESSION['forgot_code_time']);
+             
+             $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+             if ($is_ajax) {
+                 echo json_encode(['success' => true]);
+                 exit;
+             } else {
+                 $success_redirect_url = '?view=login&success=reset';
+             }
+        }
+        
+        if ($_POST['action'] === 'get_phone_hint') {
+            $username = trim($_POST['username'] ?? '');
+
+            if (empty($username)) {
+                echo json_encode(['success' => false, 'error' => 'Kullanıcı adı boş olamaz.']);
+                exit;
+            }
+
+            $stmt = $db->prepare("SELECT id, username FROM admins WHERE username = ? AND club_id = ?");
+            $stmt->bindValue(1, $username, SQLITE3_TEXT);
+            $stmt->bindValue(2, CLUB_ID, SQLITE3_INTEGER);
+            $result = $stmt->execute();
+            $admin = $result->fetchArray(SQLITE3_ASSOC);
+
+            if (!$admin) {
+                // Fake delay
+                usleep(random_int(200000, 500000));
+                echo json_encode(['success' => false, 'error' => 'Kullanıcı bulunamadı.']);
+                exit;
+            }
+
+            $admin_phone = resolve_verification_phone($db);
+            
+            if (empty($admin_phone)) {
+                 echo json_encode(['success' => false, 'error' => 'Bu kullanıcı için telefon numarası tanımlı değil.']);
+                 exit;
+            }
+            
+            // Mask phone: ******1234
+            $clean_phone = preg_replace('/[^0-9]/', '', $admin_phone);
+            // Mask phone: 1234 (no stars)
+            $clean_phone = preg_replace('/[^0-9]/', '', $admin_phone);
+            $masked_phone = substr($clean_phone, -4); // Show last 4 digits
+            if (strlen($clean_phone) < 4) {
+                 $masked_phone = $admin_phone; // Fallback for weird data
+            }
+
+            echo json_encode(['success' => true, 'hint' => $masked_phone]);
+            exit;
+        }
+
+    } catch (Exception $e) {
+        $is_ajax = !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
+        
+        if ($is_ajax) {
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+        } else {
+            // Fallback for non-JS submission errors
+            // Redirect back to the same view with error
+            $current_view = $_GET['view'] ?? 'login';
+            $error_msg = urlencode($e->getMessage());
+            header("Location: ?view=$current_view&error=$error_msg");
+        }
+        exit;
+    }
+}
+
+// Redirect helpers for non-AJAX success
+if (isset($success_redirect_url)) {
+    header("Location: $success_redirect_url");
+    exit;
+}
 
 // Güvenlik sabitleri
 const MAX_LOGIN_ATTEMPTS_PER_HOUR = 5; // Saatlik maksimum deneme
@@ -511,6 +759,7 @@ $folder_name = '';
 
 // DEBUG: Form'un render edildiğinden emin ol
 $debug_form_visible = true;
+$view = $_GET['view'] ?? 'login';
 
 try {
     // Topluluk klasör adını bul
@@ -525,21 +774,31 @@ try {
         $folder_name = $parts[0] ?? '';
         
         if (!empty($folder_name)) {
-            // Veritabanı dosyası var mı kontrol et
-            $db_path = dirname(__DIR__) . '/communities/' . $folder_name . '/fourkampus.sqlite';
+            // Veritabanı dosyası var mı kontrol et - unipanel.sqlite öncelikli
+            $db_path = dirname(__DIR__) . '/communities/' . $folder_name . '/unipanel.sqlite';
+            if (!file_exists($db_path)) {
+                $db_path = dirname(__DIR__) . '/communities/' . $folder_name . '/fourkampus.sqlite';
+            }
             
             if (!file_exists($db_path)) {
                 // Veritabanı yoksa, superadmin veritabanında talep durumunu kontrol et
-                $superadmin_db = dirname(__DIR__) . '/fourkampus.sqlite';
+                $superadmin_db = dirname(__DIR__) . '/unipanel.sqlite';
+                if (!file_exists($superadmin_db)) {
+                    $superadmin_db = dirname(__DIR__) . '/fourkampus.sqlite';
+                }
                 if (file_exists($superadmin_db)) {
-                    $super_db = new SQLite3($superadmin_db);
-                    $super_db->exec('PRAGMA journal_mode = WAL');
-                    $super_db->exec("CREATE TABLE IF NOT EXISTS community_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, community_name TEXT NOT NULL, folder_name TEXT NOT NULL, university TEXT NOT NULL, admin_username TEXT NOT NULL, admin_password_hash TEXT NOT NULL, admin_email TEXT, status TEXT DEFAULT 'pending', admin_notes TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, processed_at DATETIME, processed_by TEXT)");
-                    
-                    $check_stmt = $super_db->prepare("SELECT status, community_name, admin_notes FROM community_requests WHERE folder_name = ? ORDER BY created_at DESC LIMIT 1");
-                    $check_stmt->bindValue(1, $folder_name, SQLITE3_TEXT);
-                    $result = $check_stmt->execute();
-                    $request = $result->fetchArray(SQLITE3_ASSOC);
+                    try {
+                        $super_db = new SQLite3($superadmin_db, SQLITE3_OPEN_READONLY);
+                        
+                        // Tablo zaten varsa sorgula, yoksa atlat (readonly modda CREATE çalışmaz)
+                        $check_stmt = @$super_db->prepare("SELECT status, community_name, admin_notes FROM community_requests WHERE folder_name = ? ORDER BY created_at DESC LIMIT 1");
+                        if ($check_stmt) {
+                            $check_stmt->bindValue(1, $folder_name, SQLITE3_TEXT);
+                            $result = $check_stmt->execute();
+                            $request = $result ? $result->fetchArray(SQLITE3_ASSOC) : false;
+                        } else {
+                            $request = false;
+                        }
                     
                     if ($request) {
                         if ($request['status'] === 'pending') {
@@ -556,6 +815,11 @@ try {
                     }
                     
                     $super_db->close();
+                    } catch (Exception $e) {
+                        // Veritabanı açılamadı veya sorgu çalışmadı, devam et
+                        $community_pending = true;
+                        $community_pending_message = 'Topluluğunuz henüz oluşturulmamış. Lütfen superadmin onayını bekleyin.';
+                    }
                 } else {
                     // Superadmin veritabanı yoksa, veritabanı dosyası da yoksa beklemede
                     $community_pending = true;
@@ -2136,7 +2400,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
         
         .input-wrapper input {
             padding-left: 44px;
-            transition: all var(--transition-base);
         }
         
         .input-wrapper input:focus {
@@ -2144,7 +2407,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
         }
         
         .form-input {
-            transition: all var(--transition-base);
             background: var(--bg-primary) !important;
             display: block !important;
             visibility: visible !important;
@@ -2155,8 +2417,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
         
         .form-input:focus {
             border-color: #6366f1 !important;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
             outline: none !important;
+            box-shadow: none !important;
         }
         
         .input-wrapper {
@@ -2552,10 +2814,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                 </div>
             </div>
             <div class="auth-card-form">
+                <?php if ($view === 'login' && empty($show_verification)): ?>
                 <div class="auth-form-header">
                     <h2>Hoş Geldiniz</h2>
                     <p>Hesabınıza giriş yapın ve <?= htmlspecialchars($club_name) ?> yönetim paneline erişin.</p>
                 </div>
+                <?php endif; ?>
 
                 <?php if ($community_pending): ?>
                     <div class="mb-2 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-2xl text-sm flex items-start gap-3" style="animation: fadeInUp 0.4s ease-out;">
@@ -2663,8 +2927,149 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                         // Veya burada silip JS'e data olarak gömebiliriz ama güvenlik için session daha iyi.
                     ?>
                     <?php endif; ?>
+                <?php elseif ($view === 'forgot_password'): ?>
+                    <?php
+                    // Pre-fetch admin phone hint using the canonical resolution function
+                    $preset_phone_hint = '';
+                    try {
+                        $db_hint = get_db();
+                        $phone_val = resolve_verification_phone($db_hint);
+                        
+                        if (!empty($phone_val)) {
+                             $clean = preg_replace('/[^0-9]/', '', $phone_val);
+                             if (strlen($clean) >= 4) {
+                                 $preset_phone_hint = substr($clean, -4);
+                             }
+                         }
+                    } catch (Exception $e) { /* ignore */ }
+                    ?>
+                    <!-- Şifremi Unuttum - Adım 1: Telefon -->
+                    <div class="auth-form-header">
+                        <h2>Şifremi Unuttum</h2>
+                        <p>Kullanıcı adınızı ve telefon numaranızı girerek şifrenizi sıfırlayabilirsiniz.</p>
+                    </div>
+
+                    <form method="POST" action="" class="auth-form" id="forgotPhoneForm" style="display: flex !important; flex-direction: column !important; gap: 1.4rem !important;">
+                        <input type="hidden" name="action" value="forgot_send_code">
+                        
+                        <div style="display: block !important; margin-bottom: 1.4rem;">
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Kullanıcı Adı</label>
+                            <div class="input-wrapper" style="position: relative; width: 100%;">
+                                <i class="fas fa-user input-icon" style="position: absolute !important; left: 16px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 1 !important; color: #94a3b8 !important; pointer-events: none !important;"></i>
+                                <input type="text" name="username" required class="form-input" placeholder="Kullanıcı adınızı girin"
+                                       style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; min-height: 48px !important; padding: 14px 16px 14px 48px !important; border: 2px solid #e2e8f0 !important; border-radius: 16px !important; outline: none !important; font-weight: 500 !important; color: #0f172a !important; background: #ffffff !important; box-sizing: border-box !important;">
+                            </div>
+                        </div>
+
+                        <div style="display: block !important; margin-bottom: 1.4rem;">
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Telefon Numarası</label>
+                            <div class="input-wrapper" style="position: relative; width: 100%;">
+                                <i class="fas fa-phone input-icon" style="position: absolute !important; left: 16px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 1 !important; color: #94a3b8 !important; pointer-events: none !important;"></i>
+                                <input type="tel" name="phone" required class="form-input" placeholder="05XX XXX XX XX"
+                                       style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; min-height: 48px !important; padding: 14px 16px 14px 48px !important; border: 2px solid #e2e8f0 !important; border-radius: 16px !important; outline: none !important; font-weight: 500 !important; color: #0f172a !important; background: #ffffff !important; box-sizing: border-box !important;">
+                            </div>
+                            <?php if (!empty($preset_phone_hint)): ?>
+                                <div class="text-xs text-blue-600 mt-2 font-medium">
+                                    <i class="fas fa-info-circle mr-1"></i> İpucu: Kayıtlı numaranızın sonu <b><?= $preset_phone_hint ?></b> ile bitiyor.
+                                </div>
+                            <?php else: ?>
+                                 <p class="text-gray-500 text-xs mt-2">Sistemde kayıtlı yönetici telefonu ile eşleşmelidir.</p>
+                            <?php endif; ?>
+                            <!-- JS Dynamic Hint Container (hidden by default, used if user types specific username) -->
+                             <div id="phone-hint-display"></div> 
+                        </div>
+                        
+                        <div id="forgotPhoneError" class="mb-2 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm hidden"></div>
+
+                        <button type="submit" class="btn-primary w-full py-3.5 text-white rounded-xl font-semibold text-base" id="forgotPhoneBtn" style="letter-spacing: -0.01em; display: block !important; width: 100% !important; min-height: 48px !important;">
+                            Doğrulama Kodu Gönder
+                        </button>
+                        
+                        <div class="text-center mt-4">
+                            <a href="?view=login" class="text-sm font-medium link-primary">
+                                <i class="fas fa-arrow-left mr-1"></i> Giriş Yap
+                            </a>
+                        </div>
+                    </form>
+
+                <?php elseif ($view === 'forgot_verify'): ?>
+                    <!-- Şifremi Unuttum - Adım 2: Kod Doğrulama -->
+                    <div class="auth-form-header">
+                        <h2>Doğrulama Kodu</h2>
+                        <p>Telefonunuza gönderilen 6 haneli kodu giriniz.</p>
+                    </div>
+
+                    <form method="POST" action="" class="auth-form" id="forgotVerifyForm" style="display: flex !important; flex-direction: column !important; gap: 1.4rem !important;">
+                        <input type="hidden" name="action" value="forgot_verify_code">
+                        
+                        <div style="display: block !important; margin-bottom: 1.4rem;">
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Doğrulama Kodu</label>
+                            <div class="input-wrapper" style="position: relative; width: 100%;">
+                                <i class="fas fa-key input-icon" style="position: absolute !important; left: 16px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 1 !important; color: #94a3b8 !important; pointer-events: none !important;"></i>
+                                <input type="text" name="code" required maxlength="6" class="form-input text-center tracking-widest text-2xl font-bold" placeholder="000000"
+                                       style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; min-height: 48px !important; padding: 14px 16px 14px 48px !important; border: 2px solid #e2e8f0 !important; border-radius: 16px !important; outline: none !important; font-weight: 500 !important; color: #0f172a !important; background: #ffffff !important; box-sizing: border-box !important;">
+                            </div>
+                        </div>
+                        
+                        <div id="forgotVerifyError" class="mb-2 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm hidden"></div>
+
+                        <button type="submit" class="btn-primary w-full py-3.5 text-white rounded-xl font-semibold text-base" id="forgotVerifyBtn" style="letter-spacing: -0.01em; display: block !important; width: 100% !important; min-height: 48px !important;">
+                            Doğrula
+                        </button>
+                        
+                        <div class="text-center mt-4">
+                             <a href="?view=forgot_password" class="text-sm text-gray-500 hover:text-gray-700">Telefon numarasını değiştir</a>
+                        </div>
+                    </form>
+
+                <?php elseif ($view === 'forgot_reset'): ?>
+                    <!-- Şifremi Unuttum - Adım 3: Yeni Şifre -->
+                    <div class="auth-form-header">
+                        <h2>Yeni Şifre Belirle</h2>
+                        <p>Hesabınız için yeni bir şifre belirleyin.</p>
+                    </div>
+
+                    <form method="POST" action="" class="auth-form" id="forgotResetForm" style="display: flex !important; flex-direction: column !important; gap: 1.4rem !important;">
+                        <input type="hidden" name="action" value="forgot_reset_password">
+                        
+                        <div style="display: block !important; margin-bottom: 1.4rem;">
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Yeni Şifre</label>
+                            <div class="input-wrapper" style="position: relative; width: 100%;">
+                                <i class="fas fa-lock input-icon" style="position: absolute !important; left: 16px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 1 !important; color: #94a3b8 !important; pointer-events: none !important;"></i>
+                                <input type="password" name="password" required minlength="6" class="form-input" placeholder="••••••••"
+                                       style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; min-height: 48px !important; padding: 14px 48px 14px 48px !important; border: 2px solid #e2e8f0 !important; border-radius: 16px !important; outline: none !important; font-weight: 500 !important; color: #0f172a !important; background: #ffffff !important; box-sizing: border-box !important;">
+                                <i class="fas fa-eye cursor-pointer" onclick="const i=this.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password'; this.classList.toggle('fa-eye'); this.classList.toggle('fa-eye-slash');" 
+                                   style="position: absolute !important; right: 16px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 2 !important; color: #94a3b8 !important; cursor: pointer !important;"></i>
+                            </div>
+                        </div>
+
+                        <div style="display: block !important; margin-bottom: 1.4rem;">
+                            <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary);">Yeni Şifre (Tekrar)</label>
+                            <div class="input-wrapper" style="position: relative; width: 100%;">
+                                <i class="fas fa-lock input-icon" style="position: absolute !important; left: 16px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 1 !important; color: #94a3b8 !important; pointer-events: none !important;"></i>
+                                <input type="password" name="password_confirm" required minlength="6" class="form-input" placeholder="••••••••"
+                                       style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; min-height: 48px !important; padding: 14px 48px 14px 48px !important; border: 2px solid #e2e8f0 !important; border-radius: 16px !important; outline: none !important; font-weight: 500 !important; color: #0f172a !important; background: #ffffff !important; box-sizing: border-box !important;">
+                                <i class="fas fa-eye cursor-pointer" onclick="const i=this.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password'; this.classList.toggle('fa-eye'); this.classList.toggle('fa-eye-slash');" 
+                                   style="position: absolute !important; right: 16px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 2 !important; color: #94a3b8 !important; cursor: pointer !important;"></i>
+                            </div>
+                        </div>
+                        
+                        <div id="forgotResetError" class="mb-2 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm hidden"></div>
+
+                        <button type="submit" class="btn-primary w-full py-3.5 text-white rounded-xl font-semibold text-base" id="forgotResetBtn" style="letter-spacing: -0.01em; display: block !important; width: 100% !important; min-height: 48px !important;">
+                            Şifremi Güncelle
+                        </button>
+                    </form>
+
                 <?php else: ?>
                     <!-- Normal Giriş Formu -->
+                    <?php if (isset($_GET['success']) && $_GET['success'] === 'reset'): ?>
+                         <div class="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-2xl text-sm flex items-start gap-3">
+                            <i class="fas fa-check-circle mt-0.5 flex-shrink-0"></i>
+                            <span class="font-medium">Şifreniz başarıyla güncellendi. Yeni şifrenizle giriş yapabilirsiniz.</span>
+                        </div>
+                    <?php endif; ?>
+
                     <form method="POST" action="" class="auth-form" id="loginForm" style="display: flex !important; flex-direction: column !important; gap: 1.4rem !important; visibility: visible !important; opacity: 1 !important;" <?= $community_pending ? 'onsubmit="return false;"' : '' ?>>
                         <input type="hidden" name="csrf_token" value="<?= generate_csrf_token() ?>">
                         
@@ -2693,11 +3098,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                                        name="password" 
                                        required 
                                        <?= $community_pending ? 'disabled' : '' ?>
-                                       class="form-input"
-                                       style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; min-height: 48px !important; padding: 14px 16px 14px 48px !important; border: 2px solid #e2e8f0 !important; border-radius: 16px !important; outline: none !important; font-weight: 500 !important; color: #0f172a !important; background: #ffffff !important; box-sizing: border-box !important; <?= $community_pending ? 'opacity: 0.6 !important; cursor: not-allowed;' : '' ?>"
+                                        class="form-input"
+                                        style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important; min-height: 48px !important; padding: 14px 48px 14px 48px !important; border: 2px solid #e2e8f0 !important; border-radius: 16px !important; outline: none !important; font-weight: 500 !important; color: #0f172a !important; background: #ffffff !important; box-sizing: border-box !important; <?= $community_pending ? 'opacity: 0.6 !important; cursor: not-allowed;' : '' ?>"
                                        placeholder="••••••••"
                                        autocomplete="current-password">
+                                <i class="fas fa-eye cursor-pointer" onclick="const i=this.previousElementSibling; i.type = i.type === 'password' ? 'text' : 'password'; this.classList.toggle('fa-eye'); this.classList.toggle('fa-eye-slash');" 
+                                   style="position: absolute !important; right: 16px !important; top: 50% !important; transform: translateY(-50%) !important; z-index: 2 !important; color: #94a3b8 !important; cursor: pointer !important;"></i>
                             </div>
+                             <div class="text-right mt-2">
+                                <a href="?view=forgot_password" class="text-sm font-medium link-primary">Şifremi Unuttum?</a>
+                             </div>
                         </div>
 
                         <div class="auth-actions" style="display: flex !important; margin-bottom: 1.4rem;">
@@ -2712,6 +3122,117 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username']) && isset(
                         <?= $community_pending ? 'Onay Bekleniyor...' : 'Giriş Yap' ?>
                     </button>
                 </form>
+
+                <script>
+                // Forgot Password AJAX Handling
+                document.addEventListener('DOMContentLoaded', function() {
+                    const handleForgotForm = (formId, btnId, errorId, successRedirect) => {
+                        const form = document.getElementById(formId);
+                        if (!form) return;
+                        
+                        form.addEventListener('submit', function(e) {
+                            e.preventDefault();
+                            const btn = document.getElementById(btnId);
+                            const errorEl = document.getElementById(errorId);
+                            const originalBtnText = btn.innerHTML;
+                            
+                            btn.disabled = true;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> İşleniyor...';
+                            errorEl.classList.add('hidden');
+                            
+                            const formData = new FormData(form);
+                            
+                            fetch('', {
+                                method: 'POST',
+                                body: formData
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Robust Redirection Logic
+                                    if (successRedirect.startsWith('?')) {
+                                        // It's a query param change
+                                        const url = new URL(window.location.href);
+                                        const params = new URLSearchParams(successRedirect);
+                                        for (const [key, value] of params) {
+                                            url.searchParams.set(key, value);
+                                        }
+                                        window.location.href = url.toString();
+                                    } else {
+                                        // Absolute or relative path
+                                        window.location.href = successRedirect;
+                                    }
+                                } else {
+                                    errorEl.textContent = data.error || 'Bir hata oluştu.';
+                                    errorEl.classList.remove('hidden');
+                                    btn.disabled = false;
+                                    btn.innerHTML = originalBtnText;
+                                }
+                            })
+                            .catch(err => {
+                                errorEl.textContent = 'Sunucu bağlantı hatası.';
+                                errorEl.classList.remove('hidden');
+                                btn.disabled = false;
+                                btn.innerHTML = originalBtnText;
+                            });
+                        });
+                    };
+                    
+                    handleForgotForm('forgotPhoneForm', 'forgotPhoneBtn', 'forgotPhoneError', '?view=forgot_verify');
+                    handleForgotForm('forgotVerifyForm', 'forgotVerifyBtn', 'forgotVerifyError', '?view=forgot_reset');
+                    handleForgotForm('forgotResetForm', 'forgotResetBtn', 'forgotResetError', '?view=login&success=reset');
+                    
+                    // Phone Hint Logic
+                    const usernameInput = document.querySelector('input[name="username"]');
+                    const phoneInputWrapper = document.querySelector('input[name="phone"]')?.closest('div'); // Correct parent targeting
+                    
+                    if (usernameInput && phoneInputWrapper) {
+                        let hintEl = document.getElementById('phone-hint-display');
+                        if (!hintEl) {
+                            hintEl = document.createElement('div');
+                            hintEl.id = 'phone-hint-display';
+                            hintEl.className = 'text-xs text-blue-600 mt-2 font-medium hidden transition-all duration-300';
+                            phoneInputWrapper.appendChild(hintEl);
+                        }
+                        
+                        const fetchHint = () => {
+                             const username = usernameInput.value.trim();
+                            if (username.length > 0) {
+                                const formData = new FormData();
+                                formData.append('action', 'get_phone_hint');
+                                formData.append('username', username);
+                                
+                                fetch(window.location.href, { // Use current URL to ensure we hit the same controller
+                                    method: 'POST',
+                                    body: formData,
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if (data.success && data.hint) {
+                                        hintEl.innerHTML = '<i class="fas fa-info-circle mr-1"></i> İpucu: Numaranızın sonu <b>' + data.hint.slice(-4) + '</b> ile bitiyor.';
+                                        hintEl.classList.remove('hidden');
+                                        hintEl.classList.add('fade-in-up');
+                                    } else {
+                                        hintEl.classList.add('hidden');
+                                    }
+                                })
+                                .catch(err => console.error('Hint error:', err));
+                            } else {
+                                hintEl.classList.add('hidden');
+                            }
+                        };
+                        
+                        usernameInput.addEventListener('blur', fetchHint);
+                        // Optional: Also trigger if username is auto-filled
+                        usernameInput.addEventListener('change', fetchHint);
+                    }
+                });
+                    }
+                });
+                </script>
                 <?php endif; ?>
                 
                 <?php if ($community_pending): ?>

@@ -19,6 +19,7 @@ const SUPERADMIN_VERIFY_MAX_ATTEMPTS = 5;
 const SUPERADMIN_VERIFY_LOCK_SECONDS = 900;
 
 // Session başlat
+session_name('FK_SUPERADMIN');
 if (session_status() === PHP_SESSION_NONE) {
     $secure = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on';
     $cookieParams = [
@@ -274,12 +275,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             $error = 'Lütfen kullanıcı adı ve şifre giriniz.';
                 superadmin_register_failure('login', SUPERADMIN_LOGIN_MAX_ATTEMPTS, SUPERADMIN_LOGIN_LOCK_SECONDS);
         } else {
-            $db = new SQLite3(SUPERADMIN_DB_PATH);
-                    ensure_superadmin_phone_column($db);
-            $stmt = $db->prepare('SELECT * FROM superadmins WHERE username = :username');
-            $stmt->bindValue(':username', $username, SQLITE3_TEXT);
+            try {
+                $db = new SQLite3(SUPERADMIN_DB_PATH);
+                $db->busyTimeout(5000);
+                
+                // superadmins tablosunun varlığını kontrol et
+                $table_check = @$db->querySingle("SELECT name FROM sqlite_master WHERE type='table' AND name='superadmins'");
+                if (!$table_check) {
+                    // Tablo yoksa oluştur
+                    $db->exec("CREATE TABLE IF NOT EXISTS superadmins (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        username TEXT UNIQUE NOT NULL,
+                        password_hash TEXT NOT NULL,
+                        phone_number TEXT,
+                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )");
+                    // Varsayılan admin kullanıcısı
+                    $hashed = password_hash('admin123', PASSWORD_BCRYPT, ['cost' => 12]);
+                    @$db->exec("INSERT OR IGNORE INTO superadmins (username, password_hash) VALUES ('admin', '$hashed')");
+                }
+                
+                ensure_superadmin_phone_column($db);
+                $stmt = $db->prepare('SELECT * FROM superadmins WHERE username = :username');
+                if (!$stmt) {
+                    throw new Exception("Veritabanı sorgusu hazırlanamadı.");
+                }
+                $stmt->bindValue(':username', $username, SQLITE3_TEXT);
                 $result = $stmt->execute();
-                $admin = $result->fetchArray(SQLITE3_ASSOC);
+                $admin = $result ? $result->fetchArray(SQLITE3_ASSOC) : null;
             
             if ($admin && PasswordManager::verify($password, $admin['password_hash'])) {
                     superadmin_reset_attempts('login');
@@ -319,6 +342,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                     superadmin_register_failure('login', SUPERADMIN_LOGIN_MAX_ATTEMPTS, SUPERADMIN_LOGIN_LOCK_SECONDS);
             }
             $db->close();
+            } catch (Exception $e) {
+                $error = 'Veritabanı hatası: ' . $e->getMessage();
+            }
         }
         }
     }
@@ -340,23 +366,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                 $error = 'Doğrulama kodu süresi dolmuş veya geçersiz. Lütfen tekrar giriş yapın.';
                 $step = 'login';
             } elseif ($code === $_SESSION['superadmin_verification_code']) {
-                // Başarılı giriş
+                // Başarılı giriş - önce verification verileri al, sonra session yenile
+                $verified_username = $_SESSION['superadmin_verification_username'];
+                superadmin_reset_attempts('verify');
+                
+                // Session Fixation önlemi - ÖNCE session'ı yenile
+                session_regenerate_id(true);
+                
+                // Session değişkenlerini yeni session'a yaz
                 $_SESSION['superadmin_logged_in'] = true;
-                $_SESSION['superadmin_username'] = $_SESSION['superadmin_verification_username'];
+                $_SESSION['superadmin_username'] = $verified_username;
                 $_SESSION['superadmin_login_time'] = time();
                 $_SESSION['superadmin_ip'] = $_SERVER['REMOTE_ADDR'] ?? '';
                 $_SESSION['superadmin_ua'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
                 $_SESSION['superadmin_last_activity'] = time();
-                superadmin_reset_attempts('verify');
                 
-                // Session Fixation önlemi
-                regenerate_session_secure();
-                
-                // Temizlik
-                unset($_SESSION['superadmin_verification_code']);
-                unset($_SESSION['superadmin_verification_expires']);
-                unset($_SESSION['superadmin_verification_username']);
-                unset($_SESSION['superadmin_verification_last_sent']);
+                // Session'ı diske yaz
+                session_write_close();
+                session_start();
                 
                 superadmin_extend_session_cookie();
                 

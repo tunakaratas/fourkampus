@@ -260,7 +260,7 @@ class AuthService {
             ";
             
             $from_name = $smtp['from_name'] ?? 'Four Kampüs';
-            $from_email = $smtp['from_email'] ?? ($smtp['username'] ?? 'admin@foursoftware.com.tr');
+            $from_email = $smtp['from_email'] ?? ($smtp['username'] ?? 'admin@fourkampus.com.tr');
             
             if (function_exists('send_smtp_mail')) {
                 $smtpConfig = [

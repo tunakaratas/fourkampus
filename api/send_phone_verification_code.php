@@ -193,7 +193,7 @@ try {
         }
         
         if (!empty($netgsm_username) && !empty($netgsm_password) && function_exists('send_sms_netgsm')) {
-            $message = "UniFour telefon numarası doğrulama kodunuz: {$code}\n\nBu kod 10 dakika geçerlidir.\n\nEğer bu işlemi siz yapmadıysanız, bu mesajı görmezden gelebilirsiniz.";
+            $message = "Four Kampüs telefon numarası doğrulama kodunuz: {$code}\n\nBu kod 10 dakika geçerlidir.\n\nEğer bu işlemi siz yapmadıysanız, bu mesajı görmezden gelebilirsiniz.";
             
             $smsResult = send_sms_netgsm($phone_number, $message, $netgsm_username, $netgsm_password, $netgsm_msgheader);
             

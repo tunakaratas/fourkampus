@@ -157,7 +157,7 @@ try {
     // .ics dosyası içeriği
     $ics_content = "BEGIN:VCALENDAR\r\n";
     $ics_content .= "VERSION:2.0\r\n";
-    $ics_content .= "PRODID:-//UniFour//Event Calendar//TR\r\n";
+    $ics_content .= "PRODID:-//Four Kampus//Event Calendar//TR\r\n";
     $ics_content .= "CALSCALE:GREGORIAN\r\n";
     $ics_content .= "METHOD:PUBLISH\r\n";
     $ics_content .= "BEGIN:VEVENT\r\n";

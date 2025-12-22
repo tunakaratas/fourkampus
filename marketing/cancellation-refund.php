@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İptal ve İade Koşulları - UniFour</title>
-    <meta name="description" content="UniFour iptal ve iade koşulları. Ürün iade süreci ve koşulları hakkında detaylı bilgiler.">
+    <title>İptal ve İade Koşulları - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs iptal ve iade koşulları. Ürün iade süreci ve koşulları hakkında detaylı bilgiler.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -218,7 +218,7 @@
                 <h2>1. Genel Hükümler</h2>
                 <p>
                     Bu İptal ve İade Koşulları, 6502 sayılı Tüketicinin Korunması Hakkında Kanun 
-                    ve Mesafeli Sözleşmeler Yönetmeliği uyarınca hazırlanmıştır. UniFour platformu 
+                    ve Mesafeli Sözleşmeler Yönetmeliği uyarınca hazırlanmıştır. Four Kampüs platformu 
                     üzerinden yapılan satın alma işlemlerinde geçerlidir.
                 </p>
             </div>
@@ -280,7 +280,7 @@
                     Cayma hakkını kullanmak isteyen Alıcı, aşağıdaki yollardan biriyle bildirimde bulunabilir:
                 </p>
                 <ul>
-                    <li><strong>E-posta:</strong> info@unifour.com</li>
+                    <li><strong>E-posta:</strong> info@fourkampus.com.tr</li>
                     <li><strong>Telefon:</strong> +90 533 544 59 83</li>
                     <li><strong>Platform:</strong> Üyelik paneli üzerinden iletişim formu</li>
                 </ul>
@@ -403,17 +403,23 @@
             
             <div class="legal-section">
                 <h2>6. Abonelik İptali</h2>
-                <h3>6.1. Abonelik İptal Süreci</h3>
+                <h3>6.1. Abonelik Planları</h3>
+                <ul>
+                    <li><strong>Profesyonel Plan:</strong> ₺250/ay</li>
+                    <li><strong>Business Plan:</strong> ₺500/ay</li>
+                </ul>
+                
+                <h3>6.2. Abonelik İptal Süreci</h3>
                 <p>
-                    Profesyonel Plan aboneliğini iptal etmek için:
+                    Aboneliğinizi iptal etmek için:
                 </p>
                 <ul>
                     <li>Üyelik paneli üzerinden "Aboneliği İptal Et" seçeneğini kullanın</li>
-                    <li>E-posta ile info@unifour.com adresine bildirimde bulunun</li>
+                    <li>E-posta ile info@fourkampus.com.tr adresine bildirimde bulunun</li>
                     <li>Telefon ile +90 533 544 59 83 numarasını arayın</li>
                 </ul>
                 
-                <h3>6.2. Abonelik İptal Koşulları</h3>
+                <h3>6.3. Abonelik İptal Koşulları</h3>
                 <ul>
                     <li>
                         <strong>Dönem İçi İptal:</strong> Abonelik dönemi içinde iptal edilirse, 
@@ -431,18 +437,35 @@
             </div>
             
             <div class="legal-section">
-                <h2>7. İtiraz ve Şikayet</h2>
-                <h3>7.1. İtiraz Hakkı</h3>
+                <h2>7. Topluluk Market Ürünleri İadesi</h2>
+                <div class="warning-box">
+                    <p>
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <strong>Önemli:</strong> Platform üzerindeki topluluklar tarafından satılan fiziksel ürünlerin 
+                        iadesi, ilgili toplulukların belirleyeceği koşullara tabidir. Four Kampüs, bu ürünler 
+                        için aracı platform konumundadır.
+                    </p>
+                </div>
+                <p>
+                    Topluluk market ürünleri için iade talepleri doğrudan ilgili topluluk yöneticileri ile 
+                    iletişime geçilerek yapılmalıdır. Topluluklar, kendi iade politikalarını belirlemekle 
+                    yükümlüdür.
+                </p>
+            </div>
+            
+            <div class="legal-section">
+                <h2>8. İtiraz ve Şikayet</h2>
+                <h3>8.1. İtiraz Hakkı</h3>
                 <p>
                     İade/iptal işlemi ile ilgili itirazlarınızı aşağıdaki yollardan bildirebilirsiniz:
                 </p>
                 <ul>
-                    <li>E-posta: info@unifour.com</li>
+                    <li>E-posta: info@fourkampus.com.tr</li>
                     <li>Telefon: +90 533 544 59 83</li>
                     <li>Platform üzerinden iletişim formu</li>
                 </ul>
                 
-                <h3>7.2. Tüketici Hakem Heyeti</h3>
+                <h3>8.2. Tüketici Hakem Heyeti</h3>
                 <p>
                     Uyuşmazlıkların çözülememesi durumunda, Tüketici Hakem Heyetleri ve 
                     Tüketici Mahkemeleri'ne başvurabilirsiniz. İstanbul Tüketici Hakem Heyeti 
@@ -451,26 +474,26 @@
             </div>
             
             <div class="legal-section">
-                <h2>8. Özel Durumlar</h2>
-                <h3>8.1. Kampanya ve İndirimli Ürünler</h3>
+                <h2>9. Özel Durumlar</h2>
+                <h3>9.1. Kampanya ve İndirimli Ürünler</h3>
                 <p>
                     Kampanya ve indirimli ürünler için de aynı iptal ve iade koşulları geçerlidir. 
                     İndirimli fiyat üzerinden iade yapılır.
                 </p>
                 
-                <h3>8.2. Hediye Ürünler</h3>
+                <h3>9.2. Hediye Ürünler</h3>
                 <p>
                     Hediye olarak gönderilen ürünler için de aynı iptal ve iade koşulları geçerlidir.
                 </p>
             </div>
             
             <div class="legal-section">
-                <h2>9. İletişim</h2>
+                <h2>10. İletişim</h2>
                 <p>
                     İptal ve iade işlemleri hakkında sorularınız için:
                 </p>
                 <div class="contact-info">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>

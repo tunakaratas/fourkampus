@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Four Kampüs</string>
+    
+    <!-- Navigation -->
+    <string name="communities">Topluluklar</string>
+    <string name="events">Etkinlikler</string>
+    <string name="market">Market</string>
+    <string name="profile">Profil</string>
+    
+    <!-- Common Actions -->
+    <string name="share">Paylaş</string>
+    <string name="reminder">Hatırlat</string>
+    <string name="add_to_calendar">Takvime Ekle</string>
+    <string name="open_in_maps">Haritada Aç</string>
+    <string name="scan_qr">QR Kod Tara</string>
+    <string name="back">Geri</string>
+    <string name="cancel">İptal</string>
+    <string name="save">Kaydet</string>
+    <string name="delete">Sil</string>
+    <string name="edit">Düzenle</string>
+    <string name="close">Kapat</string>
+    
+    <!-- Language -->
+    <string name="language">Dil</string>
+    <string name="language_selection">Dil Seçimi</string>
+    <string name="current_language">Şu anki dil: %1$s</string>
+    <string name="turkish">Türkçe</string>
+    <string name="english">İngilizce</string>
+    
+    <!-- Settings -->
+    <string name="settings">Ayarlar</string>
+    <string name="notifications">Bildirimler</string>
+    <string name="enable_notifications">Bildirimleri Aç</string>
+    <string name="enable_notifications_desc">Uygulama bildirimlerini al</string>
+    <string name="email_notifications">E-posta Bildirimleri</string>
+    <string name="email_notifications_desc">E-posta ile bildirim al</string>
+    <string name="push_notifications">Push Bildirimleri</string>
+    <string name="push_notifications_desc">Anlık bildirimler al</string>
+    
+    <string name="appearance">Görünüm</string>
+    <string name="dark_mode">Karanlık Mod</string>
+    <string name="dark_mode_desc">Karanlık temayı kullan</string>
+    
+    <string name="account">Hesap</string>
+    <string name="change_password">Şifre Değiştir</string>
+    <string name="change_password_desc">Hesap şifrenizi güncelleyin</string>
+    <string name="privacy">Gizlilik</string>
+    <string name="privacy_desc">Gizlilik ayarlarınızı yönetin</string>
+    
+    <string name="app_info">Uygulama</string>
+    <string name="version">Versiyon</string>
+    <string name="developer">Geliştirici</string>
+    
+    <!-- Profile -->
+    <string name="change_photo">Fotoğraf Değiştir</string>
+    <string name="biometric_auth">Biyometrik Giriş</string>
+    <string name="search_history">Arama Geçmişi</string>
+    <string name="advanced_filters">Gelişmiş Filtreler</string>
+    
+    <!-- Auth -->
+    <string name="login">Giriş Yap</string>
+    <string name="signup">Kayıt Ol</string>
+    <string name="email">E-posta</string>
+    <string name="password">Şifre</string>
+    <string name="logout">Çıkış Yap</string>
+    <string name="no_account">Hesabınız yok mu? Kayıt Ol</string>
+    <string name="has_account">Zaten hesabınız var mı? Giriş Yap</string>
+    
+    <!-- Common Messages -->
+    <string name="loading">Yükleniyor…</string>
+    <string name="error">Hata</string>
+    <string name="success">Başarılı</string>
+    <string name="no_data">Veri bulunamadı</string>
+</resources>

@@ -5,7 +5,6 @@ require_once __DIR__ . '/security_helper.php';
  * Her topluluk ve etkinlik için özel QR kodlar oluşturur
  */
 
-header('Content-Type: application/json');
 require_once __DIR__ . '/connection_pool.php';
 
 // QR kod oluşturma için endroid/qr-code kütüphanesi kullanılacak
@@ -101,8 +100,29 @@ if ($method === 'GET') {
     
     // QR kod URL'i oluştur
     $qrUrl = generateQRCodeSVG($qrContent, $size);
+    
+    $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
+    $format = strtolower($_GET['format'] ?? '');
+    $forceJson = ($format === 'json');
+    $wantsImage = !$forceJson
+        && ($format === 'image' || $format === 'img' || $format === 'png' || strpos($accept, 'image/') !== false);
+    
+    if ($wantsImage) {
+        $qrImage = @file_get_contents($qrUrl);
+        if ($qrImage !== false) {
+            header('Content-Type: image/png');
+            header('Cache-Control: no-store');
+            echo $qrImage;
+            exit;
+        }
+        
+        header('Location: ' . $qrUrl);
+        exit;
+    }
+    
     $qrBase64 = generateQRCodeBase64($qrContent, $size);
     
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => true,
         'data' => [
@@ -118,10 +138,10 @@ if ($method === 'GET') {
     ]);
 } else {
     http_response_code(405);
+    header('Content-Type: application/json');
     echo json_encode([
         'success' => false,
         'error' => 'Method not allowed'
     ]);
 }
 ?>
-

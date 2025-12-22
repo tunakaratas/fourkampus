@@ -377,6 +377,7 @@ function ensure_events_table_columns($db) {
         $required_columns = [
             'image_path' => 'TEXT',
             'video_path' => 'TEXT',
+            'university' => 'TEXT',
             'category' => 'TEXT DEFAULT "Genel"',
             'status' => 'TEXT DEFAULT "planlanıyor"',
             'priority' => 'TEXT DEFAULT "normal"',
@@ -394,7 +395,9 @@ function ensure_events_table_columns($db) {
             'external_link' => 'TEXT',
             'cost' => 'REAL DEFAULT 0',
             'max_attendees' => 'INTEGER',
-            'min_attendees' => 'INTEGER'
+            'min_attendees' => 'INTEGER',
+            'created_at' => 'DATETIME DEFAULT CURRENT_TIMESTAMP',
+            'updated_at' => 'DATETIME DEFAULT CURRENT_TIMESTAMP'
         ];
         
         foreach ($required_columns as $column => $definition) {
@@ -410,6 +413,38 @@ function ensure_events_table_columns($db) {
     } catch (Exception $e) {
         tpl_error_log("Events tablosu güncellenirken hata: " . $e->getMessage());
     }
+}
+
+function get_community_university_name($db) {
+    $university = '';
+    try {
+        $table_check = @$db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='settings'");
+        if (!$table_check || !$table_check->fetchArray()) {
+            return '';
+        }
+        $stmt = @$db->prepare("SELECT setting_key, setting_value FROM settings WHERE club_id = 1 AND setting_key IN ('university', 'organization')");
+        if (!$stmt) {
+            return '';
+        }
+        $result = $stmt->execute();
+        if (!$result) {
+            return '';
+        }
+        while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+            $key = $row['setting_key'] ?? '';
+            $value = trim($row['setting_value'] ?? '');
+            if ($key === 'university' && $value !== '') {
+                $university = $value;
+                break;
+            }
+            if ($key === 'organization' && $university === '' && $value !== '') {
+                $university = $value;
+            }
+        }
+    } catch (Exception $e) {
+        return '';
+    }
+    return $university;
 }
 
 
@@ -572,16 +607,23 @@ function add_event($db, $post) {
             $tags = json_encode($tags_array);
         }
         
+        $event_university = get_community_university_name($db);
+        
+        $event_university = get_community_university_name($db);
+        $timestamp = date('Y-m-d H:i:s');
+        
         $stmt = $db->prepare("INSERT INTO events (
             club_id, title, date, time, location, description, image_path, video_path,
             category, status, priority, capacity, registration_required, registration_deadline,
             start_datetime, end_datetime, organizer, contact_email, contact_phone, tags,
-            visibility, featured, external_link, cost, max_attendees, min_attendees
+            visibility, featured, external_link, cost, max_attendees, min_attendees,
+            university, created_at, updated_at
         ) VALUES (
             :club_id, :title, :date, :time, :location, :description, :image_path, :video_path,
             :category, :status, :priority, :capacity, :registration_required, :registration_deadline,
             :start_datetime, :end_datetime, :organizer, :contact_email, :contact_phone, :tags,
-            :visibility, :featured, :external_link, :cost, :max_attendees, :min_attendees
+            :visibility, :featured, :external_link, :cost, :max_attendees, :min_attendees,
+            :university, :created_at, :updated_at
         )");
         
         $stmt->bindValue(':club_id', CLUB_ID, SQLITE3_INTEGER);
@@ -610,6 +652,9 @@ function add_event($db, $post) {
         $stmt->bindValue(':cost', $cost !== null ? $cost : 0, SQLITE3_FLOAT);
         $stmt->bindValue(':max_attendees', $max_attendees, $max_attendees === null ? SQLITE3_NULL : SQLITE3_INTEGER);
         $stmt->bindValue(':min_attendees', $min_attendees, $min_attendees === null ? SQLITE3_NULL : SQLITE3_INTEGER);
+        $stmt->bindValue(':university', $event_university, SQLITE3_TEXT);
+        $stmt->bindValue(':created_at', $timestamp, SQLITE3_TEXT);
+        $stmt->bindValue(':updated_at', $timestamp, SQLITE3_TEXT);
         $stmt->execute();
         $event_id = $db->lastInsertRowID();
         
@@ -669,10 +714,13 @@ function add_event($db, $post) {
         
         // Yeni etkinlik oluşturulduğunda push notification gönder
         try {
-            sendEventNotificationToMembers($db, $event_id, $title, $date, $time, $location);
+            @sendEventNotificationToMembers($db, $event_id, $title, $date, $time, $location);
         } catch (Exception $e) {
-            // Notification hatası kritik değil, sadece logla
-            tpl_error_log("Event notification gönderim hatası: " . $e->getMessage());
+            // Notification hatası kritik değil, sadece logla - kullanıcıya gösterme
+            @tpl_error_log("Event notification gönderim hatası: " . $e->getMessage());
+        } catch (Error $e) {
+            // Fatal error bile olsa etkinlik eklendi, logla ve devam et
+            @tpl_error_log("Event notification fatal error: " . $e->getMessage());
         }
         
         // Form verilerini temizle (JavaScript için)
@@ -882,6 +930,7 @@ function update_event($db, $post) {
             contact_email = :contact_email, contact_phone = :contact_phone, tags = :tags,
             visibility = :visibility, featured = :featured, external_link = :external_link,
             cost = :cost, max_attendees = :max_attendees, min_attendees = :min_attendees,
+            university = :university,
             updated_at = CURRENT_TIMESTAMP
             WHERE id = :id AND club_id = :club_id");
         
@@ -910,6 +959,7 @@ function update_event($db, $post) {
         $stmt->bindValue(':cost', $cost !== null ? $cost : 0, SQLITE3_FLOAT);
         $stmt->bindValue(':max_attendees', $max_attendees, $max_attendees === null ? SQLITE3_NULL : SQLITE3_INTEGER);
         $stmt->bindValue(':min_attendees', $min_attendees, $min_attendees === null ? SQLITE3_NULL : SQLITE3_INTEGER);
+        $stmt->bindValue(':university', $event_university, SQLITE3_TEXT);
         $stmt->bindValue(':id', $event_id, SQLITE3_INTEGER);
         $stmt->bindValue(':club_id', CLUB_ID, SQLITE3_INTEGER);
         $stmt->execute();
@@ -1541,89 +1591,79 @@ function sendEventNotificationToMembers($db, $event_id, $event_title, $event_dat
         }
         
         $superadminDb = new SQLite3($superadminDbPath);
-        $superadminDb->exec('PRAGMA journal_mode = WAL');
+        @$superadminDb->exec('PRAGMA journal_mode = DELETE');
         
-        // Topluluk ID'sini al
-        $db_path = $db->filename;
-        $community_id = basename(dirname($db_path));
+        // Topluluk ID'sini al (DB_PATH sabitinden)
+        $community_id = defined('COMMUNITY_ID') ? COMMUNITY_ID : (defined('CLUB_ID') ? 'community_' . CLUB_ID : 'unknown');
         
-        // Bu topluluğun üyelerini al (members tablosundan)
-        $members_query = $db->prepare("SELECT DISTINCT email, user_id FROM members WHERE club_id = 1 AND email IS NOT NULL AND email != ''");
-        $members_result = $members_query->execute();
+        // Bu topluluğun üyelerini al (members tablosundan) - sadece email
+        $members_query = @$db->prepare("SELECT DISTINCT email FROM members WHERE club_id = ? AND email IS NOT NULL AND email != ''");
+        if (!$members_query) {
+            @$superadminDb->close();
+            return; // SQL hazırlanamadıysa sessizce çık
+        }
+        $members_query->bindValue(1, CLUB_ID, SQLITE3_INTEGER);
+        $members_result = @$members_query->execute();
+        if (!$members_result) {
+            @$superadminDb->close();
+            return;
+        }
         
         $member_emails = [];
-        $member_user_ids = [];
         while ($row = $members_result->fetchArray(SQLITE3_ASSOC)) {
             if (!empty($row['email'])) {
                 $member_emails[] = strtolower(trim($row['email']));
             }
-            if (!empty($row['user_id'])) {
-                $member_user_ids[] = (string)$row['user_id'];
-            }
         }
         
-        if (empty($member_emails) && empty($member_user_ids)) {
-            $superadminDb->close();
+        if (empty($member_emails)) {
+            @$superadminDb->close();
             return; // Üye yoksa çık
         }
         
         // Bu topluluğun üyelerine ait device token'ları al
         // SQL injection koruması için prepared statement kullan
-        $placeholders_email = [];
-        $placeholders_user_id = [];
+        $placeholders = [];
         $params = [];
-        $param_index = 1;
         
         // Email'ler için placeholder'lar
-        if (!empty($member_emails)) {
-            foreach ($member_emails as $email) {
-                $placeholders_email[] = '?';
-                $params[] = $email;
-                $param_index++;
-            }
+        foreach ($member_emails as $email) {
+            $placeholders[] = '?';
+            $params[] = $email;
         }
         
-        // User ID'ler için placeholder'lar
-        if (!empty($member_user_ids)) {
-            foreach ($member_user_ids as $user_id) {
-                $placeholders_user_id[] = '?';
-                $params[] = $user_id;
-                $param_index++;
-            }
+        if (empty($placeholders)) {
+            @$superadminDb->close();
+            return;
         }
         
-        // Community ID için placeholder
-        $params[] = $community_id;
-        
-        // SQL sorgusunu oluştur
-        $where_conditions = [];
-        $bind_index = 1;
-        
-        if (!empty($placeholders_email)) {
-            $where_conditions[] = "user_email IN (" . implode(",", $placeholders_email) . ")";
-        }
-        if (!empty($placeholders_user_id)) {
-            $where_conditions[] = "user_id IN (" . implode(",", $placeholders_user_id) . ")";
-        }
-        $where_conditions[] = "community_id = ?";
-        
+        // SQL sorgusunu oluştur - sadece email bazlı
         $sql = "
-            SELECT DISTINCT device_token, platform, user_id, user_email 
+            SELECT DISTINCT device_token, platform, user_email 
             FROM device_tokens 
-            WHERE (" . implode(" OR ", $where_conditions) . ")
+            WHERE user_email IN (" . implode(",", $placeholders) . ")
             AND device_token IS NOT NULL 
             AND device_token != ''
         ";
         
-        $tokens_query = $superadminDb->prepare($sql);
+        $tokens_query = @$superadminDb->prepare($sql);
+        if (!$tokens_query) {
+            @$superadminDb->close();
+            return; // SQL hazırlanamadıysa sessizce çık
+        }
         
         // Parametreleri bağla
+        $bind_index = 1;
         foreach ($params as $param) {
             $tokens_query->bindValue($bind_index, $param, SQLITE3_TEXT);
             $bind_index++;
         }
         
-        $tokens_result = $tokens_query->execute();
+        $tokens_result = @$tokens_query->execute();
+        if (!$tokens_result) {
+            @$superadminDb->close();
+            return;
+        }
         
         $device_tokens = [];
         while ($row = $tokens_result->fetchArray(SQLITE3_ASSOC)) {
@@ -1631,7 +1671,7 @@ function sendEventNotificationToMembers($db, $event_id, $event_title, $event_dat
         }
         
         if (empty($device_tokens)) {
-            $superadminDb->close();
+            @$superadminDb->close();
             return; // Token yoksa çık
         }
         
@@ -1696,5 +1736,3 @@ function sendEventNotificationToMembers($db, $event_id, $event_title, $event_dat
         error_log("Event notification gönderme hatası (detay): " . $e->getTraceAsString());
     }
 }
-
-

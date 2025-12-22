@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ön Bilgilendirme Formu - UniFour</title>
-    <meta name="description" content="UniFour ön bilgilendirme formu. Ürün, fiyat ve teslimat hakkında yasal bilgiler.">
+    <title>Ön Bilgilendirme Formu - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs ön bilgilendirme formu. Ürün, fiyat ve teslimat hakkında yasal bilgiler.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -218,11 +218,11 @@
                 <table class="info-table">
                     <tr>
                         <td>Şirket Adı</td>
-                        <td>UniFour</td>
+                        <td>Four Kampüs</td>
                     </tr>
                     <tr>
                         <td>E-posta</td>
-                        <td>info@unifour.com</td>
+                        <td>info@fourkampus.com.tr</td>
                     </tr>
                     <tr>
                         <td>Telefon</td>
@@ -245,11 +245,11 @@
                 <table class="info-table">
                     <tr>
                         <td>Ürün/Hizmet Adı</td>
-                        <td>UniFour Profesyonel Plan</td>
+                        <td>Four Kampüs Profesyonel Plan</td>
                     </tr>
                     <tr>
                         <td>Açıklama</td>
-                        <td>Topluluk yönetim platformu, web sitesi, email hosting ve tüm özelliklere erişim</td>
+                        <td>Topluluk yönetim platformu, email hosting ve temel özelliklere erişim</td>
                     </tr>
                     <tr>
                         <td>Fiyat</td>
@@ -269,11 +269,43 @@
                     </tr>
                 </table>
                 
-                <h3>2. Diğer Ürün/Hizmetler</h3>
-                <p>
-                    Platform üzerinden sunulan diğer ürün ve hizmetlerin fiyat, özellik ve 
-                    teslimat bilgileri, ilgili ürün/hizmet sayfasında detaylı olarak belirtilir.
-                </p>
+                <h3>2. Business Plan Abonelik Hizmeti</h3>
+                <table class="info-table">
+                    <tr>
+                        <td>Ürün/Hizmet Adı</td>
+                        <td>Four Kampüs Business Plan</td>
+                    </tr>
+                    <tr>
+                        <td>Açıklama</td>
+                        <td>Gelişmiş topluluk yönetim platformu, öncelikli destek ve tüm özelliklere erişim</td>
+                    </tr>
+                    <tr>
+                        <td>Fiyat</td>
+                        <td>₺500/ay (KDV dahil)</td>
+                    </tr>
+                    <tr>
+                        <td>Ödeme Yöntemleri</td>
+                        <td>Kredi kartı, banka kartı, havale/EFT</td>
+                    </tr>
+                    <tr>
+                        <td>Teslimat Süresi</td>
+                        <td>Anında (dijital hizmet)</td>
+                    </tr>
+                    <tr>
+                        <td>Teslimat Yöntemi</td>
+                        <td>E-posta ile erişim bilgileri gönderilir</td>
+                    </tr>
+                </table>
+                
+                <h3>3. Topluluk Market Ürünleri</h3>
+                <div class="warning-box">
+                    <p>
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <strong>Not:</strong> Platform üzerindeki topluluklar tarafından satışa sunulan fiziksel ürünler, 
+                        ilgili toplulukların sorumluluğundadır. Bu ürünlerin satışı, teslimatı, kalitesi ve iadesi 
+                        topluluk yöneticileri tarafından yönetilir. Four Kampüs, bu ürünler için aracı konumundadır.
+                    </p>
+                </div>
             </div>
             
             <div class="legal-section">
@@ -357,7 +389,7 @@
                     Cayma hakkını kullanmak için:
                 </p>
                 <ul>
-                    <li>E-posta: info@unifour.com</li>
+                    <li>E-posta: info@fourkampus.com.tr</li>
                     <li>Telefon: +90 533 544 59 83</li>
                     <li>Platform üzerinden iletişim formu</li>
                 </ul>
@@ -408,7 +440,7 @@
                     Ön bilgilendirme formu hakkında sorularınız için:
                 </p>
                 <div class="contact-info">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>
@@ -424,4 +456,3 @@
     </div>
 </body>
 </html>
-

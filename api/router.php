@@ -172,7 +172,7 @@ class Router {
         // register_2fa.php kaldırıldı - kayıt altyapısı kaldırıldı
         
         // Remove base path if exists
-        $path = str_replace('/unipanel', '', $path);
+        $path = str_replace('/fourkampus', '', $path);
         $path = str_replace('/api/v1', '', $path); // Remove /api/v1 from path
         
         // Debug: Log the path

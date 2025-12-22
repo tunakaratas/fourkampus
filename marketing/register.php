@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topluluk Kayıt - UniPanel</title>
-    <meta name="description" content="Topluluğunuzu UniPanel'e kaydedin. İlk yıl tamamen ücretsiz!">
+    <title>Topluluk Kayıt - Four Kampüs</title>
+    <meta name="description" content="Topluluğunuzu Four Kampüs'e kaydedin. Bandırma 17 Eylül Üniversitesi topluluklarına Profesyonel Plan 6 ay ücretsiz.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -176,23 +176,35 @@
         @media (min-width: 1024px) {
             body {
                 padding: 0;
+                overflow: hidden;
             }
 
             .auth-page {
                 max-width: none;
+                height: 100vh;
                 min-height: 100vh;
                 align-items: stretch;
                 justify-content: stretch;
+                overflow: hidden;
             }
 
             .auth-card {
+                height: 100vh;
                 min-height: 100vh;
                 grid-template-columns: minmax(0, 0.75fr) minmax(0, 1fr);
             }
 
-            .auth-card-media,
+            .auth-card-media {
+                height: 100%;
+                overflow: hidden;
+            }
+
             .auth-card-form {
                 height: 100%;
+                overflow-y: auto;
+                justify-content: flex-start;
+                padding-top: 2rem;
+                padding-bottom: 5rem;
             }
         }
 
@@ -248,18 +260,19 @@
             gap: 1rem;
         }
 
-        .auth-brand-icon {
+        .auth-brand-logo {
             width: clamp(60px, 10vw, 72px);
             height: clamp(60px, 10vw, 72px);
-            border-radius: 20px;
-            display: grid;
-            place-items: center;
-            background: rgba(255, 255, 255, 0.16);
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        .auth-brand-icon i {
-            font-size: clamp(1.8rem, 3vw, 2.2rem);
+        
+        .auth-brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
         }
 
         .auth-brand h1 {
@@ -511,21 +524,21 @@
             <div class="auth-card-media">
                 <div class="auth-media-content">
                     <div class="auth-brand">
-                        <div class="auth-brand-icon">
-                            <i class="fas fa-graduation-cap"></i>
+                        <div class="auth-brand-logo">
+                            <img src="assets/images/brand/nobackground_logo.png" alt="Four Kampüs" class="auth-logo-img">
                         </div>
                         <div>
-                            <h1>UniPanel</h1>
+                            <h1>Four Kampüs</h1>
                             <p>Topluluk Yönetimi</p>
                         </div>
                     </div>
                     <div>
                         <h2 class="auth-headline">Topluluğunuzu kaydedin ve yönetmeye başlayın</h2>
-                        <p class="auth-subheadline">UniPanel ile topluluğunuzu profesyonelce yönetin. Etkinlik planlama, üye takibi, bildirimler ve daha fazlası tek platformda. İlk yıl tamamen ücretsiz!</p>
+                        <p class="auth-subheadline">Four Kampüs ile topluluğunuzu profesyonelce yönetin. Etkinlik planlama, üye takibi, bildirimler ve daha fazlası tek platformda. Bandırma 17 Eylül Üniversitesi topluluklarına Profesyonel Plan 6 ay ücretsiz.</p>
                     </div>
                     <ul class="auth-benefits">
-                        <li><i class="fas fa-check"></i> İlk yıl tamamen ücretsiz</li>
-                        <li><i class="fas fa-check"></i> Ücretsiz web sitesi ve email</li>
+                        <li><i class="fas fa-check"></i> Bandırma 17 Eylül Üniversitesi topluluklarına Profesyonel Plan 6 ay ücretsiz</li>
+                        <li><i class="fas fa-check"></i> Ücretsiz email adresleri</li>
                         <li><i class="fas fa-check"></i> 7/24 teknik destek</li>
                     </ul>
                 </div>
@@ -533,7 +546,7 @@
             <div class="auth-card-form">
                 <div class="auth-form-header">
                     <h2>Topluluk Kayıt</h2>
-                    <p>Topluluğunuzu UniPanel'e kaydedin ve yönetmeye başlayın.</p>
+                    <p>Topluluğunuzu Four Kampüs'e kaydedin ve yönetmeye başlayın.</p>
                 </div>
 
                 <div id="alertContainer"></div>
@@ -923,7 +936,7 @@
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Kayıt yapılıyor...';
             
             try {
-                const response = await fetch('../api/community_register.php', {
+                const response = await fetch('api/community_register.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

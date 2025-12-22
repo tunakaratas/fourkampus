@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KVKK Aydınlatma Metni - UniFour</title>
-    <meta name="description" content="UniFour KVKK aydınlatma metni. Kişisel verilerinizin işlenmesi hakkında bilgilendirme.">
+    <title>KVKK Aydınlatma Metni - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs KVKK aydınlatma metni. Kişisel verilerinizin işlenmesi hakkında bilgilendirme.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -151,13 +151,13 @@
             <div class="legal-section">
                 <h2>1. Veri Sorumlusu</h2>
                 <p>
-                    <strong>UniFour</strong> olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") 
+                    <strong>Four Kampüs</strong> olarak, 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") 
                     kapsamında veri sorumlusu sıfatıyla, kişisel verilerinizin işlenmesi hakkında 
                     sizleri bilgilendirmek isteriz.
                 </p>
                 <div class="highlight-box">
                     <p><strong>İletişim:</strong></p>
-                    <p>E-posta: info@unifour.com</p>
+                    <p>E-posta: info@fourkampus.com.tr</p>
                     <p>Telefon: +90 533 544 59 83</p>
                 </div>
             </div>
@@ -273,7 +273,7 @@
                 <div class="highlight-box">
                     <p>
                         <i class="fas fa-info-circle"></i> 
-                        <strong>Haklarınızı kullanmak için:</strong> info@unifour.com adresine e-posta gönderebilir 
+                        <strong>Haklarınızı kullanmak için:</strong> info@fourkampus.com.tr adresine e-posta gönderebilir 
                         veya +90 533 544 59 83 numaralı telefonu arayabilirsiniz.
                     </p>
                 </div>

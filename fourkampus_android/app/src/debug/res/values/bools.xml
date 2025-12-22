@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cleartext traffic - Debug modda true (localhost için) -->
+    <bool name="allow_cleartext_traffic">true</bool>
+</resources>
+

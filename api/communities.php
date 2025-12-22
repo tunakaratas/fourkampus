@@ -206,7 +206,7 @@ function get_all_communities($useCache = true) {
             }
             
             // Base URL
-            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'foursoftware.com.tr');
+            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'fourkampus.com.tr');
             $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
             $baseUrl = $protocol . '://' . $host;
             
@@ -559,7 +559,7 @@ try {
                 
                 // URLs
                 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
-                $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'foursoftware.com.tr');
+                $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'fourkampus.com.tr');
                 $baseUrl = $protocol . '://' . $host;
                 $qr_deep_link = 'unifour://community/' . urlencode($community_id);
                 $qr_code_url = $baseUrl . '/api/qr_code.php?type=community&id=' . urlencode($community_id);
@@ -704,7 +704,7 @@ try {
             ConnectionPool::releaseConnection($db_path, $poolId, true);
             
             // Base URL
-            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'foursoftware.com.tr');
+            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'fourkampus.com.tr');
             $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
             $baseUrl = $protocol . '://' . $host;
             
@@ -877,7 +877,7 @@ try {
         }
         
             // Base URL
-            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'foursoftware.com.tr');
+            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'fourkampus.com.tr');
             $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
             $baseUrl = $protocol . '://' . $host;
         

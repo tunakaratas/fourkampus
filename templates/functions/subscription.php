@@ -155,23 +155,23 @@ function render_subscription_view($db, $communityId) {
     
     ?>
     <div class="subscription-view">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Abonelik Yönetimi</h2>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Topluluğunuzun abonelik durumunu yönetin</p>
+                    <h2 class="text-2xl font-bold text-gray-900">Abonelik Yönetimi</h2>
+                    <p class="text-sm text-gray-500 mt-1">Topluluğunuzun abonelik durumunu yönetin</p>
                 </div>
             </div>
             
             <?php if ($paymentError): ?>
-                <div class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    <p class="text-sm text-red-800 dark:text-red-200"><?= htmlspecialchars($paymentError) ?></p>
+                <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-sm text-red-800"><?= htmlspecialchars($paymentError) ?></p>
                 </div>
             <?php endif; ?>
             
             <?php if ($paymentSuccess): ?>
-                <div class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <p class="text-sm text-green-800 dark:text-green-200"><?= htmlspecialchars($paymentSuccess) ?></p>
+                <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="text-sm text-green-800"><?= htmlspecialchars($paymentSuccess) ?></p>
                 </div>
             <?php endif; ?>
             
@@ -368,16 +368,16 @@ function render_subscription_view($db, $communityId) {
                 </div>
             <?php else: ?>
                 <div class="mb-6">
-                    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
                         <div class="flex items-center">
-                            <svg class="w-6 h-6 text-gray-400 dark:text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-6 h-6 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                <h3 class="text-lg font-semibold text-gray-900 mb-1">
                                     Abonelik Bulunmuyor
                                 </h3>
-                                <p class="text-sm text-gray-600 dark:text-gray-400">
+                                <p class="text-sm text-gray-600">
                                     Standart sürümü ücretsiz kullanabilir veya Professional/Business paketlerinden birini seçebilirsiniz.
                                 </p>
                             </div>
@@ -387,16 +387,16 @@ function render_subscription_view($db, $communityId) {
             <?php endif; ?>
             
             <!-- Paket Seçimi ve Ödeme -->
-            <div class="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+            <div class="border-t border-gray-200 pt-6 mt-6">
                 <?php if ($isSeptemberPromo): ?>
-                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-400 dark:border-green-600 rounded-lg p-4 mb-6">
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-400 rounded-lg p-4 mb-6">
                             <div class="flex items-start">
-                                <svg class="w-6 h-6 text-green-600 dark:text-green-400 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <svg class="w-6 h-6 text-green-600 mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                 </svg>
                                 <div>
-                                    <h4 class="text-lg font-bold text-green-800 dark:text-green-200 mb-1">🎉 Eylül Özel Kampanya!</h4>
-                                    <p class="text-sm text-green-700 dark:text-green-300">
+                                    <h4 class="text-lg font-bold text-green-800 mb-1">🎉 Eylül Özel Kampanya!</h4>
+                                    <p class="text-sm text-green-700">
                                         <strong>Tüm paketler bu ay ücretsiz!</strong> Pro sürüm özelliklerine ücretsiz erişim kazanın. Kampanya sadece Eylül ayı boyunca geçerlidir.
                                     </p>
                                 </div>
@@ -422,66 +422,66 @@ function render_subscription_view($db, $communityId) {
                         
                         <!-- Sürüm Seçimi -->
                         <div class="mb-8">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Sürüm Seçin</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Sürüm Seçin</h3>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="tier-selection">
                                 <?php 
                                 $tiers = [
                     'standard' => ['label' => 'Standart', 'monthly' => 0, 'unlimited' => true, 'color_classes' => [
-                        'border' => 'peer-checked:border-gray-500 hover:border-gray-300 dark:hover:border-gray-600',
-                        'bg' => 'peer-checked:bg-gray-50 dark:peer-checked:bg-gray-900/20',
-                        'text' => 'text-gray-600 dark:text-gray-400'
+                        'border' => 'peer-checked:border-gray-500 hover:border-gray-300',
+                        'bg' => 'peer-checked:bg-gray-50',
+                        'text' => 'text-gray-600'
                     ]],
                     'professional' => ['label' => 'Profesyonel', 'monthly' => 250, 'color_classes' => [
-                        'border' => 'peer-checked:border-blue-500 hover:border-blue-300 dark:hover:border-blue-600',
-                        'bg' => 'peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/20',
-                        'text' => 'text-blue-600 dark:text-blue-400'
+                        'border' => 'peer-checked:border-blue-500 hover:border-blue-300',
+                        'bg' => 'peer-checked:bg-blue-50',
+                        'text' => 'text-blue-600'
                     ]],
                     'business' => ['label' => 'Business', 'monthly' => 500, 'monthly_sms_gift' => 500, 'color_classes' => [
-                        'border' => 'peer-checked:border-purple-500 hover:border-purple-300 dark:hover:border-purple-600',
-                        'bg' => 'peer-checked:bg-purple-50 dark:peer-checked:bg-purple-900/20',
-                        'text' => 'text-purple-600 dark:text-purple-400'
+                        'border' => 'peer-checked:border-purple-500 hover:border-purple-300',
+                        'bg' => 'peer-checked:bg-purple-50',
+                        'text' => 'text-purple-600'
                     ]]
                 ];
                                 foreach ($tiers as $tierKey => $tierInfo): 
                                 ?>
                                     <label class="tier-option block" data-tier="<?= $tierKey ?>">
                                         <input type="radio" name="tier" value="<?= $tierKey ?>" class="peer hidden" <?= $tierKey === 'professional' ? 'checked' : '' ?>>
-                                        <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl p-6 cursor-pointer transition-all duration-200 <?= $tierInfo['color_classes']['border'] ?> <?= $tierInfo['color_classes']['bg'] ?> peer-checked:shadow-lg h-full flex flex-col min-h-[500px]">
+                                        <div class="border-2 border-gray-200 rounded-xl p-6 cursor-pointer transition-all duration-200 <?= $tierInfo['color_classes']['border'] ?> <?= $tierInfo['color_classes']['bg'] ?> peer-checked:shadow-lg h-full flex flex-col min-h-[500px]">
                                             <div class="text-center flex-grow flex flex-col">
-                                                <h4 class="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                                                <h4 class="text-xl font-bold text-gray-900 mb-3">
                                                     <?= htmlspecialchars($tierInfo['label']) ?>
                                                 </h4>
                                                 <div class="mb-4">
                                                     <?php if (isset($tierInfo['unlimited']) && $tierInfo['unlimited']): ?>
-                                                        <span class="text-2xl font-bold text-green-600 dark:text-green-400 block">
+                                                        <span class="text-2xl font-bold text-green-600 block">
                                                             ÜCRETSİZ
                                                         </span>
-                                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sınırsız</p>
+                                                        <p class="text-sm text-gray-500 mt-1">Sınırsız</p>
                                                     <?php elseif (isset($tierInfo['monthly_sms_gift'])): ?>
-                                                        <span class="text-2xl font-bold text-purple-600 dark:text-purple-400 block">
+                                                        <span class="text-2xl font-bold text-purple-600 block">
                                                             <?= number_format($tierInfo['monthly'], 0, ',', '.') ?>₺
                                                         </span>
-                                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">/ ay</p>
-                                                        <p class="text-xs text-green-600 dark:text-green-400 font-semibold mt-1">
+                                                        <p class="text-sm text-gray-500 mt-1">/ ay</p>
+                                                        <p class="text-xs text-green-600 font-semibold mt-1">
                                                             +<?= $tierInfo['monthly_sms_gift'] ?> SMS/ay hediye
                                                         </p>
                                                     <?php else: ?>
                                                         <span class="text-2xl font-bold <?= $tierInfo['color_classes']['text'] ?> block">
                                                             <?= number_format($tierInfo['monthly'], 0, ',', '.') ?>₺
                                                         </span>
-                                                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">/ ay</p>
+                                                        <p class="text-sm text-gray-500 mt-1">/ ay</p>
                                                     <?php endif; ?>
                                                 </div>
-                                                <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mt-auto">
-                                                    <h5 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 text-left">Paket İçeriği:</h5>
+                                                <div class="border-t border-gray-200 pt-4 mt-auto">
+                                                    <h5 class="text-sm font-semibold text-gray-900 mb-3 text-left">Paket İçeriği:</h5>
                                                     <div class="text-left space-y-2 max-h-[300px] overflow-y-auto">
                                                         <?php 
                                                         $samplePackage = $packagesByTier[$tierKey][0] ?? null;
                                                         if ($samplePackage && isset($samplePackage['features'])): 
                                                             foreach ($samplePackage['features'] as $feature): 
                                                         ?>
-                                                            <p class="text-xs text-gray-600 dark:text-gray-400 flex items-start">
-                                                                <span class="mr-2 mt-0.5 text-purple-600 dark:text-purple-400 flex-shrink-0">✓</span>
+                                                            <p class="text-xs text-gray-600 flex items-start">
+                                                                <span class="mr-2 mt-0.5 text-purple-600 flex-shrink-0">✓</span>
                                                                 <span class="leading-relaxed"><?= htmlspecialchars($feature) ?></span>
                                                             </p>
                                                         <?php 
@@ -499,20 +499,20 @@ function render_subscription_view($db, $communityId) {
                         
                         <!-- Süre Seçimi -->
                         <div class="mb-6" id="duration-selection" style="display: none;">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Süre Seçin</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Süre Seçin</h3>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <?php foreach ([1, 6, 12] as $months): ?>
                                     <label class="duration-option block" data-months="<?= $months ?>">
                                         <input type="radio" name="duration" value="<?= $months ?>" class="peer hidden" <?= $months === 12 ? 'checked' : '' ?>>
-                                        <div class="border-2 border-gray-200 dark:border-gray-700 rounded-xl p-5 cursor-pointer transition-all duration-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 peer-checked:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 h-full">
+                                        <div class="border-2 border-gray-200 rounded-xl p-5 cursor-pointer transition-all duration-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:shadow-lg hover:border-indigo-300 h-full">
                                             <div class="text-center">
-                                                <h5 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                                                <h5 class="font-semibold text-gray-900 mb-3">
                                                     <?= $months ?> Aylık
                                                 </h5>
-                                                <div id="price-<?= $months ?>" class="text-lg font-bold text-indigo-600 dark:text-indigo-400 mb-1">
+                                                <div id="price-<?= $months ?>" class="text-lg font-bold text-indigo-600 mb-1">
                                                     Hesaplanıyor...
                                                 </div>
-                                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1" id="discount-<?= $months ?>"></p>
+                                                <p class="text-xs text-gray-500 mt-1" id="discount-<?= $months ?>"></p>
                                             </div>
                                         </div>
                                     </label>
@@ -522,19 +522,19 @@ function render_subscription_view($db, $communityId) {
                         
                         <!-- SMS Ek Paketleri (Business aboneleri için) -->
                         <div class="mb-6" id="sms-addon-selection" style="display: none;">
-                            <div class="bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 p-4 mb-4">
+                            <div class="bg-purple-50 border-l-4 border-purple-500 p-4 mb-4">
                                 <div class="flex items-center">
-                                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-5 h-5 text-purple-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
                                     </svg>
                                     <div>
-                                        <h4 class="font-semibold text-purple-900 dark:text-purple-100">Business aboneliğinize SMS kredisi ekleyin</h4>
-                                        <p class="text-sm text-purple-700 dark:text-purple-300">Her ay 500 SMS hediye gelir. Daha fazla SMS için ek paket satın alabilirsiniz.</p>
+                                        <h4 class="font-semibold text-purple-900">Business aboneliğinize SMS kredisi ekleyin</h4>
+                                        <p class="text-sm text-purple-700">Her ay 500 SMS hediye gelir. Daha fazla SMS için ek paket satın alabilirsiniz.</p>
                                     </div>
                                 </div>
                             </div>
                             
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">SMS Ek Paketleri (Opsiyonel)</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">SMS Ek Paketleri (Opsiyonel)</h3>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 <?php 
                                 $addonPackages = $packagesByTier['business_addon'] ?? [];
@@ -542,26 +542,26 @@ function render_subscription_view($db, $communityId) {
                                 ?>
                                     <label class="sms-addon-option block cursor-pointer">
                                         <input type="radio" name="sms_addon" value="<?= number_format($package['sms_credits'], 0, '', '') ?>" class="peer hidden" data-price="<?= $package['price'] ?>" data-package-key="business_sms_addon_<?= number_format($package['sms_credits'], 0, '', '') ?>">
-                                        <div class="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4 transition-all duration-200 peer-checked:border-purple-500 peer-checked:bg-purple-50 dark:peer-checked:bg-purple-900/20 peer-checked:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 h-full flex flex-col">
+                                        <div class="border-2 border-gray-200 rounded-lg p-4 transition-all duration-200 peer-checked:border-purple-500 peer-checked:bg-purple-50 peer-checked:shadow-lg hover:border-purple-300 h-full flex flex-col">
                                             <div class="text-center flex-grow">
-                                                <div class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                                                <div class="text-sm font-semibold text-gray-900 mb-2">
                                                     <?= number_format($package['sms_credits'], 0, ',', '.') ?> SMS
                                                 </div>
-                                                <div class="text-xl font-bold text-purple-600 dark:text-purple-400 mb-2">
+                                                <div class="text-xl font-bold text-purple-600 mb-2">
                                                     <?= number_format($package['price'], 0, ',', '.') ?>₺
                                                 </div>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                                <div class="text-xs text-gray-500 mb-2">
                                                     <?php if ($package['commission_rate'] == 7): ?>
-                                                        <span class="text-green-600 dark:text-green-400 font-semibold">%7 komisyon</span>
+                                                        <span class="text-green-600 font-semibold">%7 komisyon</span>
                                                     <?php else: ?>
                                                         NetGSM + %<?= $package['commission_rate'] ?>
                                                     <?php endif; ?>
                                                 </div>
-                                                <div class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                                <div class="text-xs text-gray-500 mb-2">
                                                     <?= number_format($package['price'] / $package['sms_credits'], 4, ',', '.') ?>₺/SMS
                                                 </div>
                                                 <?php if (!empty($package['badge'])): ?>
-                                                    <span class="inline-block mt-1 px-2 py-0.5 text-xs font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
+                                                    <span class="inline-block mt-1 px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
                                                         <?= $package['badge'] ?>
                                                     </span>
                                                 <?php endif; ?>
@@ -570,7 +570,7 @@ function render_subscription_view($db, $communityId) {
                                     </label>
                                 <?php endforeach; ?>
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-3">
+                            <p class="text-xs text-gray-500 mt-3">
                                 <svg class="w-4 h-4 inline-block mr-1" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
                                 </svg>
@@ -663,14 +663,14 @@ function render_subscription_view($db, $communityId) {
                                             
                                             if (pkg.price == 0) {
                                                 priceEl.textContent = 'ÜCRETSİZ';
-                                                priceEl.className = 'text-lg font-bold text-green-600 dark:text-green-400';
+                                                priceEl.className = 'text-lg font-bold text-green-600';
                                             } else {
                                                 priceEl.textContent = pkg.price.toLocaleString('tr-TR') + '₺';
-                                                priceEl.className = 'text-lg font-bold text-indigo-600 dark:text-indigo-400';
+                                                priceEl.className = 'text-lg font-bold text-indigo-600';
                                                 
                                                 if (pkg.discount > 0) {
                                                     discountEl.textContent = '%' + pkg.discount + ' indirim';
-                                                    discountEl.className = 'text-xs text-green-600 dark:text-green-400 mt-1';
+                                                    discountEl.className = 'text-xs text-green-600 mt-1';
                                                 } else {
                                                     discountEl.textContent = '';
                                                 }
@@ -732,11 +732,11 @@ function render_subscription_view($db, $communityId) {
                                             const discountEl = document.getElementById('discount-' + months);
                                             
                                             priceEl.textContent = pkg.price.toLocaleString('tr-TR') + '₺';
-                                            priceEl.className = 'text-lg font-bold text-indigo-600 dark:text-indigo-400';
+                                            priceEl.className = 'text-lg font-bold text-indigo-600';
                                             
                                             if (pkg.discount > 0) {
                                                 discountEl.textContent = '%' + pkg.discount + ' indirim';
-                                                discountEl.className = 'text-xs text-green-600 dark:text-green-400 mt-1';
+                                                discountEl.className = 'text-xs text-green-600 mt-1';
                                             } else {
                                                 discountEl.textContent = '';
                                             }

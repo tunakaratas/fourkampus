@@ -9,7 +9,7 @@ return [
     // API Settings
     'api' => [
         'version' => 'v1',
-        'base_url' => 'https://foursoftware.com.tr/api',
+        'base_url' => 'https://fourkampus.com.tr/api',
         'timezone' => 'Europe/Istanbul',
     ],
     
@@ -22,8 +22,8 @@ return [
         ],
         'cors' => [
             'allowed_origins' => [
-                'https://foursoftware.com.tr',
-                'https://www.foursoftware.com.tr',
+                'https://fourkampus.com.tr',
+                'https://www.fourkampus.com.tr',
                 'https://community.foursoftware.net',
                 'https://app.foursoftware.net',
             ],
@@ -50,7 +50,7 @@ return [
     'email' => [
         'verification_code_ttl' => 3600, // 1 hour
         'from_name' => 'Four Kampüs',
-        'from_email' => 'noreply@foursoftware.com.tr',
+        'from_email' => 'noreply@fourkampus.com.tr',
     ],
     
     // Logging

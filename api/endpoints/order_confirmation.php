@@ -83,9 +83,9 @@ toplulukla iletişime geçiniz.
 YASAL BİLGİLER
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-• İade ve iptal koşulları için: https://foursoftware.net/marketing/cancellation-refund.php
-• Stant teslimat sözleşmesi: https://foursoftware.net/marketing/stand-delivery-contract.php
-• Tüketici hakları: https://foursoftware.net/marketing/consumer-rights.php
+• İade ve iptal koşulları için: https://fourkampus.com.tr/marketing/cancellation-refund.php
+• Stant teslimat sözleşmesi: https://fourkampus.com.tr/marketing/stand-delivery-contract.php
+• Tüketici hakları: https://fourkampus.com.tr/marketing/consumer-rights.php
 
 Topluluk size stant konumu ve teslimat tarihi hakkında bilgi verecektir.
 
@@ -96,14 +96,14 @@ Four Kampüs Ekibi
         // SMTP ayarlarını al
         $smtp_username = '';
         $smtp_password = '';
-        $smtp_host = 'ms7.guzel.net.tr';
+        $smtp_host = 'ms8.guzel.net.tr';
         $smtp_port = 587;
         $smtp_secure = 'tls';
         
         if (function_exists('get_smtp_credential')) {
             $smtp_username = get_smtp_credential('username') ?? '';
             $smtp_password = get_smtp_credential('password') ?? '';
-            $smtp_host = get_smtp_credential('host', 'ms7.guzel.net.tr');
+            $smtp_host = get_smtp_credential('host', 'ms8.guzel.net.tr');
             $smtp_port = (int)(get_smtp_credential('port', 587));
             $smtp_secure = get_smtp_credential('encryption', 'tls');
         }
@@ -203,4 +203,3 @@ try {
         'message' => 'Sipariş onayı sırasında bir hata oluştu.'
     ], JSON_UNESCAPED_UNICODE);
 }
-

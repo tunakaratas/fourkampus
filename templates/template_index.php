@@ -109,7 +109,7 @@ if (!function_exists('tpl_load_default_credentials')) {
 
         $defaults = [
             'smtp' => [
-                'host' => 'mail.guzel.net.tr',
+                'host' => 'ms8.guzel.net.tr',
                 'port' => 587,
                 'username' => '',
                 'password' => '',
@@ -413,6 +413,11 @@ $displayErrors = (defined('APP_ENV') && APP_ENV === 'development');
 ErrorHandler::init($errorLogPath, $displayErrors);
 
 // Session güvenlik ayarları
+// Session Name Isolation per Community
+if (defined('COMMUNITY_ID')) {
+    session_name('FK_COMM_' . preg_replace('/[^a-zA-Z0-9]/', '', COMMUNITY_ID));
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     // Session cookie güvenlik ayarları
     ini_set('session.cookie_httponly', 1);
@@ -2679,7 +2684,8 @@ function trigger_email_queue_processor() {
         pclose(popen($command, "r"));
     } else {
         // Unix/Linux/Mac için
-        $command = "php $escaped_script_path $escaped_db_path $escaped_club_id > /dev/null 2>&1 &";
+        $log_file = dirname($script_path, 2) . '/logs/process_email_queue.log';
+        $command = "php $escaped_script_path $escaped_db_path $escaped_club_id >> " . escapeshellarg($log_file) . " 2>&1 &";
         exec($command);
     }
 }
@@ -3156,6 +3162,12 @@ function acknowledge_urgent_notification($db) {
 function handle_post_request() {
     // Admin kontrolü
     if (!isset($_SESSION['admin_id'])) {
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            header('Content-Type: application/json');
+            http_response_code(401);
+            echo json_encode(['success' => false, 'error' => 'Oturum bulunamadı. Lütfen tekrar giriş yapın.']);
+            exit;
+        }
         return;
     }
     
@@ -3642,12 +3654,18 @@ function handle_post_request() {
                     add_event($db, $_POST);
                     // Cache'i temizle
                     clear_entity_cache('events');
-                    $_SESSION['message'] = "Etkinlik başarıyla eklendi.";
+                    // Eğer add_event içinde $_SESSION['message'] set edilmediyse, default mesaj koy
+                    if (empty($_SESSION['error']) && empty($_SESSION['message'])) {
+                        $_SESSION['message'] = "Etkinlik başarıyla eklendi.";
+                    }
                 } catch (Exception $e) {
                     $_SESSION['error'] = "Etkinlik eklenirken hata: " . $e->getMessage();
                     tpl_error_log("Etkinlik ekleme exception: " . $e->getMessage() . " - " . $e->getTraceAsString());
+                } catch (Error $e) {
+                    $_SESSION['error'] = "Etkinlik eklenirken kritik hata oluştu. Lütfen tekrar deneyin.";
+                    tpl_error_log("Etkinlik ekleme fatal error: " . $e->getMessage() . " - " . $e->getTraceAsString());
                 }
-                // Redirect yap
+                // Her durumda redirect yap
                 header("Location: index.php?view=events");
                 exit;
             case 'update_event':
@@ -3662,11 +3680,34 @@ function handle_post_request() {
                 }
                 exit;
             case 'delete_event':
-                delete_event($db, $id);
-                break;
+                try {
+                    delete_event($db, $id);
+                } catch (Exception $e) {
+                    $_SESSION['error'] = "Etkinlik silinirken hata: " . $e->getMessage();
+                    tpl_error_log("Etkinlik silme exception: " . $e->getMessage());
+                } catch (Error $e) {
+                    $_SESSION['error'] = "Etkinlik silinirken kritik hata oluştu.";
+                    tpl_error_log("Etkinlik silme fatal error: " . $e->getMessage());
+                }
+                header("Location: index.php?view=events");
+                exit;
             case 'add_member':
-                add_member($db, $_POST);
-                break;
+                try {
+                    add_member($db, $_POST);
+                    // Eğer add_member içinde $_SESSION['message'] set edilmediyse, default mesaj koy
+                    if (empty($_SESSION['error']) && empty($_SESSION['message'])) {
+                        $_SESSION['message'] = "Üye başarıyla eklendi.";
+                    }
+                } catch (Exception $e) {
+                    $_SESSION['error'] = "Üye eklenirken hata: " . $e->getMessage();
+                    tpl_error_log("Üye ekleme exception: " . $e->getMessage() . " - " . $e->getTraceAsString());
+                } catch (Error $e) {
+                    $_SESSION['error'] = "Üye eklenirken kritik hata oluştu. Lütfen tekrar deneyin.";
+                    tpl_error_log("Üye ekleme fatal error: " . $e->getMessage() . " - " . $e->getTraceAsString());
+                }
+                // Her durumda redirect yap
+                header("Location: index.php?view=members");
+                exit;
             case 'update_member':
                 update_member($db, $_POST);
                 // Güvenlik: View name validation
@@ -3675,8 +3716,17 @@ function handle_post_request() {
                 header("Location: index.php?view=" . urlencode($redirect_view));
                 exit;
             case 'delete_member':
-                delete_member($db, $id);
-                break;
+                try {
+                    delete_member($db, $id);
+                } catch (Exception $e) {
+                    $_SESSION['error'] = "Üye silinirken hata: " . $e->getMessage();
+                    tpl_error_log("Üye silme exception: " . $e->getMessage());
+                } catch (Error $e) {
+                    $_SESSION['error'] = "Üye silinirken kritik hata oluştu.";
+                    tpl_error_log("Üye silme fatal error: " . $e->getMessage());
+                }
+                header("Location: index.php?view=members");
+                exit;
         case 'approve_membership_request':
             $request_id = (int)($_POST['request_id'] ?? 0);
             if ($request_id > 0) {
@@ -3825,11 +3875,13 @@ function handle_post_request() {
                     register_shutdown_function(function() {
                         $error = error_get_last();
                         if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+                            error_log('[SMS_FATAL] ' . ($error['message'] ?? 'Unknown fatal') . ' in ' . ($error['file'] ?? 'unknown') . ':' . ($error['line'] ?? '0'));
                             // Tüm output'u temizle
                             while (ob_get_level() > 0) {
                                 ob_end_clean();
                             }
                             header('Content-Type: application/json; charset=utf-8');
+                            http_response_code(200);
                             echo json_encode([
                                 'success' => false,
                                 'message' => 'SMS gönderilirken kritik hata oluştu. Lütfen tekrar deneyin.'
@@ -3839,10 +3891,25 @@ function handle_post_request() {
                     });
                     
                     header('Content-Type: application/json; charset=utf-8');
+                    header('Cache-Control: no-store');
                     
                     $response = ['success' => false, 'message' => 'Bilinmeyen hata'];
+                    $request_id = preg_replace('/[^a-zA-Z0-9_-]/', '', (string)($_POST['request_id'] ?? ''));
                     
                     try {
+                        if ($request_id !== '') {
+                            $history = $_SESSION['sms_request_history'] ?? [];
+                            $cached = $history[$request_id] ?? null;
+                            if (is_array($cached) && ($cached['status'] ?? '') === 'success') {
+                                $age = time() - (int)($cached['time'] ?? 0);
+                                if ($age < 600) {
+                                    $response = ['success' => true, 'message' => 'SMS gönderimi zaten tamamlandı.'];
+                                    echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                                    exit;
+                                }
+                            }
+                        }
+
                         // Debug log
                         error_log("[SMS_DEBUG] Starting handle_send_message");
                         
@@ -3856,6 +3923,20 @@ function handle_post_request() {
                             $message = $_SESSION['message'];
                             unset($_SESSION['message']);
                             $response = ['success' => true, 'message' => $message];
+                            if ($request_id !== '') {
+                                $history = $_SESSION['sms_request_history'] ?? [];
+                                $history[$request_id] = [
+                                    'status' => 'success',
+                                    'time' => time()
+                                ];
+                                foreach ($history as $key => $entry) {
+                                    $entryTime = (int)($entry['time'] ?? 0);
+                                    if ($entryTime > 0 && (time() - $entryTime) > 3600) {
+                                        unset($history[$key]);
+                                    }
+                                }
+                                $_SESSION['sms_request_history'] = $history;
+                            }
                         } elseif (isset($_SESSION['error']) && !empty($_SESSION['error'])) {
                             $error = $_SESSION['error'];
                             unset($_SESSION['error']);
@@ -3873,6 +3954,7 @@ function handle_post_request() {
                         }
                         
                         // JSON response gönder
+                        http_response_code(200);
                         echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                         
                     } catch (Exception $e) {
@@ -3882,6 +3964,7 @@ function handle_post_request() {
                         }
                         error_log("SMS send exception: " . $e->getMessage() . " | Trace: " . $e->getTraceAsString());
                         header('Content-Type: application/json; charset=utf-8');
+                        http_response_code(200);
                         echo json_encode([
                             'success' => false, 
                             'message' => 'SMS gönderilirken hata oluştu: ' . $e->getMessage()
@@ -3893,6 +3976,7 @@ function handle_post_request() {
                         }
                         error_log("SMS send fatal error: " . $e->getMessage() . " | Trace: " . $e->getTraceAsString());
                         header('Content-Type: application/json; charset=utf-8');
+                        http_response_code(200);
                         echo json_encode([
                             'success' => false, 
                             'message' => 'SMS gönderilirken kritik hata oluştu: ' . $e->getMessage()
@@ -3904,6 +3988,7 @@ function handle_post_request() {
                         }
                         error_log("SMS send throwable error: " . $e->getMessage() . " | Trace: " . $e->getTraceAsString());
                         header('Content-Type: application/json; charset=utf-8');
+                        http_response_code(200);
                         echo json_encode([
                             'success' => false, 
                             'message' => 'SMS gönderilirken beklenmeyen hata oluştu: ' . $e->getMessage()
@@ -4578,6 +4663,7 @@ function handle_post_request() {
 
 // GET request için medya çekme
 if ($TPL_GET_ACTION === 'get_event_media' && isset($_SESSION['admin_id'])) {
+    load_module('events'); // Fonksiyonun tanımlı olduğundan emin ol
     $db = get_db();
     header('Content-Type: application/json');
     get_event_media_json($db, (int)($_GET['event_id'] ?? 0));
@@ -4810,7 +4896,7 @@ $stats = get_stats();
 load_module('events');
 // Etkinlikleri lazy loading için ilk 30'unu göster
 $db = get_db();
-$events_stmt = $db->prepare("SELECT *, (SELECT COUNT(*) FROM event_rsvp r WHERE r.event_id = events.id) as rsvp_count FROM events WHERE club_id = ? ORDER BY date DESC, time DESC, id DESC LIMIT 30");
+$events_stmt = $db->prepare("SELECT *, (SELECT COUNT(*) FROM event_rsvp r WHERE r.event_id = events.id) as rsvp_count FROM events WHERE club_id = ? ORDER BY id DESC LIMIT 30");
 $events_stmt->bindValue(1, CLUB_ID, SQLITE3_INTEGER);
 $events_result = $events_stmt->execute();
 $events = [];
@@ -4892,6 +4978,15 @@ function get_partner_logos() {
     
     $logos = [];
     while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
+        // Dosya varlık kontrolü - 404 hatalarını önle
+        if (!empty($row['logo_path'])) {
+            $full_path = community_path($row['logo_path']);
+            if (!file_exists($full_path)) {
+                // Dosya yoksa logo_path'i temizle (UI'da placeholder gösterilecek)
+                $row['logo_path'] = '';
+                $row['logo_missing'] = true;
+            }
+        }
         $logos[] = $row;
     }
     return $logos;
@@ -5893,6 +5988,131 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
             max-width: 100%;
             overflow-x: hidden;
             box-sizing: border-box;
+        }
+
+        .settings-shell {
+            position: relative;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 28px 24px;
+            box-shadow: none;
+            overflow: visible;
+        }
+
+        .settings-shell::before {
+            display: none;
+        }
+
+        .settings-shell > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .settings-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .settings-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        .settings-subtitle {
+            font-size: 15px;
+            color: #475569;
+        }
+
+        .settings-summary {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px 18px;
+            min-width: 240px;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .settings-summary-label {
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .settings-summary-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .settings-alert {
+            border-radius: 12px;
+            border: 1px solid;
+            padding: 16px 18px;
+            background: #ffffff;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+        }
+
+        .settings-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 28px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+        }
+
+        .settings-section {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.06);
+        }
+
+        .settings-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-callout {
+            background: #eef2ff;
+            border: 1px solid #c7d2fe;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .settings-divider {
+            border-top: 1px dashed #e2e8f0;
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .settings-actions {
+            position: sticky;
+            bottom: 16px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            box-shadow: 0 16px 40px rgba(15, 23, 42, 0.1);
+            backdrop-filter: blur(12px);
         }
         
         .main-header {
@@ -7332,24 +7552,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                 // Ana menü öğelerini göster
                 foreach ($menu_items as $view => $item):
                     $requiredTier = $item[2] ?? null;
-                    $is_active = $current_view === $view ? 'active-link' : 'text-sidebar hover:bg-gray-100 hover:text-indigo-500';
+                    $is_active = ($current_view === $view || ($current_view === 'event_detail' && $view === 'events'))
+                        ? 'active-link'
+                        : 'text-sidebar hover:bg-gray-100 hover:text-indigo-500';
                 ?>
                     <a href="?view=<?= $view ?>" class="sidebar-link flex items-center p-3 rounded-md <?= $is_active ?> transition duration-150">
                         <span class="sidebar-icon"><?= $item[1] ?></span>
                         <span class="font-normal"><?= $item[0] ?></span>
                     </a>
                     
-                    <!-- Etkinlik Yönetimi Alt Başlığı -->
-                    <?php if ($view === 'events' && $current_view === 'event_detail' && $event_detail): ?>
-                        <div class="ml-4 mt-1 mb-2 border-l-3 border-indigo-500 pl-3 bg-indigo-50 rounded-r-md py-2">
-                            <a href="?view=event_detail&event_id=<?= $event_detail['id'] ?>" class="flex items-center text-sm font-semibold text-indigo-500 hover:text-indigo-800 transition duration-150">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                        </svg>
-                                <span class="truncate"><?= htmlspecialchars($event_detail['title']) ?></span>
-                                </a>
-                        </div>
-                    <?php endif; ?>
+                    
                 <?php endforeach; ?>
             </nav>
             
@@ -7357,7 +7569,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                 <div class="mt-4 pt-4 border-t border-gray-200">
                     <div class="text-center">
                         <p class="text-xs text-gray-500 mb-1">
-                            © 2025 UniFour - Four Software tarafından
+                            © 2025 Four Kampüs - Four Software tarafından
                         </p>
                     </div>
                 </div>
@@ -7369,6 +7581,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         <header class="main-header bg-white fixed top-0 left-0 lg:left-64 right-0 z-40 border-b border-gray-200 shadow-sm max-w-full overflow-x-hidden">
             <div class="p-4 sm:p-6 lg:p-4 flex items-center justify-between w-full max-w-full">
                 <div class="flex items-center gap-3">
+                    <?php
+                    $header_logo = get_setting('club_logo', '');
+                    $header_logo_path = $header_logo ? community_path($header_logo) : '';
+                    $header_logo_exists = $header_logo && file_exists($header_logo_path);
+                    ?>
+                    <div class="w-10 h-10 rounded-md border border-gray-200 bg-white flex items-center justify-center overflow-hidden flex-shrink-0">
+                        <?php if ($header_logo_exists): ?>
+                            <img src="<?= htmlspecialchars($header_logo) ?>" alt="Topluluk Logosu" class="w-full h-full object-cover">
+                        <?php else: ?>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                            </svg>
+                        <?php endif; ?>
+                    </div>
                     <div>
                         <?php
                         if (!function_exists('verification_is_verified')) {
@@ -7936,6 +8162,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     $category = $event_detail['category'] ?? 'Genel';
                     $priority = $event_detail['priority'] ?? 'normal';
                     $featured = $event_detail['featured'] ?? 0;
+                    $visibility = $event_detail['visibility'] ?? 'public';
+                    $visibility_labels = [
+                        'public' => 'Herkese Açık',
+                        'members_only' => 'Sadece Üyelere',
+                        'private' => 'Özel'
+                    ];
+                    $registration_required = !empty($event_detail['registration_required']);
                     $status_colors = [
                         'planlanıyor' => 'bg-indigo-100 text-indigo-800',
                         'devam_ediyor' => 'bg-green-100 text-green-800',
@@ -7960,6 +8193,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     }
                     foreach ($turkish_days as $en => $tr) {
                         $formatted_date = str_replace($en, $tr, $formatted_date);
+                    }
+                    $start_display = date('d.m.Y', strtotime($event_detail['date'])) . ' ' . htmlspecialchars($event_detail['time'] ?? '');
+                    $end_display = '';
+                    if (!empty($event_detail['end_datetime'])) {
+                        $end_display = date('d.m.Y H:i', strtotime($event_detail['end_datetime']));
+                    } elseif (!empty($event_detail['end_date']) || !empty($event_detail['end_time'])) {
+                        $end_parts = [];
+                        if (!empty($event_detail['end_date'])) {
+                            $end_parts[] = date('d.m.Y', strtotime($event_detail['end_date']));
+                        }
+                        if (!empty($event_detail['end_time'])) {
+                            $end_parts[] = $event_detail['end_time'];
+                        }
+                        $end_display = trim(implode(' ', $end_parts));
                     }
                     
                     // RSVP verileri
@@ -7986,40 +8233,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     $survey = $event_detail['survey'] ?? get_event_survey($event_detail['id']);
                     $survey_exists = !empty($survey);
                     ?>
-                    <div data-view="event_detail" class="max-w-7xl mx-auto">
+                    <div data-view="event_detail" class="max-w-7xl mx-auto space-y-6">
                         <!-- Unified Main Card -->
-                        <div class="bg-white rounded-lg card-shadow border border-gray-200 overflow-hidden">
+                        <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden section-card">
                             <!-- Header -->
-                            <div class="bg-gradient-to-r from-indigo-500 to-purple-600 px-8 py-6">
+                            <div class="bg-white px-6 py-6 border-b border-gray-200">
                                 <div class="flex items-start justify-between mb-4">
                                     <div class="flex-1">
                                         <div class="flex items-center gap-3 mb-3">
-                                            <a href="?view=events" class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors">
+                                            <a href="?view=events" class="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-gray-100 text-gray-600 hover:text-gray-900 transition-colors">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                                 </svg>
                                             </a>
                                             <div class="flex flex-wrap items-center gap-2">
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium <?= $status_colors[$status] ?? $status_colors['planlanıyor'] ?> bg-white/20 backdrop-blur-sm">
+                                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium border border-gray-200">
+                                                    <span class="w-2 h-2 rounded-full <?= $status_colors[$status] ?? $status_colors['planlanıyor'] ?>"></span>
                                                     <?= ucfirst($status) ?>
                                                 </span>
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 backdrop-blur-sm text-white">
+                                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium border border-gray-200">
+                                                    <svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h10M7 16h6"></path>
+                                                    </svg>
                                                     <?= htmlspecialchars($category) ?>
                                                 </span>
                                                 <?php if ($priority === 'yüksek'): ?>
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500/80 backdrop-blur-sm text-white">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700 border border-red-200">
                                                     Yüksek Öncelik
                                                 </span>
                                                 <?php endif; ?>
                                                 <?php if ($featured): ?>
-                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-500/80 backdrop-blur-sm text-white">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-700 border border-yellow-200">
                                                     Öne Çıkarılmış
                                                 </span>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
-                                        <h1 class="text-3xl font-bold text-white mb-1"><?= htmlspecialchars($event_detail['title']) ?></h1>
-                                        <p class="text-white/80 text-sm">ID: #<?= $event_detail['id'] ?></p>
+                                        <h1 class="text-2xl font-semibold text-gray-900 mb-1"><?= htmlspecialchars($event_detail['title']) ?></h1>
+                                        <p class="text-gray-500 text-sm">ID: #<?= $event_detail['id'] ?></p>
                                     </div>
                                 </div>
                             </div>
@@ -8027,11 +8278,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                             <!-- Main Content -->
                             <div class="p-8">
                                 <!-- Essential Info Grid -->
-                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 pb-8 border-b-2 border-gray-200">
-                                    <div class="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-purple-300 transition-all">
-                                        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M16 11h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 pb-8 border-b border-gray-200">
+                                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-all">
+                                        <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                             </svg>
                                         </div>
                                         <div class="flex-1 min-w-0">
@@ -8045,9 +8296,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         </div>
                                     </div>
                                     
-                                    <div class="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-purple-300 transition-all">
-                                        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-all">
+                                        <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
                                         </div>
@@ -8060,9 +8311,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         </div>
                                     </div>
                                     
-                                    <div class="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-purple-300 transition-all">
-                                        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-all">
+                                        <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             </svg>
@@ -8073,9 +8324,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         </div>
                                     </div>
                                     
-                                    <div class="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-gray-200 hover:border-purple-300 transition-all">
-                                        <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-all">
+                                        <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                             </svg>
                                         </div>
@@ -8092,12 +8343,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     <div class="lg:col-span-2">
                                         <div class="mb-6">
                                             <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                                 </svg>
                                                 Açıklama
                                             </h3>
-                                            <div class="bg-white rounded-xl p-4 border-2 border-gray-200">
+                                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
                                                 <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap"><?= nl2br(htmlspecialchars($event_detail['description'] ?: 'Bu etkinlik için detaylı açıklama bulunmamaktadır.')) ?></p>
                                             </div>
                                         </div>
@@ -8144,7 +8395,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         if (!empty($event_images) || !empty($event_videos) || !empty($event_detail['video_path'])): ?>
                                         <div>
                                             <h3 class="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                                 </svg>
                                                 Medya
@@ -8183,7 +8434,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                     <div class="flex justify-center gap-2 mt-3">
                                                         <?php foreach ($event_images as $index => $img): ?>
                                                         <button onclick="carouselGoTo('eventImageCarousel', <?= $index ?>)" 
-                                                                class="carousel-dot w-2 h-2 rounded-full transition-all <?= $index === 0 ? 'bg-purple-600 w-6' : 'bg-gray-300' ?>"
+                                                                class="carousel-dot w-2 h-2 rounded-full transition-all <?= $index === 0 ? 'bg-indigo-600 w-6' : 'bg-gray-300' ?>"
                                                                 aria-label="Fotoğraf <?= $index + 1 ?>"></button>
                                                         <?php endforeach; ?>
                                                     </div>
@@ -8223,9 +8474,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     
                                     <!-- Sidebar Info -->
                                     <div class="space-y-6">
-                                        <div class="bg-white rounded-xl p-5 border-2 border-gray-200">
-                                            <h3 class="text-base font-semibold text-gray-900 mb-4 pb-3 border-b-2 border-gray-200">Detaylar</h3>
+                                        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                                            <h3 class="text-base font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-200">Detaylar</h3>
                                             <div class="space-y-3">
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Kategori</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= htmlspecialchars($category) ?></span>
+                                                </div>
+                                                
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Durum</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= ucfirst($status) ?></span>
+                                                </div>
+                                                
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Öncelik</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= ucfirst($priority) ?></span>
+                                                </div>
+                                                
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Görünürlük</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= $visibility_labels[$visibility] ?? 'Herkese Açık' ?></span>
+                                                </div>
+                                                
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Öne Çıkarılmış</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= $featured ? 'Evet' : 'Hayır' ?></span>
+                                                </div>
+                                                
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Kayıt Gerekliliği</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= $registration_required ? 'Gerekli' : 'Gerekli değil' ?></span>
+                                                </div>
+                                                
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Başlangıç</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= htmlspecialchars(trim($start_display)) ?></span>
+                                                </div>
+                                                
+                                                <?php if (!empty($end_display)): ?>
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Bitiş</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= htmlspecialchars($end_display) ?></span>
+                                                </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($event_detail['location'])): ?>
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Konum</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= htmlspecialchars($event_detail['location']) ?></span>
+                                                </div>
+                                                <?php endif; ?>
+                                                
                                                 <?php if (!empty($event_detail['organizer'])): ?>
                                                 <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
                                                     <span class="text-xs font-medium text-gray-500">Organizatör</span>
@@ -8236,14 +8536,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                 <?php if (!empty($event_detail['contact_email'])): ?>
                                                 <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
                                                     <span class="text-xs font-medium text-gray-500">E-posta</span>
-                                                    <a href="mailto:<?= htmlspecialchars($event_detail['contact_email']) ?>" class="text-xs font-semibold text-purple-600 hover:underline text-right"><?= htmlspecialchars($event_detail['contact_email']) ?></a>
+                                                    <a href="mailto:<?= htmlspecialchars($event_detail['contact_email']) ?>" class="text-xs font-semibold text-indigo-600 hover:underline text-right"><?= htmlspecialchars($event_detail['contact_email']) ?></a>
                                                 </div>
                                                 <?php endif; ?>
                                                 
                                                 <?php if (!empty($event_detail['contact_phone'])): ?>
                                                 <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
                                                     <span class="text-xs font-medium text-gray-500">Telefon</span>
-                                                    <a href="tel:<?= htmlspecialchars($event_detail['contact_phone']) ?>" class="text-xs font-semibold text-purple-600 hover:underline text-right"><?= htmlspecialchars($event_detail['contact_phone']) ?></a>
+                                                    <a href="tel:<?= htmlspecialchars($event_detail['contact_phone']) ?>" class="text-xs font-semibold text-indigo-600 hover:underline text-right"><?= htmlspecialchars($event_detail['contact_phone']) ?></a>
                                                 </div>
                                                 <?php endif; ?>
                                                 
@@ -8258,6 +8558,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                 <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
                                                     <span class="text-xs font-medium text-gray-500">Kapasite</span>
                                                     <span class="text-xs font-semibold text-gray-900 text-right"><?= $event_detail['capacity'] ?> kişi</span>
+                                                </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($event_detail['max_attendees'])): ?>
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Maksimum Katılımcı</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= $event_detail['max_attendees'] ?> kişi</span>
+                                                </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php if (!empty($event_detail['min_attendees'])): ?>
+                                                <div class="flex items-center justify-between py-2.5 border-b border-gray-100">
+                                                    <span class="text-xs font-medium text-gray-500">Minimum Katılımcı</span>
+                                                    <span class="text-xs font-semibold text-gray-900 text-right"><?= $event_detail['min_attendees'] ?> kişi</span>
                                                 </div>
                                                 <?php endif; ?>
                                                 
@@ -8276,7 +8590,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                     <p class="text-xs font-medium text-gray-500 mb-2">Etiketler</p>
                                                     <div class="flex flex-wrap gap-1.5">
                                                         <?php foreach ($tags as $tag): ?>
-                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
+                                                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
                                                             <?= htmlspecialchars(trim($tag)) ?>
                                                         </span>
                                                         <?php endforeach; ?>
@@ -8287,7 +8601,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                 <?php if (!empty($event_detail['external_link'])): ?>
                                                 <div class="pt-2">
                                                     <a href="<?= htmlspecialchars($event_detail['external_link']) ?>" target="_blank" rel="noopener noreferrer" 
-                                                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-600 hover:underline">
+                                                       class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:underline">
                                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
                                                         </svg>
@@ -8300,11 +8614,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         
                                         <!-- RSVP List -->
                                         <?php if (count($rsvp_list) > 0): ?>
-                                        <div class="bg-white rounded-xl p-5 border-2 border-gray-200">
-                                            <div class="flex items-center justify-between mb-4 pb-3 border-b-2 border-gray-200">
+                                        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                                            <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
                                                 <h3 class="text-base font-semibold text-gray-900">Katılımcılar</h3>
                                                 <div class="flex items-center gap-2">
-                                                    <span class="px-2.5 py-1 bg-purple-50 text-purple-700 rounded-lg text-xs font-semibold border border-purple-200"><?= $attending_count ?></span>
+                                                    <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-semibold border border-indigo-200"><?= $attending_count ?></span>
                                                     <span class="px-2.5 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-semibold border border-gray-200"><?= count($rsvp_list) - $attending_count ?></span>
                                                 </div>
                                             </div>
@@ -8316,7 +8630,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                         <p class="text-xs text-gray-500 truncate"><?= htmlspecialchars($rsvp['member_email']) ?></p>
                                                     </div>
                                                     <?php if ($rsvp['rsvp_status'] === 'attending'): ?>
-                                                    <span class="ml-2 inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200 flex-shrink-0">
+                                                    <span class="ml-2 inline-flex items-center px-2 py-1 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 flex-shrink-0">
                                                         Katılacak
                                                     </span>
                                                     <?php else: ?>
@@ -8336,11 +8650,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                 </div>
                                 
                                 <!-- Survey Section -->
-                                <div class="border-t-2 border-gray-200 pt-8">
+                                <div class="border-t border-gray-200 pt-8">
                                     <div class="flex items-center justify-between mb-6">
                                         <div class="flex items-center gap-3">
-                                            <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <div class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                                 </svg>
                                             </div>
@@ -8352,7 +8666,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             </div>
                                         </div>
                                         <button onclick="openSurveyModal(<?= $event_detail['id'] ?>)" 
-                                                class="inline-flex items-center gap-2 px-4 py-2 <?= $survey_exists ? 'bg-purple-600 hover:bg-purple-700' : 'bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50' ?> text-white rounded-lg text-sm font-semibold transition-all duration-200">
+                                                class="inline-flex items-center gap-2 px-4 py-2 <?= $survey_exists ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-white border border-indigo-600 text-indigo-600 hover:bg-indigo-50' ?> text-white rounded-lg text-sm font-semibold transition-all duration-200">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                                             </svg>
@@ -8364,17 +8678,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         $survey_total_responses = (int)($survey['total_responses'] ?? 0);
                                         $survey_participant_count = (int)($survey['participant_count'] ?? 0);
                                     ?>
+                                    <div class="bg-white rounded-lg p-5 border border-gray-200 shadow-sm mb-6">
+                                        <h4 class="text-sm font-semibold text-gray-900 mb-2">Anket İçeriği</h4>
+                                        <?php if (!empty($survey['title'])): ?>
+                                            <p class="text-sm text-gray-700 font-medium"><?= htmlspecialchars($survey['title']) ?></p>
+                                        <?php endif; ?>
+                                        <?php if (!empty($survey['description'])): ?>
+                                            <p class="text-sm text-gray-600 mt-1"><?= htmlspecialchars($survey['description']) ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if (!empty($survey['questions'])): ?>
+                                            <div class="mt-4 space-y-4">
+                                                <?php foreach ($survey['questions'] as $question): ?>
+                                                    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                                                        <p class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($question['question_text'] ?? '') ?></p>
+                                                        <p class="text-xs text-gray-500 mt-1">
+                                                            <?= ($question['question_type'] ?? 'multiple_choice') === 'multiple_choice' ? 'Çoktan seçmeli' : 'Metin yanıtı' ?>
+                                                        </p>
+                                                        <?php if (!empty($question['options'])): ?>
+                                                            <div class="flex flex-wrap gap-2 mt-3">
+                                                                <?php foreach ($question['options'] as $option): ?>
+                                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-700 border border-gray-200">
+                                                                        <?= htmlspecialchars($option['option_text'] ?? '') ?>
+                                                                    </span>
+                                                                <?php endforeach; ?>
+                                                            </div>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
                                     <div class="grid grid-cols-3 gap-4 mb-6">
-                                        <div class="bg-white rounded-xl p-4 border-2 border-purple-200 text-center">
-                                            <p class="text-xs font-medium text-purple-600 uppercase tracking-wide mb-1">Katılımcı</p>
+                                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center shadow-sm">
+                                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Katılımcı</p>
                                             <p class="text-2xl font-bold text-gray-900"><?= $survey_participant_count ?></p>
                                         </div>
-                                        <div class="bg-white rounded-xl p-4 border-2 border-gray-200 text-center">
-                                            <p class="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">Yanıt</p>
+                                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center shadow-sm">
+                                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Yanıt</p>
                                             <p class="text-2xl font-bold text-gray-900"><?= $survey_total_responses ?></p>
                                         </div>
-                                        <div class="bg-white rounded-xl p-4 border-2 border-gray-200 text-center">
-                                            <p class="text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">Soru</p>
+                                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center shadow-sm">
+                                            <p class="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">Soru</p>
                                             <p class="text-2xl font-bold text-gray-900"><?= count($survey['questions'] ?? []) ?></p>
                                         </div>
                                     </div>
@@ -8386,16 +8731,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             $question_title = $question['question_text'] ?? '';
                                             $question_options = $question['options'] ?? [];
                                         ?>
-                                        <div class="border-2 border-gray-200 rounded-xl p-5 bg-white">
+                                        <div class="border border-gray-200 rounded-lg p-5 bg-white shadow-sm">
                                             <div class="flex items-start justify-between mb-4">
                                                 <div class="flex items-start gap-3 flex-1">
-                                                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-purple-100 text-purple-700 text-xs font-bold flex-shrink-0 border border-purple-200"><?= $index + 1 ?></span>
+                                                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold flex-shrink-0 border border-indigo-200"><?= $index + 1 ?></span>
                                                     <div class="flex-1 min-w-0">
                                                         <h4 class="text-sm font-semibold text-gray-900"><?= htmlspecialchars($question_title) ?></h4>
                                                         <p class="text-xs text-gray-500 mt-0.5"><?= ($question['question_type'] ?? 'multiple_choice') === 'multiple_choice' ? 'Çoktan seçmeli' : 'Metin yanıtı' ?></p>
                                                     </div>
                                                 </div>
-                                                <span class="text-xs font-medium text-gray-600 ml-2 flex-shrink-0"><?= $question_total ?> yanıt</span>
+                                                <span class="text-xs font-medium text-gray-500 ml-2 flex-shrink-0"><?= $question_total ?> yanıt</span>
                                             </div>
                                             
                                             <?php if (!empty($question_options)): ?>
@@ -8412,7 +8757,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                         <span class="font-semibold text-gray-900 ml-2 flex-shrink-0"><?= number_format($option_percentage, 1) ?>% (<?= $option_count ?>)</span>
                                                     </div>
                                                     <div class="h-2.5 rounded-full bg-gray-200 overflow-hidden">
-                                                        <div class="h-full rounded-full bg-purple-600" style="width: <?= $bar_width ?>%;"></div>
+                                                        <div class="h-full rounded-full bg-indigo-600" style="width: <?= $bar_width ?>%;"></div>
                                                     </div>
                                                 </div>
                                                 <?php endforeach; ?>
@@ -8433,9 +8778,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                 </div>
                                 
                                 <!-- Action Buttons -->
-                                <div class="flex flex-wrap items-center gap-3 pt-6 mt-8 border-t-2 border-gray-200">
+                                <div class="flex flex-wrap items-center gap-3 pt-6 mt-8 border-t border-gray-200">
                                     <button onclick="openEditModal('event', <?= (int)$event_detail['id'] ?>, <?= tpl_js_escaped($event_detail['title'] ?? '') ?>, <?= tpl_js_escaped($event_detail['date'] ?? '') ?>, <?= tpl_js_escaped($event_detail['time'] ?? '') ?>, <?= tpl_js_escaped($event_detail['location'] ?? '') ?>, <?= tpl_js_escaped(preg_replace('/\r|\n/', ' ', $event_detail['description'] ?? '')) ?>)" 
-                                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg">
+                                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
@@ -8443,7 +8788,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     </button>
                                     
                                     <button onclick="openSurveyModal(<?= $event_detail['id'] ?>)" 
-                                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50 rounded-xl text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg">
+                                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                                         </svg>
@@ -8451,7 +8796,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     </button>
                                     
                                     <button onclick="openMediaUploadModal(<?= $event_detail['id'] ?>)" 
-                                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50 rounded-xl text-sm font-semibold transition-all duration-200 shadow-md hover:shadow-lg">
+                                            class="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-semibold transition-all duration-200 shadow-sm">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                         </svg>
@@ -8502,11 +8847,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                             <!-- Filtreleme ve Arama -->
                             <div class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
                                 <div>
-                                    <input type="text" id="event_search" onkeyup="filterEvents()" placeholder="Ara..." 
+                                    <input type="text" id="event_search" onkeyup="typeof filterEvents === 'function' && filterEvents()" placeholder="Ara..." 
                                            class="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all">
                                 </div>
                                 <div>
-                                    <select id="filter_status" onchange="filterEvents()" 
+                                    <select id="filter_status" onchange="typeof filterEvents === 'function' && filterEvents()" 
                                             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all">
                                         <option value="">Tüm Durumlar</option>
                                         <option value="planlanıyor">Planlanıyor</option>
@@ -8516,7 +8861,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     </select>
                                 </div>
                                 <div>
-                                    <select id="filter_category" onchange="filterEvents()" 
+                                    <select id="filter_category" onchange="typeof filterEvents === 'function' && filterEvents()" 
                                             class="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all">
                                         <option value="">Tüm Kategoriler</option>
                                         <option value="Genel">Genel</option>
@@ -9740,7 +10085,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     <?php 
                         // Tüm email contacts sayısını kullan (sadece ilk 50 değil)
                         $emailTotal = isset($all_email_contacts) ? count($all_email_contacts) : count($email_contacts);
-                        $smtpSender = get_setting('smtp_username', 'info@fourkampus.com');
+                        $smtpSender = get_setting('smtp_username', 'info@fourkampus.com.tr');
                         
                         // Load events for Events tab
                         if (!function_exists('get_events')) {
@@ -12337,12 +12682,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     if ($active_tab === '') {
                                         $active_tab = 'info';
                                     }
-                                    $tab_class_info = ($active_tab === 'info') ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-700';
-                                    $tab_class_privacy = ($active_tab === 'privacy') ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-700';
-                                    $tab_class_terms = ($active_tab === 'terms') ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-700';
-                                    $tab_class_distance = ($active_tab === 'distance') ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-700';
-                                    $tab_class_preinfo = ($active_tab === 'preinfo') ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-700';
-                                    $tab_class_cancellation = ($active_tab === 'cancellation') ? 'text-purple-600 border-b-2 border-purple-600' : 'text-gray-500 hover:text-gray-700';
+                                    $tab_class_info = ($active_tab === 'info') ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700';
+                                    $tab_class_privacy = ($active_tab === 'privacy') ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700';
+                                    $tab_class_terms = ($active_tab === 'terms') ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700';
+                                    $tab_class_distance = ($active_tab === 'distance') ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700';
+                                    $tab_class_preinfo = ($active_tab === 'preinfo') ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700';
+                                    $tab_class_cancellation = ($active_tab === 'cancellation') ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-gray-500 hover:text-gray-700';
                                     ?>
                                     <a href="?view=system_info&tab=info" id="system-tab-info" class="system-info-tab <?= $tab_class_info ?> px-1 py-4 text-sm font-medium transition-colors duration-200 -mb-px whitespace-nowrap">
                                         Sistem Bilgileri
@@ -12956,7 +13301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">1. Taraflar</h3>
                                             <p class="text-gray-600 mb-3"><strong>Satıcı:</strong> Four Kampüs</p>
-                                            <p class="text-gray-600 mb-3"><strong>E-posta:</strong> info@fourkampus.com</p>
+                                            <p class="text-gray-600 mb-3"><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                                             <p class="text-gray-600 mb-3"><strong>Telefon:</strong> +90 533 544 59 83</p>
                                             <p class="text-gray-600 leading-relaxed">Bu sözleşme, Four Kampüs platformu üzerinden ürün veya hizmet satın alan gerçek veya tüzel kişiler (Alıcı) ile Four Kampüs (Satıcı) arasında 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümlerine göre düzenlenmiştir.</p>
                                         </section>
@@ -13011,7 +13356,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">9. İletişim</h3>
-                                            <p class="text-gray-600 mb-3"><strong>E-posta:</strong> info@fourkampus.com</p>
+                                            <p class="text-gray-600 mb-3"><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                                             <p class="text-gray-600 mb-3"><strong>Telefon:</strong> +90 533 544 59 83</p>
                                             <p class="text-gray-600 leading-relaxed"><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                                         </section>
@@ -13040,7 +13385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                 </div>
                                                 <div class="flex justify-between items-center py-3 px-4">
                                                     <span class="text-gray-600">E-posta</span>
-                                                    <span class="font-semibold text-gray-900">info@fourkampus.com</span>
+                                                    <span class="font-semibold text-gray-900">info@fourkampus.com.tr</span>
                                                 </div>
                                                 <div class="flex justify-between items-center py-3 px-4">
                                                     <span class="text-gray-600">Telefon</span>
@@ -13086,7 +13431,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">İletişim</h3>
-                                            <p class="text-gray-600 mb-3"><strong>E-posta:</strong> info@fourkampus.com</p>
+                                            <p class="text-gray-600 mb-3"><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                                             <p class="text-gray-600 mb-3"><strong>Telefon:</strong> +90 533 544 59 83</p>
                                             <p class="text-gray-600 leading-relaxed"><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                                         </section>
@@ -13121,7 +13466,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">3. İptal İşlemi</h3>
                                             <p class="text-gray-600 mb-3">Cayma hakkını kullanmak isteyen Alıcı, aşağıdaki yollardan biriyle bildirimde bulunabilir:</p>
                                             <ul class="space-y-2 text-gray-600">
-                                                <li class="flex items-start"><span class="text-purple-600 mr-2">•</span><span><strong>E-posta:</strong> info@unifour.com</span></li>
+                                                <li class="flex items-start"><span class="text-purple-600 mr-2">•</span><span><strong>E-posta:</strong> info@fourkampus.com.tr</span></li>
                                                 <li class="flex items-start"><span class="text-purple-600 mr-2">•</span><span><strong>Telefon:</strong> +90 533 544 59 83</span></li>
                                                 <li class="flex items-start"><span class="text-purple-600 mr-2">•</span><span><strong>Platform:</strong> Üyelik paneli üzerinden iletişim formu</span></li>
                                             </ul>
@@ -13152,7 +13497,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         
                                         <section class="border-l-4 border-purple-500 pl-6">
                                             <h3 class="text-lg font-semibold text-gray-900 mb-3">7. İletişim</h3>
-                                            <p class="text-gray-600 mb-3"><strong>E-posta:</strong> info@fourkampus.com</p>
+                                            <p class="text-gray-600 mb-3"><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                                             <p class="text-gray-600 mb-3"><strong>Telefon:</strong> +90 533 544 59 83</p>
                                             <p class="text-gray-600 leading-relaxed"><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                                         </section>
@@ -14016,14 +14361,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     }
                     $auto_backup_next_run_label = $auto_backup_next_run ?: 'Bir sonraki panel ziyaretiyle tetiklenecek';
                     ?>
-                    <div data-view="settings" class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 animate-fadeInUp">
+                    <div data-view="settings" class="settings-shell w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 animate-fadeInUp">
                         <?php
                         $config_health = $TPL_CONFIG_HEALTH ?? tpl_get_comm_config_health();
                         if (!$config_health['smtp']['configured'] || !$config_health['sms']['configured']):
                         ?>
                         <div class="mb-6 space-y-3">
                             <?php if (!$config_health['smtp']['configured']): ?>
-                            <div class="border border-amber-300 bg-amber-50 text-amber-900 rounded-lg p-4">
+                            <div class="settings-alert border-amber-300 bg-amber-50 text-amber-900">
                                 <h3 class="font-semibold mb-1">SMTP Ayarları Eksik</h3>
                                 <ul class="text-sm list-disc list-inside space-y-1">
                                     <?php foreach ($config_health['smtp']['issues'] as $issue): ?>
@@ -14034,7 +14379,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                             </div>
                             <?php endif; ?>
                             <?php if (!$config_health['sms']['configured']): ?>
-                            <div class="border border-red-300 bg-red-50 text-red-900 rounded-lg p-4">
+                            <div class="settings-alert border-red-300 bg-red-50 text-red-900">
                                 <h3 class="font-semibold mb-1">SMS Servisi Hazır Değil</h3>
                                 <ul class="text-sm list-disc list-inside space-y-1">
                                     <?php foreach ($config_health['sms']['issues'] as $issue): ?>
@@ -14047,19 +14392,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                         </div>
                         <?php endif; ?>
                         <!-- Birleşik Ayarlar Kutusu -->
-                        <div class="bg-white p-8 rounded-md shadow-xl border border-gray-200">
+                        <div class="settings-card">
                             <!-- Başlık Bölümü -->
-                            <div class="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
+                            <div class="settings-header">
                                 <div>
-                                    <h1 class="text-4xl font-bold mb-2 text-gray-800">Sistem Ayarları</h1>
-                                    <p class="text-gray-600 text-lg">Topluluk yapılandırması ve sistem tercihleri</p>
+                                    <h1 class="settings-title mb-2">Sistem Ayarları</h1>
+                                    <p class="settings-subtitle">Topluluk yapılandırması ve sistem tercihleri</p>
                                 </div>
-                                <div class="bg-gray-50 rounded-md p-4 border border-gray-200">
-                                    <p class="text-sm font-medium text-gray-600">Mevcut Topluluk</p>
-                                    <p class="text-2xl font-bold text-gray-800"><?= htmlspecialchars($club_name) ?></p>
+                                <div class="settings-summary">
+                                    <p class="settings-summary-label">Mevcut Topluluk</p>
+                                    <p class="settings-summary-value"><?= htmlspecialchars($club_name) ?></p>
                                 </div>
                             </div>
                             
+                            <form id="clubLogoForm" method="POST" action="index.php" enctype="multipart/form-data" class="hidden">
+                                <?= csrf_token_field() ?>
+                                <input type="hidden" name="action" value="upload_club_logo">
+                            </form>
                             <!-- Form İçeriği -->
                             <form method="POST" action="index.php" class="space-y-6" id="settingsForm">
                                 <?= csrf_token_field() ?>
@@ -14068,10 +14417,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                 <!-- Kategoriler boş olsa bile form submit edildiğinde kaydetmek için hidden input -->
                                 <input type="hidden" name="club_categories_submitted" value="1">
                                 
-                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                    <div class="space-y-6">
-                                        <div class="bg-gray-50 p-6 rounded-md border border-gray-200">
-                                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                                        <div class="settings-section lg:col-span-7 lg:order-1">
+                                            <h3 class="settings-section-title mb-4">
                                                 <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                                 </svg>
@@ -14079,7 +14427,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             </h3>
                                             
                                             <div class="space-y-4">
-                                                <div class="bg-blue-50 border border-blue-200 p-4 rounded-md">
+                                                <div class="settings-callout">
                                                     <div class="flex items-center mb-2">
                                                         <svg class="w-5 h-5 text-blue-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -14117,19 +14465,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                                 </div>
                                                             <?php endif; ?>
                                                         </div>
-                                                        <div class="flex-1 w-full">
-                                                            <form id="clubLogoForm" enctype="multipart/form-data" class="space-y-3">
-                                                                <div>
-                                                                    <input type="file" id="clubLogoFile" name="club_logo" accept="image/*" required class="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-gray-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
-                                                                </div>
-                                                                <p class="text-xs text-gray-500">Desteklenen formatlar: JPG, PNG, GIF, WebP (Max: 2MB)</p>
-                                                                <button type="submit" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition-colors shadow-sm hover:shadow-md">
-                                                                    <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                                                    </svg>
-                                                                    Logoyu Yükle
-                                                                </button>
-                                                            </form>
+                                                        <div class="flex-1 w-full space-y-3">
+                                                            <div>
+                                                                <input type="file" id="clubLogoFile" name="club_logo" form="clubLogoForm" accept="image/*" required class="w-full p-3 border-2 border-gray-300 rounded-md bg-white text-gray-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                                                            </div>
+                                                            <p class="text-xs text-gray-500">Desteklenen formatlar: JPG, PNG, GIF, WebP (Max: 2MB)</p>
+                                                            <button type="submit" form="clubLogoForm" class="w-full sm:w-auto px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-sm font-medium transition-colors shadow-sm hover:shadow-md">
+                                                                <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                                                </svg>
+                                                                Logoyu Yükle
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -14178,8 +14524,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                     <p class="mt-2 text-xs text-gray-500" id="categoryCount">Seçilen: <span id="selectedCount"><?= count($current_categories) ?></span>/3</p>
                                                     
                                                     <!-- Ayrı Kategori Kaydetme Butonu -->
-                                                    <div class="mt-4 pt-4 border-t border-gray-200">
-                                                        <button type="button" onclick="saveCategoriesOnly()" class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-semibold transition-all duration-200 shadow-md flex items-center justify-center">
+                                                    <div class="settings-divider">
+                                                        <button type="button" onclick="saveCategoriesOnly()" class="w-full px-4 py-2.5 color-primary hover-primary text-white rounded-md font-semibold transition-all duration-200 shadow-md flex items-center justify-center">
                                                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                                             </svg>
@@ -14191,8 +14537,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             </div>
                                         </div>
                                         
-                                        <div class="bg-gray-50 p-6 rounded-md border border-gray-200">
-                                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                        <div class="settings-section lg:col-span-4 lg:order-3">
+                                            <h3 class="settings-section-title mb-4">
                                                 <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                                 </svg>
@@ -14225,8 +14571,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         </div>
                                         
                                         <!-- Dil Ayarları -->
-                                        <div class="bg-gray-50 p-6 rounded-md border border-gray-200">
-                                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                        <div class="settings-section lg:col-span-4 lg:order-4">
+                                            <h3 class="settings-section-title mb-4">
                                                 <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
                                                 </svg>
@@ -14257,8 +14603,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         </div>
                                         
                                         <!-- Veritabanı Yedekleme -->
-                                        <div class="bg-gray-50 p-6 rounded-md border border-gray-200">
-                                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                        <div class="settings-section lg:col-span-12 lg:order-6">
+                                            <h3 class="settings-section-title mb-4">
                                                 <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                                                 </svg>
@@ -14293,7 +14639,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                 <?php endif; ?>
                                                 
                                                 <div>
-                                                    <button type="button" onclick="createBackup()" class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-md font-semibold transition-all duration-200 shadow-md flex items-center">
+                                                    <button type="button" onclick="createBackup()" class="px-6 py-2.5 color-primary hover-primary text-white rounded-md font-semibold transition-all duration-200 shadow-md flex items-center">
                                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                                                         </svg>
@@ -14329,7 +14675,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                             </div>
                                             
                                             <!-- Otomatik Yedekleme Ayarları -->
-                                            <div class="mt-6 pt-6 border-t border-gray-200">
+                                            <div class="settings-divider">
                                                 <h4 class="text-sm font-semibold text-gray-700 mb-4 flex items-center">
                                                     <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -14378,11 +14724,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                     
-                                    <div class="space-y-6">
-                                        <div class="bg-gray-50 p-6 rounded-md border border-gray-200">
-                                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                        <div class="settings-section lg:col-span-5 lg:order-2">
+                                            <h3 class="settings-section-title mb-4">
                                                 <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
                                                 </svg>
@@ -14416,8 +14760,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                         </div>
                                         
                                         
-                                        <div class="bg-gray-50 p-6 rounded-md border border-gray-200">
-                                            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                                        <div class="settings-section lg:col-span-4 lg:order-5">
+                                            <h3 class="settings-section-title mb-4">
                                                 <svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
                                                 </svg>
@@ -14443,14 +14787,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                                     </div>
                                 </div>
                                 
-                                <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                                <div class="settings-actions">
                                     <button type="button" onclick="resetSettings()" class="px-6 py-3 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition duration-200 font-medium border border-gray-300">
                                         <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
                                         Sıfırla
                                     </button>
-                                    <button type="submit" class="px-8 py-3 text-white bg-gray-800 rounded-md hover:bg-gray-900 font-semibold shadow-lg transition duration-200 border border-gray-700">
+                                    <button type="submit" class="px-8 py-3 text-white color-primary hover-primary rounded-md font-semibold shadow-lg transition duration-200">
                                         <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                         </svg>
@@ -14882,9 +15226,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     
                     <div>
                         <label for="add_event_survey_title" class="block text-sm font-medium text-gray-700 mb-1">
-                            Anket Başlığı <span class="text-red-500">*</span>
+                            Anket Başlığı
                         </label>
-                        <input type="text" name="survey_title" id="add_event_survey_title" required
+                        <input type="text" name="survey_title" id="add_event_survey_title"
                                class="w-full p-3 border border-gray-300 rounded-md shadow-sm input-focus bg-white text-gray-900" 
                                placeholder="Örn: Etkinlik Değerlendirme Anketi">
                     </div>
@@ -15097,6 +15441,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         const categorySelect = document.getElementById('filter_category');
         if (categorySelect) {
             categorySelect.addEventListener('change', filterEvents);
+        }
+        
+        const surveyToggle = document.getElementById('create_survey_with_event');
+        if (surveyToggle) {
+            surveyToggle.addEventListener('change', toggleEventSurveyFields);
+            toggleEventSurveyFields();
         }
     });
     
@@ -15848,8 +16198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         // Başarı mesajı varsa veya clear_form_data flag'i varsa form verilerini temizle
         <?php if (isset($_SESSION['clear_form_data']) || isset($_SESSION['event_added_successfully']) || (isset($_SESSION['message']) && (strpos($_SESSION['message'], 'etkinlik') !== false || strpos($_SESSION['message'], 'Etkinlik') !== false || strpos($_SESSION['message'], 'başarıyla') !== false))): ?>
         clearEventFormData();
-        // Formu da temizle
-        const addEventForm = document.getElementById('addEventForm');
+        // Formu da temizle (addEventForm yukarıda zaten tanımlandı)
         if (addEventForm) {
             addEventForm.reset();
         }
@@ -16634,8 +16983,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
             <?php if (!empty($partner_logos)): ?>
                 <?php $current_logo = $partner_logos[0]; ?>
                 <div id="currentLogoInfo" class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-                    <div class="flex items-center space-x-4 mb-3">
-                        <img src="<?= htmlspecialchars($current_logo['logo_path']) ?>" alt="<?= htmlspecialchars($current_logo['partner_name']) ?>" class="w-16 h-16 rounded-md object-cover">
+                <div class="flex items-center space-x-4 mb-3">
+                        <?php if (!empty($current_logo['logo_path'])): ?>
+                            <img src="<?= htmlspecialchars($current_logo['logo_path']) ?>" alt="<?= htmlspecialchars($current_logo['partner_name']) ?>" class="w-16 h-16 rounded-md object-cover">
+                        <?php else: ?>
+                            <div class="w-16 h-16 rounded-md bg-gray-200 flex items-center justify-center">
+                                <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        <?php endif; ?>
                         <div>
                             <h4 class="font-semibold text-gray-800"><?= htmlspecialchars($current_logo['partner_name']) ?></h4>
                             <?php if (!empty($current_logo['partner_website'])): ?>
@@ -17852,6 +18209,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         const statusDiv = document.getElementById('email_sending_status');
         const progressDiv = document.getElementById('email_progress');
         
+        // Community ID ekle (SMTP ayarları için)
+        formData.append('community_id', '<?= defined("COMMUNITY_FOLDER") ? COMMUNITY_FOLDER : "" ?>');
+        
         emailFormSubmitting = true;
         
         // Loading durumunu göster
@@ -17867,7 +18227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         }
         
         // AJAX isteği - Yeni basit Email API kullan
-        fetch('/unipanel/api_email.php', {
+        fetch('<?= defined('PROJECT_ROOT_URL') ? rtrim(PROJECT_ROOT_URL, '/') : '/fourkampus' ?>/api/api_email.php', {
             method: 'POST',
             body: formData
         })
@@ -17906,6 +18266,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         return false;
     }
 
+    function createSmsRequestId() {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            return 'sms_' + window.crypto.randomUUID();
+        }
+        const rand = Math.random().toString(36).slice(2, 10);
+        return 'sms_' + Date.now().toString(36) + '_' + rand;
+    }
+
+    function buildFormDataFromEntries(entries) {
+        const formData = new FormData();
+        entries.forEach(([key, value]) => {
+            formData.append(key, value);
+        });
+        return formData;
+    }
+
+    function shouldRetryResponse(response) {
+        return response && response.status >= 500;
+    }
+
+    function fetchWithRetry(url, options, buildBody, maxRetries = 2, retryDelayMs = 1000) {
+        const attempt = (retryIndex) => {
+            const body = buildBody ? buildBody() : options.body;
+            const fetchOptions = Object.assign({}, options, { body });
+            return fetch(url, fetchOptions).then((response) => {
+                if (!response.ok && shouldRetryResponse(response) && retryIndex < maxRetries) {
+                    return new Promise((resolve) => {
+                        setTimeout(resolve, retryDelayMs * Math.pow(2, retryIndex));
+                    }).then(() => attempt(retryIndex + 1));
+                }
+                return response;
+            }).catch((error) => {
+                if (retryIndex < maxRetries) {
+                    return new Promise((resolve) => {
+                        setTimeout(resolve, retryDelayMs * Math.pow(2, retryIndex));
+                    }).then(() => attempt(retryIndex + 1));
+                }
+                throw error;
+            });
+        };
+        return attempt(0);
+    }
+
     // Formların onsubmit olaylarını bağlamak için DOMContentLoaded kullanıyoruz
     document.addEventListener('DOMContentLoaded', () => {
         // Email form AJAX handler
@@ -17938,6 +18341,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                 const recipientCount = selectedPhones.length;
                 
                 const formData = new FormData(smsForm);
+                const requestId = createSmsRequestId();
+                formData.append('request_id', requestId);
+                const formEntries = Array.from(formData.entries());
                 const submitButton = smsForm.querySelector('button[type="submit"]');
                 const originalButtonText = submitButton ? submitButton.textContent : 'Mesaj Gönder';
                 
@@ -17949,10 +18355,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                 }
                 
                 // AJAX isteği - Yeni basit API endpoint'i kullan
-                fetch('/unipanel/api_sms.php', {
+                fetchWithRetry('index.php', {
                     method: 'POST',
-                    body: formData
-                })
+                    headers: { 
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                }, () => buildFormDataFromEntries(formEntries), 2)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('HTTP ' + response.status);
@@ -17965,21 +18376,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                         const message = data.message || 'SMS başarıyla gönderildi';
                         toastManager.show('Başarılı', message, 'success', 5000);
                         
-                        // Kısa bir gecikme sonrası sayfayı yenile (toast görünsün)
-                        setTimeout(() => {
-                            window.location.href = 'index.php?view=messages';
-                        }, 500);
-                    } else {
-                        // Hata - Butonu tekrar aktif et
-                        toastManager.show('Hata', data.message || 'SMS gönderilemedi', 'error', 5000);
+                        // Formu temizle - SAYFA YENİLEME YOK
+                        smsForm.reset();
                         
-                        if (submitButton) {
-                            submitButton.disabled = false;
-                            submitButton.textContent = originalButtonText;
-                            submitButton.classList.remove('opacity-70', 'pointer-events-none');
+                        // Seçili telefon checkboxlarını temizle
+                        smsForm.querySelectorAll('input[name="selected_phones[]"]:checked').forEach(cb => cb.checked = false);
+                        
+                        // Alıcı sayısını sıfırla
+                        const recipientCountEl = document.getElementById('sms-recipient-count');
+                        if (recipientCountEl) recipientCountEl.textContent = '0';
+                        
+                        // SMS kullanımını güncelle (sayfa yenilemeden)
+                        if (typeof updateSmsUsage === 'function') {
+                            setTimeout(updateSmsUsage, 1000);
                         }
-                        smsFormSubmitting = false;
+                    } else {
+                        // Hata - Toast göster
+                        toastManager.show('Hata', data.message || 'SMS gönderilemedi', 'error', 5000);
                     }
+                    
+                    // Butonu her durumda resetle
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                        submitButton.classList.remove('opacity-70', 'pointer-events-none');
+                    }
+                    smsFormSubmitting = false;
                 })
                 .catch(error => {
                     console.error('SMS send error:', error);
@@ -18011,6 +18433,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                 eventSmsFormSubmitting = true;
                 
                 const formData = new FormData(eventSmsForm);
+                const requestId = createSmsRequestId();
+                formData.append('request_id', requestId);
+                const formEntries = Array.from(formData.entries());
                 const submitButton = eventSmsForm.querySelector('button[type="submit"]');
                 const originalButtonText = submitButton ? submitButton.textContent : 'SMS Gönder';
                 
@@ -18019,26 +18444,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     submitButton.textContent = 'Gönderiliyor...';
                 }
                 
-                fetch('/unipanel/api_sms.php', {
+                fetchWithRetry('index.php', {
                     method: 'POST',
-                    body: formData
-                })
+                    headers: { 
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                }, () => buildFormDataFromEntries(formEntries), 2)
                 .then(response => {
                     if (!response.ok) throw new Error('HTTP ' + response.status);
                     return response.json();
                 })
                 .then(data => {
                     if (data.success) {
-                        toastManager.show('Başarılı', data.message, 'success', 5000);
-                        setTimeout(() => window.location.reload(), 500);
+                        toastManager.show('Başarılı', data.message || 'SMS başarıyla gönderildi', 'success', 5000);
+                        
+                        // Formu temizle - SAYFA YENİLEME YOK
+                        eventSmsForm.reset();
                     } else {
-                        toastManager.show('Hata', data.message, 'error', 5000);
-                        if (submitButton) {
-                            submitButton.disabled = false;
-                            submitButton.textContent = originalButtonText;
-                        }
-                        eventSmsFormSubmitting = false;
+                        toastManager.show('Hata', data.message || 'SMS gönderilemedi', 'error', 5000);
                     }
+                    
+                    // Butonu her durumda resetle
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = originalButtonText;
+                    }
+                    eventSmsFormSubmitting = false;
                 })
                 .catch(error => {
                     toastManager.show('Hata', error.message, 'error', 5000);
@@ -19426,6 +19860,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
     window.testToastProgress = testToastProgress;
 
     // Toast sistemi hazır - artık tüm feedback'ler modern toast olarak gösterilecek
+    // NOT: Session mesajları zaten header sonrasında toast olarak gösteriliyor (satır ~7500)
     
     // Bildirim izni butonu durumunu güncelle
     function updateNotificationButton() {
@@ -19879,19 +20314,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
             clubLogoForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                const formData = new FormData(this);
-                formData.append('action', 'upload_club_logo');
-                
-                // CSRF token ekle
-                const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-                if (csrfToken) {
-                    formData.append('csrf_token', csrfToken);
+                const fileInput = document.getElementById('clubLogoFile');
+                if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                    if (typeof toastManager !== 'undefined') {
+                        toastManager.show('Uyarı', 'Lütfen bir logo dosyası seçin.', 'warning', 3000);
+                    } else {
+                        alert('Lütfen bir logo dosyası seçin.');
+                    }
+                    return;
                 }
                 
-                const submitBtn = this.querySelector('button[type="submit"]');
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Yükleniyor...';
-                submitBtn.disabled = true;
+                const formData = new FormData();
+                formData.set('action', 'upload_club_logo');
+                formData.set('club_logo', fileInput.files[0]);
+                
+                // CSRF token ekle
+                const csrfToken = clubLogoForm.querySelector('input[name="csrf_token"]')?.value
+                    || document.querySelector('input[name="csrf_token"]')?.value;
+                if (csrfToken) {
+                    formData.set('csrf_token', csrfToken);
+                }
+                
+                const submitBtn = document.querySelector('button[form="clubLogoForm"]');
+                const originalText = submitBtn ? submitBtn.textContent : '';
+                if (submitBtn) {
+                    submitBtn.textContent = 'Yükleniyor...';
+                    submitBtn.disabled = true;
+                }
                 
                 fetch('', {
                     method: 'POST',
@@ -19915,8 +20364,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                         } else {
                             alert('Hata: ' + data.message);
                         }
-                        submitBtn.textContent = originalText;
-                        submitBtn.disabled = false;
+                        if (submitBtn) {
+                            submitBtn.textContent = originalText;
+                            submitBtn.disabled = false;
+                        }
                     }
                 })
                 .catch(error => {
@@ -19926,8 +20377,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     } else {
                         alert('Logo yüklenirken bir hata oluştu');
                     }
-                    submitBtn.textContent = originalText;
-                    submitBtn.disabled = false;
+                    if (submitBtn) {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                    }
                 });
             });
         }
@@ -20042,14 +20495,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
     }
     
     function addSurveyQuestion() {
-        // İki farklı container olabilir: surveyQuestionsContainer (yeni etkinlik modalı) veya questionsContainer (anket modalı)
-        const container = document.getElementById('surveyQuestionsContainer') || document.getElementById('questionsContainer');
+        const container = getSurveyQuestionContainer();
         if (!container) {
             console.error('Anket soru container bulunamadı');
             return;
         }
         
         const questionCount = container.children.length;
+        const requireSurvey = isSurveyRequired(container);
         const questionDiv = document.createElement('div');
         questionDiv.className = 'border border-gray-300 p-4 rounded-lg bg-gray-50';
         questionDiv.dataset.questionIndex = questionCount;
@@ -20064,13 +20517,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
             </div>
             <div class="mb-3">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Soru Metni <span class="text-red-500">*</span></label>
-                <input type="text" name="survey_questions[${questionCount}][text]" required class="w-full p-2 border border-gray-300 rounded-md" placeholder="Soruyu buraya yazın">
+                <input type="text" name="survey_questions[${questionCount}][text]" ${requireSurvey ? 'required' : ''} class="w-full p-2 border border-gray-300 rounded-md" placeholder="Soruyu buraya yazın">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Seçenekler</label>
                 <div id="survey_options_${questionCount}" class="space-y-2">
                     <div class="flex items-center gap-2">
-                        <input type="text" name="survey_questions[${questionCount}][options][]" required class="flex-1 p-2 border border-gray-300 rounded-md" placeholder="Seçenek 1">
+                        <input type="text" name="survey_questions[${questionCount}][options][]" ${requireSurvey ? 'required' : ''} class="flex-1 p-2 border border-gray-300 rounded-md" placeholder="Seçenek 1">
                         <button type="button" onclick="addSurveyOption(${questionCount})" class="px-3 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 text-sm">+</button>
                     </div>
                 </div>
@@ -20088,9 +20541,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         
         const optionCount = container.children.length;
         const optionDiv = document.createElement('div');
+        const requireSurvey = isSurveyRequired(container);
         optionDiv.className = 'flex items-center gap-2';
         optionDiv.innerHTML = `
-            <input type="text" name="survey_questions[${questionIndex}][options][]" required class="flex-1 p-2 border border-gray-300 rounded-md" placeholder="Seçenek ${optionCount + 1}">
+            <input type="text" name="survey_questions[${questionIndex}][options][]" ${requireSurvey ? 'required' : ''} class="flex-1 p-2 border border-gray-300 rounded-md" placeholder="Seçenek ${optionCount + 1}">
             <button type="button" onclick="this.parentElement.remove()" class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 text-sm">-</button>
         `;
         container.appendChild(optionDiv);
@@ -20101,7 +20555,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
         if (questionDiv) {
             questionDiv.remove();
             // Soru numaralarını yeniden düzenle
-            const container = document.getElementById('surveyQuestionsContainer') || document.getElementById('questionsContainer');
+            const container = getSurveyQuestionContainer();
             if (container) {
                 Array.from(container.children).forEach((child, index) => {
                     const title = child.querySelector('h5');
@@ -20111,6 +20565,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $TPL_GET_ACTION !== '' && isset($_SE
                     child.dataset.questionIndex = index;
                 });
             }
+        }
+    }
+
+    function getSurveyQuestionContainer() {
+        const surveyModal = document.getElementById('surveyModal');
+        if (surveyModal && !surveyModal.classList.contains('hidden')) {
+            return document.getElementById('questionsContainer');
+        }
+        return document.getElementById('surveyQuestionsContainer') || document.getElementById('questionsContainer');
+    }
+
+    function isSurveyRequired(container) {
+        const addEventContainer = document.getElementById('surveyQuestionsContainer');
+        if (container && addEventContainer && container.closest('#tab-content-survey')) {
+            const checkbox = document.getElementById('create_survey_with_event');
+            return checkbox ? checkbox.checked : false;
+        }
+        return true;
+    }
+
+    function toggleEventSurveyFields() {
+        const checkbox = document.getElementById('create_survey_with_event');
+        const titleInput = document.getElementById('add_event_survey_title');
+        const descriptionInput = document.getElementById('add_event_survey_description');
+        const container = document.getElementById('surveyQuestionsContainer');
+        if (!checkbox || !titleInput || !descriptionInput) {
+            return;
+        }
+        
+        const isEnabled = checkbox.checked;
+        titleInput.disabled = !isEnabled;
+        descriptionInput.disabled = !isEnabled;
+        
+        if (!isEnabled) {
+            titleInput.removeAttribute('required');
+        }
+        
+        if (container) {
+            container.querySelectorAll('input, textarea').forEach((input) => {
+                input.disabled = !isEnabled;
+                if (!isEnabled) {
+                    input.removeAttribute('required');
+                }
+            });
         }
     }
     
@@ -22350,7 +22848,7 @@ if (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) {
         
         <a href="?view=support" class="group flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
             <div class="w-8 h-8 mr-3 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                <svg class="w-4 h-4 text-gray-600 group-hover:text-purple-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
@@ -22371,7 +22869,7 @@ if (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) {
         
         <a href="?view=subscription" class="group flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200">
             <div class="w-8 h-8 mr-3 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors duration-200">
-                <svg class="w-4 h-4 text-gray-600 group-hover:text-indigo-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-600 group-hover:text-blue-600 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                 </svg>
             </div>
@@ -22410,8 +22908,8 @@ if (isset($_SESSION['admin_id']) && $_SESSION['admin_id']) {
 (function() {
     'use strict';
     
-    // API Base URL
-    const API_BASE_URL = '/unipanel/api';
+    // API Base URL - Dinamik olarak proje kök dizininden hesapla
+    const API_BASE_URL = '<?= defined('PROJECT_ROOT_URL') ? rtrim(PROJECT_ROOT_URL, '/') : '/fourkampus' ?>/api/endpoints';
     // Global olarak erişilebilir yap
     window.API_BASE_URL = API_BASE_URL;
     window.COMMUNITY_ID = '<?= COMMUNITY_ID ?>';
@@ -23194,5 +23692,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // Butonları bul ve event listener ekle
 });
 </script>
-
-

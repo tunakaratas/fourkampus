@@ -89,19 +89,22 @@ function get_netgsm_credential($key, $default = '') {
         $superadminConfigPath = dirname(__DIR__, 2) . '/superadmin/config.php';
         if (file_exists($superadminConfigPath)) {
             try {
-                $superadminConfig = require $superadminConfigPath;
-                if (isset($superadminConfig['netgsm']) && is_array($superadminConfig['netgsm'])) {
-                    $netgsmConfig = $superadminConfig['netgsm'];
-                    // Key mapping: username -> user, password -> pass, msgheader -> header
-                    $mapping = [
-                        'username' => 'user',
-                        'password' => 'pass',
-                        'msgheader' => 'header'
+                static $superadminLoaded = false;
+                if (!$superadminLoaded) {
+                    require_once $superadminConfigPath;
+                    $superadminLoaded = true;
+                }
+
+                if (function_exists('superadmin_config_env')) {
+                    $envMap = [
+                        'username' => 'NETGSM_USER',
+                        'password' => 'NETGSM_PASS',
+                        'msgheader' => 'NETGSM_HEADER'
                     ];
-                    $superadminKey = $mapping[$key] ?? $key;
-                    if (isset($netgsmConfig[$superadminKey]) && !empty($netgsmConfig[$superadminKey])) {
-                        $value = trim((string)$netgsmConfig[$superadminKey]);
-                        if (!empty($value)) {
+                    $envKey = $envMap[$key] ?? '';
+                    if ($envKey !== '') {
+                        $value = trim((string)superadmin_config_env($envKey, false, ''));
+                        if ($value !== '') {
                             tpl_error_log('NetGSM credential loaded from superadmin config: ' . $key . ' = ' . (strlen($value) > 0 ? 'SET (' . strlen($value) . ' chars)' : 'EMPTY'));
                             return $value;
                         }
@@ -194,7 +197,7 @@ function send_test_email() {
             $smtp_password = get_smtp_credential('password');
         }
         if (empty($smtp_host)) {
-            $smtp_host = get_smtp_credential('host', 'ms7.guzel.net.tr');
+            $smtp_host = get_smtp_credential('host', 'ms8.guzel.net.tr');
         }
         if (empty($smtp_port)) {
             $smtp_port = get_smtp_credential('port', '587');
@@ -368,7 +371,7 @@ function handle_send_email($post) {
         // SMTP ayarlarını al - önce veritabanından, yoksa config'den
         $smtp_username = get_setting('smtp_username', '') ?: get_smtp_credential('username');
         $smtp_password = get_setting('smtp_password', '') ?: get_smtp_credential('password');
-        $smtp_host = get_setting('smtp_host', '') ?: get_smtp_credential('host', 'ms7.guzel.net.tr');
+        $smtp_host = get_setting('smtp_host', '') ?: get_smtp_credential('host', 'ms8.guzel.net.tr');
         $smtp_port = (int)(get_setting('smtp_port', '587') ?: get_smtp_credential('port', 587));
         $smtp_secure = strtolower(trim(get_setting('smtp_secure', 'tls') ?: get_smtp_credential('encryption', 'tls')));
         
@@ -508,7 +511,7 @@ function handle_send_email($post) {
         // HEMEN GÖNDER: İlk batch'i hemen gönder
         $first_batch = array_slice($queue_entries, 0, min(20, count($queue_entries)));
         $batch_result = send_smtp_mail_batch($first_batch, $subject, $message, $fromName, $fromEmail, [
-            'host' => $smtp_host ?: 'ms7.guzel.net.tr',
+            'host' => $smtp_host ?: 'ms8.guzel.net.tr',
             'port' => $smtp_port ?: 587,
             'secure' => $smtp_secure ?: 'tls',
             'username' => $smtp_username,
@@ -575,7 +578,7 @@ function handle_send_email_ajax($post) {
         // SMTP ayarlarını al - önce veritabanından, yoksa config'den
         $smtp_username = get_setting('smtp_username', '') ?: get_smtp_credential('username');
         $smtp_password = get_setting('smtp_password', '') ?: get_smtp_credential('password');
-        $smtp_host = get_setting('smtp_host', '') ?: get_smtp_credential('host', 'ms7.guzel.net.tr');
+        $smtp_host = get_setting('smtp_host', '') ?: get_smtp_credential('host', 'ms8.guzel.net.tr');
         $smtp_port = (int)(get_setting('smtp_port', '587') ?: get_smtp_credential('port', 587));
         $smtp_secure = strtolower(trim(get_setting('smtp_secure', 'tls') ?: get_smtp_credential('encryption', 'tls')));
         
@@ -703,7 +706,7 @@ function handle_send_email_ajax($post) {
         // HEMEN GÖNDER: İlk batch'i hemen gönder (kullanıcı beklemesin)
         $first_batch = array_slice($queue_entries, 0, min(20, count($queue_entries)));
         $batch_result = send_smtp_mail_batch($first_batch, $subject, $message, $fromName, $fromEmail, [
-            'host' => $smtp_host ?: 'ms7.guzel.net.tr',
+            'host' => $smtp_host ?: 'ms8.guzel.net.tr',
             'port' => $smtp_port ?: 587,
             'secure' => $smtp_secure ?: 'tls',
             'username' => $smtp_username,
@@ -1061,7 +1064,7 @@ function get_email_template($subject, $message, $from_name, $from_email, $partne
 function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from_email, $config = []) {
     // from_email parametresi boşsa veya yanlışsa, veritabanından al
     if (empty($from_email) || stripos($from_email, 'tun4aa') !== false || stripos($from_email, 'gmail.com') !== false) {
-        $from_email = get_setting('smtp_from_email', '') ?: ($config['username'] ?? get_setting('smtp_username', '') ?: 'admin@foursoftware.com.tr');
+        $from_email = get_setting('smtp_from_email', '') ?: ($config['username'] ?? get_setting('smtp_username', '') ?: 'admin@fourkampus.com.tr');
     }
     // from_name parametresi boşsa, veritabanından al
     if (empty($from_name)) {
@@ -1132,7 +1135,7 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
     
     try {
         // Önce config'den al, yoksa veritabanından al, yoksa fallback
-        $host = $config['host'] ?? get_setting('smtp_host', '') ?: get_smtp_credential('host', 'ms7.guzel.net.tr');
+        $host = $config['host'] ?? get_setting('smtp_host', '') ?: get_smtp_credential('host', 'ms8.guzel.net.tr');
         $port = (int)($config['port'] ?? get_setting('smtp_port', '587') ?: get_smtp_credential('port', 587));
         $secure = strtolower($config['secure'] ?? get_setting('smtp_secure', 'tls') ?: get_smtp_credential('encryption', 'tls'));
         $username = $config['username'] ?? get_setting('smtp_username', '') ?: get_smtp_credential('username');
@@ -1254,13 +1257,8 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
             tpl_error_log('Partner logo error (batch): ' . $e->getMessage());
         }
         
-        // MAIL FROM her zaman from_email kullanmalı (SMTP sunucusu kullanıcı adı ile aynı olmalı)
-        // Güzel Hosting için from_email kullanıcı adı ile aynı olmalı
-        $envelopeFrom = $from_email;
-        if (empty($envelopeFrom) || $envelopeFrom !== $username) {
-            // Eğer from_email boşsa veya username ile eşleşmiyorsa, username kullan
-            $envelopeFrom = $username;
-        }
+        // MAIL FROM her zaman sunucu kullanıcı adı ile aynı olmalı
+        $envelopeFrom = $username;
         
         foreach ($recipient_entries as $entry) {
             $to = $entry['email'];
@@ -1278,10 +1276,12 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
             $html_template = get_email_template($individual_subject, $individual_message, $from_name, $from_email, $partner_logos_html);
             
             try {
-                $write('MAIL FROM: <' . $envelopeFrom . '>');
+                $write('MAIL FROM:<' . $envelopeFrom . '>');
                 $mf = $read();
                 if (strpos($mf, '250') !== 0) {
                     tpl_error_log('MAIL FROM reddedildi: ' . trim($mf) . ' for ' . $to);
+                    $write('RSET');
+                    $read();
                     $failed_count++;
                     $failed_emails[] = $to;
                     if ($recipient_id) {
@@ -1290,10 +1290,12 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
                     continue;
                 }
                 
-                $write('RCPT TO: <' . $to . '>');
+                $write('RCPT TO:<' . $to . '>');
                 $rc = $read();
                 if (strpos($rc, '250') !== 0 && strpos($rc, '251') !== 0) {
                     tpl_error_log('RCPT TO reddedildi: ' . trim($rc) . ' Alıcı: ' . $to);
+                    $write('RSET');
+                    $read();
                     $failed_count++;
                     $failed_emails[] = $to;
                     if ($recipient_id) {
@@ -1306,6 +1308,8 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
                 $dt = $read();
                 if (strpos($dt, '354') !== 0) {
                     tpl_error_log('DATA kabul edilmedi: ' . trim($dt) . ' for ' . $to);
+                    $write('RSET');
+                    $read();
                     $failed_count++;
                     $failed_emails[] = $to;
                     if ($recipient_id) {
@@ -1315,14 +1319,18 @@ function send_smtp_mail_batch($recipients, $subject, $message, $from_name, $from
                 }
 
                 $headers = [];
-                $headers[] = 'From: ' . sprintf('%s <%s>', $from_name, $from_email);
+                $encoded_from_name = '=?UTF-8?B?' . base64_encode($from_name) . '?=';
+                $headers[] = 'From: ' . sprintf('%s <%s>', $encoded_from_name, $envelopeFrom);
+                $headers[] = 'Reply-To: ' . $from_email;
                 $headers[] = 'To: ' . $to;
-                $headers[] = 'Subject: ' . $individual_subject;
+                $headers[] = 'Subject: =?UTF-8?B?' . base64_encode($individual_subject) . '?=';
                 $headers[] = 'MIME-Version: 1.0';
                 $headers[] = 'Content-Type: text/html; charset=UTF-8';
-                $headers[] = 'X-Mailer: UniFour';
+                $headers[] = 'X-Mailer: Four Kampüs';
+                $headers[] = 'Date: ' . date('r');
+                $headers[] = 'Message-ID: <' . md5(uniqid(microtime(), true)) . '@' . $host . '>';
 
-                $data = implode("\r\n", $headers) . "\r\n\r\n" . $html_template . "\r\n.\r\n";
+                $data = implode("\r\n", $headers) . "\r\n\r\n" . $html_template . "\r\n.";
                 $write($data);
                 $resp = $read();
                 
@@ -1415,7 +1423,7 @@ function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $confi
         // Önce config'den al, yoksa veritabanından al (get_setting varsa), yoksa fallback
         $get_setting_func = function_exists('get_setting') ? 'get_setting' : null;
         
-        $host = $config['host'] ?? ($get_setting_func ? get_setting('smtp_host', '') : '') ?: get_smtp_credential('host', 'ms7.guzel.net.tr');
+        $host = $config['host'] ?? ($get_setting_func ? get_setting('smtp_host', '') : '') ?: get_smtp_credential('host', 'ms8.guzel.net.tr');
         $port = (int)($config['port'] ?? ($get_setting_func ? get_setting('smtp_port', '587') : '587') ?: get_smtp_credential('port', 587));
         $secure = strtolower($config['secure'] ?? ($get_setting_func ? get_setting('smtp_secure', 'tls') : 'tls') ?: get_smtp_credential('encryption', 'tls')); // tls | ssl | none
         $username = $config['username'] ?? ($get_setting_func ? get_setting('smtp_username', '') : '') ?: get_smtp_credential('username');
@@ -1424,7 +1432,7 @@ function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $confi
 
         // from_email parametresi boşsa veya yanlışsa, veritabanından al (get_setting varsa)
         if (empty($from_email) || stripos($from_email, 'tun4aa') !== false || stripos($from_email, 'gmail.com') !== false) {
-            $from_email = ($get_setting_func ? get_setting('smtp_from_email', '') : '') ?: ($username ?: 'admin@foursoftware.com.tr');
+            $from_email = ($get_setting_func ? get_setting('smtp_from_email', '') : '') ?: ($username ?: 'admin@fourkampus.com.tr');
         }
         // from_name parametresi boşsa, veritabanından al (get_setting varsa)
         if (empty($from_name)) {
@@ -1522,24 +1530,23 @@ function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $confi
             return false;
         }
 
-        // MAIL FROM her zaman from_email kullanmalı (SMTP sunucusu kullanıcı adı ile aynı olmalı)
-        // Güzel Hosting için from_email kullanıcı adı ile aynı olmalı
-        $envelopeFrom = $from_email;
-        if (empty($envelopeFrom) || $envelopeFrom !== $username) {
-            // Eğer from_email boşsa veya username ile eşleşmiyorsa, username kullan
-            $envelopeFrom = $username;
-        }
-        $write('MAIL FROM: <' . $envelopeFrom . '>');
+        // MAIL FROM her zaman sunucu kullanıcı adı ile aynı olmalı
+        $envelopeFrom = $username;
+        $write('MAIL FROM:<' . $envelopeFrom . '>');
         $mf = $read();
         if (strpos($mf, '250') !== 0) {
             tpl_error_log('MAIL FROM reddedildi: ' . trim($mf));
+            $write('RSET');
+            $read();
             fclose($fp);
             return false;
         }
-        $write('RCPT TO: <' . $to . '>');
+        $write('RCPT TO:<' . $to . '>');
         $rc = $read();
         if (strpos($rc, '250') !== 0 && strpos($rc, '251') !== 0) {
             tpl_error_log('RCPT TO reddedildi: ' . trim($rc) . ' Alıcı: ' . $to);
+            $write('RSET');
+            $read();
             fclose($fp);
             return false;
         }
@@ -1547,6 +1554,8 @@ function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $confi
         $dt = $read();
         if (strpos($dt, '354') !== 0) {
             tpl_error_log('DATA kabul edilmedi: ' . trim($dt));
+            $write('RSET');
+            $read();
             fclose($fp);
             return false;
         }
@@ -1601,13 +1610,17 @@ function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $confi
             // Burada sadece referans için ekliyoruz
         }
         
-        $headers[] = 'From: ' . sprintf('%s <%s>', $from_name, $from_email);
+        $headers = [];
+        $encoded_from_name = '=?UTF-8?B?' . base64_encode($from_name) . '?=';
+        $headers[] = 'From: ' . sprintf('%s <%s>', $encoded_from_name, $envelopeFrom);
         $headers[] = 'Reply-To: ' . $from_email;
         $headers[] = 'To: ' . $to;
-        $headers[] = 'Subject: ' . $subject;
+        $headers[] = 'Subject: =?UTF-8?B?' . base64_encode($subject) . '?=';
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-Type: text/html; charset=UTF-8';
-        $headers[] = 'X-Mailer: UniFour';
+        $headers[] = 'X-Mailer: Four Kampüs';
+        $headers[] = 'Date: ' . date('r');
+        $headers[] = 'Message-ID: <' . md5(uniqid(microtime(), true)) . '@' . $host . '>';
         $headers[] = 'X-Auto-Response-Suppress: All';
         // Gravatar için referans (bazı istemciler destekler)
         if (!empty($logo_url)) {
@@ -1617,7 +1630,7 @@ function send_smtp_mail($to, $subject, $message, $from_name, $from_email, $confi
         // Batch ile aynı template'i kullan
         $html = get_email_template($subject, $message, $from_name, $from_email, $partner_logos_html);
 
-        $data = implode("\r\n", $headers) . "\r\n\r\n" . $html . "\r\n.\r\n";
+        $data = implode("\r\n", $headers) . "\r\n\r\n" . $html . "\r\n.";
         $write($data);
         $resp = $read();
         
@@ -2280,6 +2293,10 @@ function handle_send_message($post) {
             error_log('[TPL] ' . $message);
         }
     }
+
+    // Uzun sürebilecek SMS gönderimleri için oturum ve timeout güvenliği
+    ignore_user_abort(true);
+    @set_time_limit(0);
     
     // Session kontrolü - session başlatılmamışsa başlat
     if (session_status() === PHP_SESSION_NONE) {
@@ -2510,6 +2527,13 @@ function handle_send_message($post) {
         
         error_log('[SMS_TRACE] Step 2h: recipients count after parse = ' . count($recipients));
         
+        $postedRecipientCount = isset($post['selected_phone_count']) ? (int)$post['selected_phone_count'] : null;
+        if ($postedRecipientCount !== null && $postedRecipientCount > 0 && $postedRecipientCount !== count($recipients)) {
+            $_SESSION['error'] = 'Alıcı listesi doğrulanamadı. Lütfen sayfayı yenileyip tekrar deneyin.';
+            tpl_error_log('SMS recipient count mismatch. Posted=' . $postedRecipientCount . ' Parsed=' . count($recipients));
+            return;
+        }
+
         if (empty($recipients)) {
             error_log('[SMS_TRACE] Step 2i: NO RECIPIENTS - returning early');
             $_SESSION['error'] = "Alıcı seçilmedi!";
@@ -3288,4 +3312,3 @@ function send_sms_with_retry_and_failover($to, $message, $primary_provider = 'ne
         'providers_tried' => $providers
     ];
 }
-

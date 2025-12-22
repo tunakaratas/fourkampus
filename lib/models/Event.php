@@ -30,7 +30,7 @@ class Event {
             $stmt = @$this->db->prepare("
                 SELECT * FROM events 
                 WHERE club_id = ? 
-                ORDER BY date DESC, time DESC
+                ORDER BY id DESC
             ");
             if (!$stmt) {
                 return [];
@@ -70,7 +70,7 @@ class Event {
             $stmt = @$this->db->prepare("
                 SELECT * FROM events 
                 WHERE club_id = ? 
-                ORDER BY date DESC, time DESC
+                ORDER BY id DESC
                 LIMIT ? OFFSET ?
             ");
             if (!$stmt) return [];

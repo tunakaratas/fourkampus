@@ -441,14 +441,14 @@ if (!empty($code_search)) {
         .hero-logo {
             width: 52px;
             height: 52px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #fff;
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.25);
-            font-size: 22px;
+        }
+        .hero-logo img {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
         }
         .hero-brand-title {
             font-size: 18px;
@@ -1040,19 +1040,16 @@ if (!empty($code_search)) {
             <div class="hero-bar">
                 <div class="hero-brand">
                     <div class="hero-logo">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
+                        <img src="assets/images/brand/nobackground_logo.png" alt="Four Kampüs">
+                    </div>
                     <div>
                         <div class="hero-brand-title">Four Kampüs</div>
                         <div class="hero-brand-subtitle">Topluluk Yönetim Platformu</div>
             </div>
         </div>
-                <div class="hero-links">
-                    <a href="marketing/index.html" class="hero-link">Ana Sayfa</a>
-                    <a href="public/index.php" class="hero-link">Topluluk Portalı</a>
-    </div>
+
                 <div class="hero-actions">
-                    <a href="public/register.php" class="action-button ghost">
+                    <a href="../public/register.php" class="action-button ghost">
                         <i class="fas fa-plus"></i>
                         Topluluk Oluştur
                     </a>
@@ -1231,10 +1228,10 @@ if (!empty($code_search)) {
         <!-- Footer -->
         <div class="footer-section">
             <div class="footer-links">
-                <a href="marketing/index.html" class="footer-link">
+                <a href="index.html" class="footer-link">
                     <i class="fas fa-home"></i> Ana Sayfa
                 </a>
-                <a href="public/index.php" class="footer-link">
+                <a href="../public/index.php" class="footer-link">
                     <i class="fas fa-users"></i> Topluluk Portalı
                 </a>
                 <a href="admin-login.php" class="footer-link">
@@ -1242,10 +1239,9 @@ if (!empty($code_search)) {
                 </a>
             </div>
             <p class="footer-copyright">
-                © <?= date('Y') ?> UniPanel. Tüm hakları saklıdır.
+                © <?= date('Y') ?> Four Kampüs. Tüm hakları saklıdır.
             </p>
         </div>
     </div>
 </body>
 </html>
-

@@ -7,13 +7,13 @@ HEADER_HTML='    <!-- Layered Header -->
         <div class="header-top-layer">
             <div class="header-top-content">
                 <div class="header-top-left">
-                    <a href="https://instagram.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                    <a href="https://instagram.com/fourkampus" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="https://x.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                    <a href="https://x.com/fourkampus" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
                         <i class="fab fa-x"></i>
                     </a>
-                    <a href="https://linkedin.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                    <a href="https://linkedin.com/fourkampus" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
                         <i class="fab fa-linkedin"></i>
                     </a>
                 </div>
@@ -26,7 +26,7 @@ HEADER_HTML='    <!-- Layered Header -->
                         <i class="fas fa-globe"></i>
                         <span>Portal</span>
                     </a>
-                    <a href="../admin-login.php" target="_blank" rel="noopener noreferrer" class="header-top-btn admin-btn">
+                    <a href="admin-login.php" target="_blank" rel="noopener noreferrer" class="header-top-btn admin-btn">
                         <i class="fas fa-shield-alt"></i>
                         <span>Admin Panel</span>
                     </a>

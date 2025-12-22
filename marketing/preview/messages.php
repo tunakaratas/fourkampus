@@ -7,7 +7,7 @@ header('X-Frame-Options: SAMEORIGIN');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UniPanel - SMS Messages Preview</title>
+    <title>Four Kampüs - SMS Messages Preview</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         * {
@@ -377,7 +377,7 @@ header('X-Frame-Options: SAMEORIGIN');
 
             <div class="form-group">
                 <label for="sender_name">Gönderen Adı (Opsiyonel)</label>
-                <input type="text" id="sender_name" placeholder="UniPanel" value="UniPanel">
+                <input type="text" id="sender_name" placeholder="Four Kampüs" value="Four Kampüs">
             </div>
 
             <button class="btn-send">

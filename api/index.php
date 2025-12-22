@@ -53,11 +53,11 @@ echo json_encode([
     'success' => true,
     'data' => [
         'api_version' => '1.0',
-        'base_url' => 'https://community.foursoftware.net/unipanel/api',
+        'base_url' => 'https://community.foursoftware.net/fourkampus/api',
         'endpoints' => $endpoints,
-        'documentation' => 'https://community.foursoftware.net/unipanel/api/README.md'
+        'documentation' => 'https://community.foursoftware.net/fourkampus/api/README.md'
     ],
-    'message' => 'UniPanel API v1.0 - Endpoint listesi',
+    'message' => 'Four Kampüs API v1.0 - Endpoint listesi',
     'error' => null
 ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mesafeli Satış Sözleşmesi - UniFour</title>
-    <meta name="description" content="UniFour mesafeli satış sözleşmesi. E-ticaret işlemleri için yasal sözleşme metni.">
+    <title>Mesafeli Satış Sözleşmesi - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs mesafeli satış sözleşmesi. E-ticaret işlemleri için yasal sözleşme metni.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -175,16 +175,16 @@
                 <h2>1. Taraflar</h2>
                 <h3>1.1. Satıcı Bilgileri</h3>
                 <div class="contact-info">
-                    <p><strong>Şirket Adı:</strong> UniFour</p>
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>Şirket Adı:</strong> Four Kampüs</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>
                 
                 <h3>1.2. Alıcı</h3>
                 <p>
-                    Bu sözleşme, UniFour platformu üzerinden ürün veya hizmet satın alan 
-                    gerçek veya tüzel kişiler (Alıcı) ile UniFour (Satıcı) arasında 
+                    Bu sözleşme, Four Kampüs platformu üzerinden ürün veya hizmet satın alan 
+                    gerçek veya tüzel kişiler (Alıcı) ile Four Kampüs (Satıcı) arasında 
                     6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler 
                     Yönetmeliği hükümlerine göre düzenlenmiştir.
                 </p>
@@ -193,18 +193,27 @@
             <div class="legal-section">
                 <h2>2. Konu</h2>
                 <p>
-                    Bu sözleşmenin konusu, Alıcı'nın UniFour platformu üzerinden satın aldığı 
+                    Bu sözleşmenin konusu, Alıcı'nın Four Kampüs platformu üzerinden satın aldığı 
                     ürün/hizmetin satışı ve teslimi ile ilgili tarafların hak ve yükümlülükleridir.
                 </p>
                 <p>
                     <strong>Satılan Ürün/Hizmetler:</strong>
                 </p>
                 <ul>
-                    <li>Profesyonel Plan abonelik hizmeti (₺250/ay)</li>
-                    <li>Topluluk yönetim platformu hizmetleri</li>
+                    <li><strong>Profesyonel Plan:</strong> Topluluk yönetim platformu aboneliği (₺250/ay)</li>
+                    <li><strong>Business Plan:</strong> Gelişmiş topluluk yönetim platformu aboneliği (₺500/ay)</li>
                     <li>Web sitesi ve email hosting hizmetleri</li>
                     <li>Diğer dijital ürün ve hizmetler</li>
                 </ul>
+                
+                <div class="warning-box">
+                    <p>
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        <strong>Not:</strong> Four Kampüs platformu üzerinden topluluklar tarafından satılan fiziksel ürünler, 
+                        ilgili toplulukların sorumluluğundadır. Bu ürünlerin satışı, teslimatı ve kalitesinden 
+                        topluluk yöneticileri sorumludur.
+                    </p>
+                </div>
             </div>
             
             <div class="legal-section">
@@ -258,8 +267,8 @@
                 
                 <h3>5.2. Teslimat Süresi</h3>
                 <ul>
-                    <li><strong>Dijital Hizmetler:</strong> Anında (sipariş onayından sonra)</li>
-                    <li><strong>Fiziksel Ürünler:</strong> 3-7 iş günü (varsa)</li>
+                    <li><strong>Dijital Hizmetler (Four Kampüs):</strong> Anında (sipariş onayından sonra)</li>
+                    <li><strong>Fiziksel Ürünler (Topluluklar):</strong> Topluluk tarafından belirlenen süre içinde (topluluklar sorumludur)</li>
                 </ul>
                 
                 <h3>5.3. Teslimat Adresi</h3>
@@ -295,7 +304,7 @@
                     bildirimde bulunabilir:
                 </p>
                 <ul>
-                    <li>E-posta: info@unifour.com</li>
+                    <li>E-posta: info@fourkampus.com.tr</li>
                     <li>Telefon: +90 533 544 59 83</li>
                     <li>Platform üzerinden iletişim formu</li>
                 </ul>
@@ -388,7 +397,7 @@
                     Mesafeli satış sözleşmesi hakkında sorularınız için:
                 </p>
                 <div class="contact-info">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>

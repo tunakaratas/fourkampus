@@ -40,7 +40,7 @@ $publicCache = Cache::getInstance(__DIR__ . '/../system/cache');
 
 // Kullanıcı bilgilerini getir
 function get_user_profile($user_id) {
-    $db_path = __DIR__ . '/fourkampus.sqlite';
+    $db_path = __DIR__ . '/unipanel.sqlite';
     
     if (!file_exists($db_path)) {
         return null;
@@ -78,7 +78,7 @@ function get_user_profile($user_id) {
 
 // Kullanıcı bildirimlerini getir
 function get_user_notifications($user_id) {
-    $db_path = __DIR__ . '/fourkampus.sqlite';
+    $db_path = __DIR__ . '/unipanel.sqlite';
     
     if (!file_exists($db_path)) {
         return [];
@@ -108,7 +108,7 @@ function get_user_notifications($user_id) {
 
 // Kullanıcı bilgilerini güncelle
 function update_user_profile($user_id, $data) {
-    $db_path = __DIR__ . '/fourkampus.sqlite';
+    $db_path = __DIR__ . '/unipanel.sqlite';
     
     if (!file_exists($db_path)) {
         return ['success' => false, 'message' => 'Veritabanı bulunamadı'];
@@ -293,7 +293,7 @@ function get_all_communities($useCache = true) {
             continue;
         }
         
-        $db_path = $communities_dir . '/' . $dir . '/fourkampus.sqlite';
+        $db_path = $communities_dir . '/' . $dir . '/unipanel.sqlite';
         if (!file_exists($db_path)) {
             continue;
         }
@@ -456,7 +456,7 @@ function get_public_market_products($limit = 36) {
             continue;
         }
         
-        $db_path = $folder . '/fourkampus.sqlite';
+        $db_path = $folder . '/unipanel.sqlite';
         if (!file_exists($db_path)) {
             continue;
         }
@@ -662,7 +662,7 @@ function get_public_events($limit = 8) {
         if (!is_dir($folder)) {
             continue;
         }
-        $db_path = $folder . '/fourkampus.sqlite';
+        $db_path = $folder . '/unipanel.sqlite';
         if (!file_exists($db_path)) {
             continue;
         }
@@ -833,7 +833,7 @@ function get_public_campaigns($limit = 6) {
     
     foreach ($community_folders as $folder) {
         $dirName = basename($folder);
-        $db_path = $folder . '/fourkampus.sqlite';
+        $db_path = $folder . '/unipanel.sqlite';
         if (!file_exists($db_path)) {
             continue;
         }
@@ -966,7 +966,7 @@ function get_community_data($community_id) {
         return null;
     }
     
-    $db_path = __DIR__ . '/../communities/' . $community_id . '/fourkampus.sqlite';
+    $db_path = __DIR__ . '/../communities/' . $community_id . '/unipanel.sqlite';
     
     if (!file_exists($db_path)) {
         return null;
@@ -1129,7 +1129,7 @@ function get_event_media($event_id, $community_id) {
     }
     
     $media = ['images' => [], 'videos' => []];
-    $db_path = __DIR__ . '/../communities/' . $community_id . '/fourkampus.sqlite';
+    $db_path = __DIR__ . '/../communities/' . $community_id . '/unipanel.sqlite';
     
     if (!file_exists($db_path)) {
         return $media;
@@ -1506,7 +1506,7 @@ function open_community_db($community_id) {
         return null;
     }
     
-    $db_path = __DIR__ . '/../communities/' . $community_id . '/fourkampus.sqlite';
+    $db_path = __DIR__ . '/../communities/' . $community_id . '/unipanel.sqlite';
     if (!file_exists($db_path)) {
         return null;
     }

@@ -115,6 +115,7 @@ $SUPERADMIN_ALLOWED_IPS = $superadminConfig['security']['allowed_ips'] ?? ['127.
 
 // Session kontrolü - sadece web ortamında
 if (php_sapi_name() !== 'cli' && session_status() === PHP_SESSION_NONE) {
+    session_name('FK_SUPERADMIN');
     session_start();
 }
 
@@ -422,7 +423,7 @@ function getDiskUsagePercentage($total_space, $free_space) {
 
 // --- YAPILANDIRMA ---
 const COMMUNITIES_DIR = __DIR__ . '/../communities/';
-const SUPERADMIN_DB = __DIR__ . '/../fourkampus.sqlite';
+const SUPERADMIN_DB = __DIR__ . '/../unipanel.sqlite';
 
 // --- LOG SİSTEMİ FONKSİYONLARI ---
 function initLogDatabase() {
@@ -533,9 +534,24 @@ function initLogDatabase() {
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )");
         
-        $db->exec("CREATE INDEX IF NOT EXISTS idx_ads_status ON ads(status)");
-        $db->exec("CREATE INDEX IF NOT EXISTS idx_ads_priority ON ads(priority DESC)");
-        $db->exec("CREATE INDEX IF NOT EXISTS idx_ads_dates ON ads(start_date, end_date)");
+        @$db->exec("CREATE INDEX IF NOT EXISTS idx_ads_status ON ads(status)");
+        @$db->exec("CREATE INDEX IF NOT EXISTS idx_ads_priority ON ads(priority DESC)");
+        @$db->exec("CREATE INDEX IF NOT EXISTS idx_ads_dates ON ads(start_date, end_date)");
+        
+        // Community requests tablosu
+        @$db->exec("CREATE TABLE IF NOT EXISTS community_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, community_name TEXT NOT NULL, folder_name TEXT NOT NULL, university TEXT NOT NULL, admin_username TEXT NOT NULL, admin_password_hash TEXT NOT NULL, admin_email TEXT, status TEXT DEFAULT 'pending', admin_notes TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, processed_at DATETIME, processed_by TEXT)");
+        
+        // Contact submissions tablosu
+        @$db->exec("CREATE TABLE IF NOT EXISTS contact_submissions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            subject TEXT,
+            message TEXT NOT NULL,
+            status TEXT DEFAULT 'unread',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )");
         
         $db->close();
     } catch (Exception $e) {
@@ -678,7 +694,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         if (empty($community_folder) || empty($president_name)) {
             $error = "Topluluk klasörü ve başkan adı zorunludur!";
         } else {
-            $db_path = COMMUNITIES_DIR . $community_folder . '/fourkampus.sqlite';
+            $db_path = COMMUNITIES_DIR . $community_folder . '/unipanel.sqlite';
             if (!file_exists($db_path)) {
                 $error = "Topluluk veritabanı bulunamadı!";
             } else {
@@ -757,7 +773,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         
         // Her hedef topluluğa bildirim gönder
         foreach ($target_list as $community) {
-            $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
+            $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
             if (file_exists($db_path)) {
                 try {
                     $db = new SQLite3($db_path);
@@ -977,7 +993,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                 $dirs = scandir(COMMUNITIES_DIR);
                 foreach ($dirs as $dir) {
                     if ($dir === '.' || $dir === '..') continue;
-                    $db_path = COMMUNITIES_DIR . $dir . '/fourkampus.sqlite';
+                    $db_path = COMMUNITIES_DIR . $dir . '/unipanel.sqlite';
                     if (file_exists($db_path)) {
                         try {
                             $check_db = new SQLite3($db_path);
@@ -1125,7 +1141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                                     @chmod($full_path . '/assets/images', SUPERADMIN_PUBLIC_DIR_PERMS);
                                     @chmod($full_path . '/assets/videos', SUPERADMIN_PUBLIC_DIR_PERMS);
                                     
-                                    $db_path = $full_path . '/fourkampus.sqlite';
+                                    $db_path = $full_path . '/unipanel.sqlite';
                                     $db = new SQLite3($db_path);
                                     
                                     $db->exec("CREATE TABLE IF NOT EXISTS admins (
@@ -1360,10 +1376,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($action ?? '') === 'create' || ($
                                                 $smtp_settings = [
                                                     'smtp_username' => $smtp_config['username'] ?? '',
                                                     'smtp_password' => $smtp_config['password'] ?? '',
-                                                    'smtp_host' => $smtp_config['host'] ?? 'ms7.guzel.net.tr',
+                                                    'smtp_host' => $smtp_config['host'] ?? 'ms8.guzel.net.tr',
                                                     'smtp_port' => (string)($smtp_config['port'] ?? 587),
                                                     'smtp_secure' => $smtp_config['encryption'] ?? 'tls',
-                                                    'smtp_from_email' => $smtp_config['from_email'] ?? ($smtp_config['username'] ?? 'admin@foursoftware.com.tr'),
+                                                    'smtp_from_email' => $smtp_config['from_email'] ?? ($smtp_config['username'] ?? 'admin@fourkampus.com.tr'),
                                                     'smtp_from_name' => $smtp_config['from_name'] ?? 'Four Kampüs'
                                                 ];
                                                 
@@ -1543,7 +1559,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                         $dirs = scandir(COMMUNITIES_DIR);
                         foreach ($dirs as $dir) {
                             if ($dir === '.' || $dir === '..') continue;
-                            $check_db_path = COMMUNITIES_DIR . $dir . '/fourkampus.sqlite';
+                            $check_db_path = COMMUNITIES_DIR . $dir . '/unipanel.sqlite';
                             if (file_exists($check_db_path)) {
                                 try {
                                     $check_db = new SQLite3($check_db_path);
@@ -1578,7 +1594,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                     $db->close();
                 } else {
                     $community_path = COMMUNITIES_DIR . $folder_name;
-                    $db_path = $community_path . '/fourkampus.sqlite';
+                    $db_path = $community_path . '/unipanel.sqlite';
                     
                     // Klasör varsa ama veritabanı yoksa (kayıt sırasında oluşturulmuş), sadece veritabanını oluştur
                     if (is_dir($community_path) && !file_exists($db_path)) {
@@ -1748,7 +1764,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'approve_request') {
                                         }
                                         
                                         // Veritabanı oluştur
-                                        $db_path = $full_path . '/fourkampus.sqlite';
+                                        $db_path = $full_path . '/unipanel.sqlite';
                                         $community_db = new SQLite3($db_path);
                                         $community_db->exec('PRAGMA journal_mode = WAL');
                                         
@@ -2059,7 +2075,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'verif
         exit;
     }
 
-    $dbPath = COMMUNITIES_DIR . $communityFolder . '/fourkampus.sqlite';
+    $dbPath = COMMUNITIES_DIR . $communityFolder . '/unipanel.sqlite';
     if (!file_exists($dbPath)) {
         header("Location: ?view=verification_admin&error=" . urlencode('Topluluk veritabanı bulunamadı.'));
         exit;
@@ -2375,7 +2391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'assign_plan') {
         $error = "Geçersiz ay sayısı! (1-120 arası olmalı)";
     } else {
         $community_path = COMMUNITIES_DIR . $community_folder;
-        $db_path = $community_path . '/fourkampus.sqlite';
+        $db_path = $community_path . '/unipanel.sqlite';
         
         if (!is_dir($community_path)) {
             $error = "Topluluk klasörü bulunamadı!";
@@ -2450,7 +2466,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'assign_sms_package') {
         $error = "Geçersiz SMS paketi seçimi!";
     } else {
         $community_path = COMMUNITIES_DIR . $community_folder;
-        $db_path = $community_path . '/fourkampus.sqlite';
+        $db_path = $community_path . '/unipanel.sqlite';
         
         if (!is_dir($community_path)) {
             $error = "Topluluk klasörü bulunamadı!";
@@ -2525,7 +2541,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!isValidCommunityName($community)) {
                     $error = "Geçersiz topluluk adı!";
                 } else {
-                    $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
+                    $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
                     if (file_exists($db_path)) {
                         $db = new SQLite3($db_path);
                         $stmt = $db->prepare("UPDATE members SET is_banned = 1, ban_reason = ? WHERE id = ?");
@@ -2548,7 +2564,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!isValidCommunityName($community)) {
                     $error = "Geçersiz topluluk adı!";
                 } else {
-                    $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
+                    $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
                     if (file_exists($db_path)) {
                         $db = new SQLite3($db_path);
                         $stmt = $db->prepare("UPDATE members SET is_banned = 0, ban_reason = NULL WHERE id = ?");
@@ -2568,7 +2584,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (!isValidCommunityName($community)) {
                 $error = "Geçersiz topluluk adı!";
             } else {
-                $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
+                $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
                 
                 if (file_exists($db_path)) {
                     try {
@@ -2591,7 +2607,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (!isValidCommunityName($community)) {
                 $error = "Geçersiz topluluk adı!";
             } else {
-                $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
+                $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
                 
                 if (file_exists($db_path)) {
                     try {
@@ -2618,7 +2634,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $status = $_POST['status'] ?? 'active';
             
             if ($folder && isValidCommunityName($folder)) {
-                $db_path = COMMUNITIES_DIR . $folder . '/fourkampus.sqlite';
+                $db_path = COMMUNITIES_DIR . $folder . '/unipanel.sqlite';
                 
                 if (file_exists($db_path)) {
                     try {
@@ -2878,7 +2894,7 @@ if (empty($communities) && is_dir(COMMUNITIES_DIR)) {
             $communities[] = $dir;
             
             // Topluluk detaylarını al
-            $db_path = COMMUNITIES_DIR . $dir . '/fourkampus.sqlite';
+            $db_path = COMMUNITIES_DIR . $dir . '/unipanel.sqlite';
             if (file_exists($db_path)) {
                 try {
                     // Veritabanı dosyasının yazma izinlerini kontrol et ve düzelt
@@ -3488,12 +3504,13 @@ foreach ($community_details as $details) {
                         <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         <span class="font-normal">Topluluk Talepleri</span>
                         <?php
-                        initLogDatabase();
-                        $db = new SQLite3(SUPERADMIN_DB);
-                        $db->exec('PRAGMA journal_mode = WAL');
-                        $db->exec("CREATE TABLE IF NOT EXISTS community_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, community_name TEXT NOT NULL, folder_name TEXT NOT NULL, university TEXT NOT NULL, admin_username TEXT NOT NULL, admin_password_hash TEXT NOT NULL, admin_email TEXT, status TEXT DEFAULT 'pending', admin_notes TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP, processed_at DATETIME, processed_by TEXT)");
-                        $pending_count = $db->querySingle("SELECT COUNT(*) FROM community_requests WHERE status = 'pending'");
-                        $db->close();
+                        try {
+                            $db = new SQLite3(SUPERADMIN_DB);
+                            $pending_count = @$db->querySingle("SELECT COUNT(*) FROM community_requests WHERE status = 'pending'");
+                            $db->close();
+                        } catch (Exception $e) {
+                            $pending_count = 0;
+                        }
                         if ($pending_count > 0):
                         ?>
                         <span class="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full"><?= $pending_count ?></span>
@@ -3511,24 +3528,13 @@ foreach ($community_details as $details) {
                         <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                         <span class="font-normal">İletişim Formları</span>
                         <?php
-                        initLogDatabase();
-                        $db = new SQLite3(SUPERADMIN_DB);
-                        $db->exec('PRAGMA journal_mode = WAL');
-                        $db->exec("CREATE TABLE IF NOT EXISTS contact_submissions (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            name TEXT NOT NULL,
-                            email TEXT NOT NULL,
-                            phone TEXT,
-                            community TEXT,
-                            message TEXT NOT NULL,
-                            ip_address TEXT,
-                            user_agent TEXT,
-                            status TEXT DEFAULT 'new',
-                            read_at DATETIME,
-                            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-                        )");
-                        $new_count = $db->querySingle("SELECT COUNT(*) FROM contact_submissions WHERE status = 'new'");
-                        $db->close();
+                        try {
+                            $db = new SQLite3(SUPERADMIN_DB, SQLITE3_OPEN_READONLY);
+                            $new_count = @$db->querySingle("SELECT COUNT(*) FROM contact_submissions WHERE status = 'new'");
+                            $db->close();
+                        } catch (Exception $e) {
+                            $new_count = 0;
+                        }
                         if ($new_count > 0):
                         ?>
                         <span class="ml-auto bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full"><?= $new_count ?></span>
@@ -4068,7 +4074,7 @@ foreach ($community_details as $details) {
                     $community_name = ucwords(str_replace('_', ' ', $selected_community));
                     
                     if (is_dir($community_path)) {
-                        $db_path = $community_path . '/fourkampus.sqlite';
+                        $db_path = $community_path . '/unipanel.sqlite';
                         if (file_exists($db_path)) {
                             try {
                                 $db = new SQLite3($db_path);
@@ -4203,7 +4209,7 @@ foreach ($community_details as $details) {
                     $community_events = [];
                     
                     foreach ($communities as $community) {
-                        $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
+                        $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
                         if (file_exists($db_path)) {
                             try {
                                 $db = new SQLite3($db_path);
@@ -4439,28 +4445,30 @@ foreach ($community_details as $details) {
                     // Veritabanını başlat (eğer tablolar yoksa oluştur)
                     initLogDatabase();
                     
-                    // Eski logları temizle (90 günden eski loglar)
-                    try {
-                        $cleanup_db = new SQLite3(SUPERADMIN_DB);
-                        $cleanup_db->exec('PRAGMA journal_mode = WAL');
-                        
-                        // 90 günden eski aktivite loglarını sil
-                        $stmt = $cleanup_db->prepare("DELETE FROM activity_logs WHERE created_at < datetime('now', '-90 days')");
-                        $stmt->execute();
-                        
-                        // 90 günden eski sistem loglarını sil
-                        $stmt = $cleanup_db->prepare("DELETE FROM system_logs WHERE created_at < datetime('now', '-90 days')");
-                        $stmt->execute();
-                        
-                        // 90 günden eski hata loglarını sil
-                        $stmt = $cleanup_db->prepare("DELETE FROM error_logs WHERE created_at < datetime('now', '-90 days')");
-                        $stmt->execute();
-                        
-                        // VACUUM yap (veritabanı boyutunu küçült)
-                        $cleanup_db->exec('VACUUM');
-                        $cleanup_db->close();
-                    } catch (Exception $e) {
-                        error_log("Log temizleme hatası: " . $e->getMessage());
+                    // Eski logları temizle (90 günden eski loglar) - sadece yazma izni varsa
+                    if (is_writable(SUPERADMIN_DB)) {
+                        try {
+                            $cleanup_db = new SQLite3(SUPERADMIN_DB);
+                            @$cleanup_db->exec('PRAGMA journal_mode = DELETE');
+                            
+                            // 90 günden eski aktivite loglarını sil
+                            $stmt = @$cleanup_db->prepare("DELETE FROM activity_logs WHERE created_at < datetime('now', '-90 days')");
+                            if ($stmt) @$stmt->execute();
+                            
+                            // 90 günden eski sistem loglarını sil
+                            $stmt = @$cleanup_db->prepare("DELETE FROM system_logs WHERE created_at < datetime('now', '-90 days')");
+                            if ($stmt) @$stmt->execute();
+                            
+                            // 90 günden eski hata loglarını sil
+                            $stmt = @$cleanup_db->prepare("DELETE FROM error_logs WHERE created_at < datetime('now', '-90 days')");
+                            if ($stmt) @$stmt->execute();
+                            
+                            // VACUUM yap (veritabanı boyutunu küçült)
+                            @$cleanup_db->exec('VACUUM');
+                            $cleanup_db->close();
+                        } catch (Exception $e) {
+                            error_log("Log temizleme hatası: " . $e->getMessage());
+                        }
                     }
                     
                     // Filtreleme parametreleri
@@ -5552,7 +5560,7 @@ function loadMoreSuperadminEvents() {
                     $verificationItems = [];
 
                     foreach ($communities as $communityFolder) {
-                        $db_path = COMMUNITIES_DIR . $communityFolder . '/fourkampus.sqlite';
+                        $db_path = COMMUNITIES_DIR . $communityFolder . '/unipanel.sqlite';
                         if (!file_exists($db_path)) {
                             continue;
                         }
@@ -6589,7 +6597,7 @@ function loadMoreSuperadminEvents() {
                     // Topluluk ayarlarını topla
                     $community_settings = [];
                     foreach ($communities as $community) {
-                        $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
+                        $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
                         if (file_exists($db_path)) {
                             try {
                                 $db = new SQLite3($db_path);
@@ -6775,7 +6783,7 @@ function loadMoreSuperadminEvents() {
                                                         </div>
                                                         <div class="flex justify-between">
                                                             <span class="text-gray-600">Boyut:</span>
-                                                            <span class="font-medium"><?= round(filesize(COMMUNITIES_DIR . $community . '/fourkampus.sqlite') / 1024, 1) ?> KB</span>
+                                                            <span class="font-medium"><?= round(filesize(COMMUNITIES_DIR . $community . '/unipanel.sqlite') / 1024, 1) ?> KB</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -7984,7 +7992,7 @@ if ($updateBoardMembers) {
     $maxCommunities = 50; // Her seferinde max 50 topluluk güncelle
     
     foreach (array_slice($communities, 0, $maxCommunities) as $community) {
-        $db_path = COMMUNITIES_DIR . $community . '/fourkampus.sqlite';
+        $db_path = COMMUNITIES_DIR . $community . '/unipanel.sqlite';
         
         if (!file_exists($db_path)) {
             $skipped++;

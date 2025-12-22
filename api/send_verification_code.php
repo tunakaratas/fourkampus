@@ -195,11 +195,11 @@ try {
         // SMTP ayarlarını al - credentials.php'den (communication.php'den ÖNCE)
         $smtp_username = '';
         $smtp_password = '';
-        $smtp_host = 'ms7.guzel.net.tr';
+        $smtp_host = 'ms8.guzel.net.tr';
         $smtp_port = 587;
         $smtp_secure = 'tls';
-        $smtp_from_email = 'admin@foursoftware.com.tr';
-        $smtp_from_name = 'UniFour';
+        $smtp_from_email = 'admin@fourkampus.com.tr';
+        $smtp_from_name = 'Four Kampüs';
         
         // credentials.php'den SMTP ayarlarını yükle
         $credentialsPath = __DIR__ . '/../config/credentials.php';
@@ -209,11 +209,11 @@ try {
                 $smtp_config = $credentials['smtp'];
                 $smtp_username = $smtp_config['username'] ?? '';
                 $smtp_password = $smtp_config['password'] ?? '';
-                $smtp_host = $smtp_config['host'] ?? 'ms7.guzel.net.tr';
+                $smtp_host = $smtp_config['host'] ?? 'ms8.guzel.net.tr';
                 $smtp_port = (int)($smtp_config['port'] ?? 587);
                 $smtp_secure = $smtp_config['encryption'] ?? 'tls';
-                $smtp_from_email = $smtp_config['from_email'] ?? 'admin@foursoftware.com.tr';
-                $smtp_from_name = $smtp_config['from_name'] ?? 'UniFour';
+                $smtp_from_email = $smtp_config['from_email'] ?? 'admin@fourkampus.com.tr';
+                $smtp_from_name = $smtp_config['from_name'] ?? 'Four Kampüs';
             }
         }
         
@@ -228,13 +228,13 @@ try {
         if (function_exists('get_smtp_credential')) {
             if (empty($smtp_username)) $smtp_username = get_smtp_credential('username');
             if (empty($smtp_password)) $smtp_password = get_smtp_credential('password');
-            if (empty($smtp_host) || $smtp_host === 'ms7.guzel.net.tr') $smtp_host = get_smtp_credential('host', 'ms7.guzel.net.tr');
+            if (empty($smtp_host) || $smtp_host === 'ms8.guzel.net.tr') $smtp_host = get_smtp_credential('host', 'ms8.guzel.net.tr');
             $smtp_port = (int)get_smtp_credential('port', $smtp_port);
             $smtp_secure = get_smtp_credential('encryption', $smtp_secure);
         }
         
-        $subject = 'UniFour E-posta Doğrulama Kodu';
-        $message = "Merhaba,\n\nUniFour'a kayıt olmak için e-posta doğrulama kodunuz:\n\n{$code}\n\nBu kod 10 dakika geçerlidir.\n\nEğer bu işlemi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.\n\nUniFour Ekibi\nhttps://foursoftware.com.tr";
+        $subject = 'Four Kampüs E-posta Doğrulama Kodu';
+        $message = "Merhaba,\n\nFour Kampüs'e kayıt olmak için e-posta doğrulama kodunuz:\n\n{$code}\n\nBu kod 10 dakika geçerlidir.\n\nEğer bu işlemi siz yapmadıysanız, bu e-postayı görmezden gelebilirsiniz.\n\nFour Kampüs Ekibi\nhttps://fourkampus.com.tr";
         
         // SMTP ayarları kontrolü ve debug
         error_log("SMTP Config Check - Username: " . (!empty($smtp_username) ? "SET" : "EMPTY") . ", Password: " . (!empty($smtp_password) ? "SET" : "EMPTY") . ", Host: $smtp_host, Port: $smtp_port, Function exists: " . (function_exists('send_smtp_mail') ? "YES" : "NO"));

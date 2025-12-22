@@ -39,9 +39,21 @@ if (!isset($_SESSION['admin_id'])) {
     if (!$db_path || !file_exists($db_path)) {
         // Referrer'dan community path'i çıkar
         $referrer = $_SERVER['HTTP_REFERER'] ?? '';
-        if ($referrer && preg_match('#/communities/([^/]+)#', $referrer, $matches)) {
-            $community_slug = $matches[1];
-            $candidate_path = __DIR__ . '/../communities/' . $community_slug . '/unipanel.sqlite';
+        
+        // community_id parametresi varsa onu kullan
+        $community_id = isset($_GET['community_id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['community_id']) : null;
+        
+        if ($community_id) {
+            $candidate_path = __DIR__ . '/../../communities/' . $community_id . '/unipanel.sqlite';
+            if (file_exists($candidate_path) && is_readable($candidate_path)) {
+                $db_path = realpath($candidate_path);
+            }
+        }
+        
+        // community_id yoksa referrer'dan dene
+        if ((!$db_path || !file_exists($db_path)) && $referrer && preg_match('#/communities/([^/]+)#', $referrer, $matches)) {
+            $community_slug = preg_replace('/[^a-zA-Z0-9_-]/', '', $matches[1]);
+            $candidate_path = __DIR__ . '/../../communities/' . $community_slug . '/unipanel.sqlite';
             if (file_exists($candidate_path) && is_readable($candidate_path)) {
                 $db_path = realpath($candidate_path);
             }
@@ -49,7 +61,7 @@ if (!isset($_SESSION['admin_id'])) {
         
         // Hala bulunamadıysa, tüm veritabanlarını tara ve en çok üyeye sahip olanı bul
         if (!$db_path || !file_exists($db_path)) {
-            $communities_dir = __DIR__ . '/../communities/';
+            $communities_dir = __DIR__ . '/../../communities/';
             $max_members = 0;
             $best_db = null;
             

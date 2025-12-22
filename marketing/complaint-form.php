@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Şikayet Formu - UniFour</title>
-    <meta name="description" content="UniFour şikayet ve talep formu. Sorunlarınızı bize iletin.">
+    <title>Şikayet Formu - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs şikayet ve talep formu. Sorunlarınızı bize iletin.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -193,7 +193,7 @@
                 </p>
             </div>
             
-            <form id="complaintForm" method="POST" action="mailto:info@unifour.com" enctype="text/plain">
+            <form id="complaintForm" method="POST" action="mailto:info@fourkampus.com.tr" enctype="text/plain">
                 <div class="form-group">
                     <label for="name">Ad Soyad <span class="required">*</span></label>
                     <input type="text" id="name" name="name" required>
@@ -259,7 +259,7 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
                     <div>
                         <p style="margin: 0; font-weight: 600; color: #0f172a;">E-posta</p>
-                        <p style="margin: 0.25rem 0 0 0; color: #475569;">info@unifour.com</p>
+                        <p style="margin: 0.25rem 0 0 0; color: #475569;">info@fourkampus.com.tr</p>
                     </div>
                     <div>
                         <p style="margin: 0; font-weight: 600; color: #0f172a;">Telefon</p>
@@ -294,7 +294,7 @@
             const orderId = formData.get('order_id');
             const phone = formData.get('phone');
             
-            const mailtoLink = `mailto:info@unifour.com?subject=${encodeURIComponent('Şikayet/Talep: ' + subject)}&body=${encodeURIComponent(
+            const mailtoLink = `mailto:info@fourkampus.com.tr?subject=${encodeURIComponent('Şikayet/Talep: ' + subject)}&body=${encodeURIComponent(
                 'Ad Soyad: ' + name + '\n' +
                 'E-posta: ' + email + '\n' +
                 'Telefon: ' + (phone || 'Belirtilmedi') + '\n' +

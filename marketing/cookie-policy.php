@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Çerez Politikası - UniFour</title>
-    <meta name="description" content="UniFour çerez politikası. Web sitesinde kullanılan çerezler hakkında bilgilendirme.">
+    <title>Çerez Politikası - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs çerez politikası. Web sitesinde kullanılan çerezler hakkında bilgilendirme.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -180,7 +180,7 @@
             
             <div class="legal-section">
                 <h2>2. Çerezlerin Kullanım Amacı</h2>
-                <p>UniFour olarak çerezleri aşağıdaki amaçlarla kullanmaktayız:</p>
+                <p>Four Kampüs olarak çerezleri aşağıdaki amaçlarla kullanmaktayız:</p>
                 <ul>
                     <li>Web sitesinin temel işlevlerini sağlamak</li>
                     <li>Kullanıcı oturumlarını yönetmek</li>
@@ -328,7 +328,7 @@
                     Çerez politikası hakkında sorularınız için:
                 </p>
                 <div class="highlight-box">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>

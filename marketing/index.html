@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Four Kampüs - Üniversite Topluluklarınız İçin Tek Çözüm</title>
-    <meta name="description" content="Topluluğunuzu profesyonelce yönetin. Etkinlik planlama, üye takibi, bildirimler ve daha fazlası tek platformda. 2026 Eylül'e kadar ücretsiz! Üyelik sistemi ile başlayın.">
-    <meta name="keywords" content="üniversite topluluğu, topluluk yönetimi, etkinlik yönetimi, üye takibi, ücretsiz web sitesi, üyelik sistemi, profesyonel plan">
+    <meta name="description"
+        content="Topluluğunuzu profesyonelce yönetin. Etkinlik planlama, üye takibi, bildirimler ve daha fazlası tek platformda. Bandırma 17 Eylül Üniversitesi topluluklarına Profesyonel Plan 6 ay ücretsiz. Üyelik sistemi ile başlayın.">
+    <meta name="keywords"
+        content="üniversite topluluğu, topluluk yönetimi, etkinlik yönetimi, üye takibi, üyelik sistemi, profesyonel plan">
     <meta name="author" content="Four Kampüs">
     <meta property="og:title" content="Four Kampüs - Üniversite Topluluklarınız İçin Tek Çözüm">
-    <meta property="og:description" content="Topluluğunuzu profesyonelce yönetin. 2026 Eylül'e kadar ücretsiz! Üyelik sistemi ile başlayın.">
+    <meta property="og:description"
+        content="Topluluğunuzu profesyonelce yönetin. Bandırma 17 Eylül Üniversitesi topluluklarına Profesyonel Plan 6 ay ücretsiz. Üyelik sistemi ile başlayın.">
     <meta property="og:type" content="website">
     <link rel="stylesheet" href="styles.css">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style">
+    <link rel="preload"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Layered Header */
         .header-container {
@@ -30,31 +38,33 @@
             transition: transform 0.3s ease-in-out !important;
             transform: translateY(0) !important;
         }
-        
+
         .header-top-layer.header-top-hidden {
             transform: translateY(0) !important;
             opacity: 1 !important;
             pointer-events: auto !important;
         }
-        .header-top-social-btn {
-    color: rgba(255, 255, 255, 0.9) !important;
-    text-decoration: none !important;
-    font-size: 1rem !important;
-    width: 32px !important;
-    height: 32px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-    background: rgba(255, 255, 255, 0.1) !important;
-    transition: all 0.2s !important;
-}
 
-.header-top-social-btn:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
-    transform: translateY(-2px) !important;
-    color: white !important;
-}        
+        .header-top-social-btn {
+            color: rgba(255, 255, 255, 0.9) !important;
+            text-decoration: none !important;
+            font-size: 1rem !important;
+            width: 32px !important;
+            height: 32px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            border-radius: 50% !important;
+            background: rgba(255, 255, 255, 0.1) !important;
+            transition: all 0.2s !important;
+        }
+
+        .header-top-social-btn:hover {
+            background: rgba(255, 255, 255, 0.2) !important;
+            transform: translateY(-2px) !important;
+            color: white !important;
+        }
+
         .header-top-layer {
             background: #0f172a !important;
             color: white !important;
@@ -62,7 +72,7 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
             transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out !important;
         }
-        
+
         .header-top-content {
             max-width: 1920px !important;
             margin: 0 auto !important;
@@ -71,13 +81,13 @@
             justify-content: space-between !important;
             align-items: center !important;
         }
-        
+
         .header-top-left {
             display: flex !important;
             align-items: center !important;
             gap: 1rem !important;
         }
-        
+
         .header-top-link {
             color: rgba(255, 255, 255, 0.95) !important;
             text-decoration: none !important;
@@ -87,13 +97,13 @@
             align-items: center !important;
             gap: 0.5rem !important;
         }
-        
+
         .header-top-right {
             display: flex !important;
             align-items: center !important;
             gap: 0.75rem !important;
         }
-        
+
         .header-top-btn {
             padding: 0.375rem 0.75rem !important;
             border-radius: 0.5rem !important;
@@ -106,44 +116,44 @@
             white-space: nowrap !important;
             transition: all 0.2s !important;
         }
-        
+
         .header-top-btn i {
             font-size: 0.75rem !important;
         }
-        
+
         .register-btn {
             background: #6366f1 !important;
             color: white !important;
             border: 1px solid #6366f1 !important;
         }
-        
+
         .register-btn:hover {
             background: #4f46e5 !important;
             border-color: #4f46e5 !important;
         }
-        
+
         .portal-btn {
             background: #6366f1 !important;
             color: white !important;
             border: 1px solid #6366f1 !important;
         }
-        
+
         .portal-btn:hover {
             background: #4f46e5 !important;
             border-color: #4f46e5 !important;
         }
-        
+
         .admin-btn {
             background: #6366f1 !important;
             color: white !important;
             border: 1px solid #6366f1 !important;
         }
-        
+
         .admin-btn:hover {
             background: #4f46e5 !important;
             border-color: #4f46e5 !important;
         }
-        
+
         .header-bottom-layer {
             background: rgba(255, 255, 255, 0.95) !important;
             backdrop-filter: blur(20px) saturate(180%) !important;
@@ -151,7 +161,7 @@
             padding: 1rem 0 !important;
             border-bottom: 1px solid rgba(226, 232, 240, 0.6) !important;
         }
-        
+
         .header-bottom-content {
             max-width: 1920px !important;
             margin: 0 auto !important;
@@ -161,7 +171,7 @@
             align-items: center !important;
             gap: 4rem !important;
         }
-        
+
         .header-logo {
             display: flex !important;
             align-items: center !important;
@@ -173,14 +183,14 @@
             flex-shrink: 0 !important;
             white-space: nowrap !important;
         }
-        
+
         .header-logo-img {
             width: 40px !important;
             height: 40px !important;
             object-fit: contain !important;
             flex-shrink: 0 !important;
         }
-        
+
         .header-nav-menu {
             display: flex !important;
             list-style: none !important;
@@ -190,7 +200,7 @@
             padding: 0 !important;
             flex-shrink: 0 !important;
         }
-        
+
         .header-nav-menu a {
             color: var(--text-primary, #1e293b) !important;
             text-decoration: none !important;
@@ -200,11 +210,11 @@
             position: relative !important;
             padding: 0.5rem 0 !important;
         }
-        
+
         .header-nav-menu a:hover {
             color: var(--primary-color, #6366f1) !important;
         }
-        
+
         .header-nav-menu a::after {
             content: '' !important;
             position: absolute !important;
@@ -215,53 +225,68 @@
             background: var(--primary-color, #6366f1) !important;
             transition: width 0.3s !important;
         }
-        
+
         .header-nav-menu a:hover::after {
             width: 100% !important;
         }
-        
+
         .header-nav-menu li {
             list-style: none !important;
         }
-        
+
         .dark-mode-toggle {
-            display: flex !important;
+            display: inline-flex !important;
             align-items: center !important;
             justify-content: center !important;
-            width: 40px !important;
-            height: 40px !important;
-            background: rgba(99, 102, 241, 0.1) !important;
-            border: 1px solid rgba(99, 102, 241, 0.2) !important;
-            border-radius: 12px !important;
-            color: var(--primary-color, #6366f1) !important;
+            width: 42px !important;
+            height: 42px !important;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #f1f5f9 45%, #e2e8f0 100%) !important;
+            border: 1px solid rgba(15, 23, 42, 0.12) !important;
+            border-radius: 999px !important;
+            color: #0f172a !important;
             cursor: pointer !important;
-            transition: all 0.3s ease !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
             margin-left: 1rem !important;
             flex-shrink: 0 !important;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
         }
-        
+
         .dark-mode-toggle:hover {
-            background: rgba(99, 102, 241, 0.2) !important;
-            border-color: rgba(99, 102, 241, 0.3) !important;
-            transform: scale(1.05) !important;
+            transform: translateY(-1px) scale(1.03) !important;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
         }
-        
+
+        .dark-mode-toggle:active {
+            transform: translateY(0) scale(1) !important;
+            box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.65) !important;
+        }
+
+        .dark-mode-toggle:focus-visible {
+            outline: none !important;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25), 0 8px 18px rgba(15, 23, 42, 0.12) !important;
+        }
+
         .dark-mode-toggle i {
-            font-size: 1.1rem !important;
+            font-size: 1.05rem !important;
         }
-        
+
         body.dark-mode .dark-mode-toggle {
-            background: rgba(139, 92, 246, 0.2) !important;
-            border-color: rgba(139, 92, 246, 0.3) !important;
-            color: #8b5cf6 !important;
+            background: radial-gradient(circle at 30% 30%, #1e293b 0%, #0f172a 55%, #0b1020 100%) !important;
+            border-color: rgba(148, 163, 184, 0.25) !important;
+            color: #e2e8f0 !important;
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
         }
-        
+
+        body.dark-mode .dark-mode-toggle:hover {
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+        }
+
         @media (max-width: 768px) {
             .dark-mode-toggle {
                 margin-left: 0.5rem !important;
-                width: 36px !important;
-                height: 36px !important;
-                border-radius: 10px !important;
+                width: 38px !important;
+                height: 38px !important;
+                border-radius: 999px !important;
             }
         }
 
@@ -269,7 +294,7 @@
         .mobile-menu-footer {
             display: none !important;
         }
-        
+
         .mobile-menu-badge {
             display: inline-flex !important;
             align-items: center !important;
@@ -283,21 +308,21 @@
             border-radius: 999px !important;
             font-size: 0.75rem !important;
         }
-        
+
         .mobile-menu-meta-content p {
             margin: 0.75rem 0 0 0 !important;
             color: #0f172a !important;
             font-size: 0.95rem !important;
             line-height: 1.5 !important;
         }
-        
+
         .mobile-menu-divider {
             width: 100% !important;
             height: 1px !important;
             background: rgba(15, 23, 42, 0.08) !important;
             margin: 1.5rem 0 !important;
         }
-        
+
         .mobile-menu-contact {
             display: flex !important;
             flex-direction: column !important;
@@ -305,19 +330,19 @@
             color: #0f172a !important;
             font-weight: 600 !important;
         }
-        
+
         .mobile-menu-contact i {
             margin-right: 0.5rem !important;
             color: var(--primary-color, #6366f1) !important;
         }
-        
+
         .mobile-menu-cta {
             display: flex !important;
             flex-direction: column !important;
             gap: 0.75rem !important;
             margin-top: 1rem !important;
         }
-        
+
         .header-nav-item {
             position: relative !important;
         }
@@ -331,24 +356,24 @@
             height: 18px !important;
             pointer-events: auto !important;
         }
-        
+
         .nav-link {
             display: inline-flex !important;
             align-items: center !important;
             gap: 0.35rem !important;
             white-space: nowrap !important;
         }
-        
+
         .nav-link i {
             font-size: 0.75rem !important;
             transition: transform 0.2s ease !important;
         }
-        
-        .header-nav-item.dropdown-hover > .nav-link i,
-        .header-nav-item.dropdown-open > .nav-link i {
+
+        .header-nav-item.dropdown-hover>.nav-link i,
+        .header-nav-item.dropdown-open>.nav-link i {
             transform: rotate(-180deg) !important;
         }
-        
+
         .header-dropdown {
             position: absolute !important;
             top: calc(100% + 0.25rem) !important;
@@ -369,7 +394,7 @@
             transition: opacity 0.2s ease, transform 0.2s ease !important;
             z-index: 1002 !important;
         }
-        
+
         .header-nav-item.dropdown-hover .header-dropdown {
             opacity: 1 !important;
             pointer-events: auto !important;
@@ -380,7 +405,7 @@
             left: auto !important;
             right: 0 !important;
         }
-        
+
         .dropdown-group-title {
             font-size: 0.75rem !important;
             letter-spacing: 0.08em !important;
@@ -389,7 +414,7 @@
             margin-bottom: 0.35rem !important;
             font-weight: 600 !important;
         }
-        
+
         .dropdown-link {
             display: flex !important;
             align-items: center !important;
@@ -401,7 +426,7 @@
             position: relative !important;
             transition: color 0.2s ease !important;
         }
-        
+
         .dropdown-link::before {
             content: '' !important;
             width: 6px !important;
@@ -410,17 +435,17 @@
             background: rgba(99, 102, 241, 0.3) !important;
             display: inline-block !important;
         }
-        
+
         .dropdown-link:hover,
         .dropdown-link.active {
             color: var(--primary-color, #6366f1) !important;
         }
-        
+
         .dropdown-link:hover::before,
         .dropdown-link.active::before {
             background: var(--primary-color, #6366f1) !important;
         }
-        
+
         .nav-toggle {
             display: none !important;
             flex-direction: column !important;
@@ -430,7 +455,7 @@
             cursor: pointer !important;
             padding: 5px !important;
         }
-        
+
         .nav-toggle span {
             width: 25px !important;
             height: 3px !important;
@@ -438,31 +463,33 @@
             border-radius: 2px !important;
             transition: all 0.3s !important;
         }
-        
+
         @media (min-width: 769px) {
+
             .header-nav-item:hover .header-dropdown,
-            .header-nav-item:focus-within .header-dropdown {
+            body.keyboard-nav .header-nav-item:focus-within .header-dropdown {
                 opacity: 1 !important;
                 pointer-events: auto !important;
                 transform: translateY(0) !important;
             }
 
-            .header-nav-item:hover > .nav-link i,
-            .header-nav-item:focus-within > .nav-link i {
+            .header-nav-item:hover>.nav-link i,
+            body.keyboard-nav .header-nav-item:focus-within>.nav-link i {
                 transform: rotate(-180deg) !important;
             }
         }
-        
+
         @media (max-width: 768px) {
+
             .header-top-content,
             .header-bottom-content {
                 padding: 0 clamp(1.5rem, 4vw, 3rem) !important;
             }
-            
+
             .header-top-btn span {
                 display: none !important;
             }
-            
+
             /* Mobile Menu Overlay - Kapatma için koyu alan */
             .mobile-menu-overlay {
                 position: fixed !important;
@@ -479,12 +506,12 @@
                 z-index: 999 !important;
                 cursor: pointer !important;
             }
-            
+
             .mobile-menu-overlay.active {
                 opacity: 1 !important;
                 pointer-events: auto !important;
             }
-            
+
             .header-nav-menu {
                 position: fixed !important;
                 top: 0 !important;
@@ -505,19 +532,19 @@
                 overflow-y: auto !important;
                 display: flex !important;
             }
-            
+
             .header-nav-menu.active {
                 transform: translateX(0) !important;
             }
-            
+
             .nav-toggle {
                 display: flex !important;
             }
-            
+
             .header-nav-item {
                 width: 100% !important;
             }
-            
+
             .header-dropdown {
                 position: static !important;
                 transform: none !important;
@@ -533,39 +560,39 @@
                 margin-top: 0.5rem !important;
                 border-radius: 0 !important;
             }
-            
+
             .header-nav-item.dropdown-open .header-dropdown {
                 max-height: 800px !important;
                 padding: 0.5rem 0 0.5rem 1rem !important;
             }
-            
+
             .header-nav-item.dropdown-open .dropdown-group {
                 margin-bottom: 1rem !important;
             }
-            
+
             .header-nav-item.dropdown-open .dropdown-group-title {
                 font-size: 0.7rem !important;
                 margin-bottom: 0.5rem !important;
                 color: #64748b !important;
             }
-            
+
             .header-nav-item.dropdown-open .dropdown-link {
                 padding: 0.5rem 0 !important;
                 font-size: 0.9rem !important;
                 color: #1e293b !important;
             }
-            
+
             .header-nav-item.dropdown-open .dropdown-link::before {
                 width: 4px !important;
                 height: 4px !important;
                 margin-right: 0.5rem !important;
             }
-            
+
             .nav-link i {
                 transition: transform 0.2s ease !important;
             }
-            
-            .header-nav-item.dropdown-open > .nav-link i {
+
+            .header-nav-item.dropdown-open>.nav-link i {
                 transform: rotate(-180deg) !important;
             }
 
@@ -574,7 +601,7 @@
                 padding: 0 !important;
                 margin-bottom: 1rem !important;
             }
-            
+
             .mobile-menu-footer {
                 display: flex !important;
                 flex-direction: column !important;
@@ -583,11 +610,11 @@
                 border-top: 1px solid rgba(15, 23, 42, 0.1) !important;
                 width: 100% !important;
             }
-            
+
             .mobile-menu-contact {
                 margin-bottom: 1.25rem !important;
             }
-            
+
             .mobile-menu-contact p {
                 font-size: 0.9rem !important;
                 color: #475569 !important;
@@ -596,13 +623,13 @@
                 align-items: center !important;
                 gap: 0.5rem !important;
             }
-            
+
             .mobile-menu-cta {
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 0.75rem !important;
             }
-            
+
             .mobile-menu-cta .btn {
                 width: 100% !important;
                 text-align: center !important;
@@ -613,11 +640,333 @@
             }
         }
 
+        /* Mobile App Showcase */
+        .app-showcase {
+            padding: 80px 0;
+            background: linear-gradient(180deg, #eef2f7 0%, #ffffff 100%);
+            isolation: isolate;
+        }
+
+        .app-showcase-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .app-platform-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px;
+            background: #e2e8f0;
+            border-radius: 999px;
+        }
+
+        .app-platform-btn {
+            border: none;
+            background: transparent;
+            color: #475569;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .app-platform-btn.active {
+            background: #0f172a;
+            color: #ffffff;
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.2);
+        }
+
+        .app-carousel {
+            position: relative;
+            margin-top: 32px;
+            --slide-width: clamp(190px, 28vw, 260px);
+            --slide-gap: 24px;
+            overflow: visible;
+        }
+
+        .carousel-viewport {
+            overflow-x: hidden;
+            overflow-y: visible;
+            box-sizing: border-box;
+            padding: 24px 0;
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: pan-y;
+        }
+
+        .carousel-viewport.is-dragging {
+            cursor: grabbing;
+        }
+
+        .carousel-track {
+            display: flex;
+            align-items: center;
+            gap: var(--slide-gap);
+            padding: 0;
+            transition: transform 0.5s ease;
+            will-change: transform;
+        }
+
+        .carousel-slide {
+            flex: 0 0 var(--slide-width);
+            opacity: 0.7;
+            transform: scale(0.92);
+            filter: blur(1.6px);
+            transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
+        }
+
+        .carousel-slide.is-near {
+            opacity: 0.86;
+            transform: scale(0.98);
+            filter: blur(0.6px);
+        }
+
+        .carousel-slide.is-active {
+            opacity: 1;
+            transform: scale(1.08);
+            filter: blur(0);
+        }
+
+        .carousel-frame {
+            background: transparent;
+            border-radius: 24px;
+            border: none;
+            padding: 0;
+            box-shadow: none;
+        }
+
+        .carousel-frame img {
+            width: 100%;
+            height: auto;
+            border-radius: 24px;
+            display: block;
+            box-shadow: none;
+            background: transparent;
+            mix-blend-mode: darken;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-touch-callout: none;
+        }
+
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .carousel-control:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .carousel-control:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: translateY(-50%);
+        }
+
+        .carousel-control.prev {
+            left: 0;
+        }
+
+        .carousel-control.next {
+            right: 0;
+        }
+
+        .carousel-footer {
+            margin-top: 14px;
+            text-align: center;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .carousel-empty {
+            display: none;
+            text-align: center;
+            padding: 32px 0;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .carousel-empty.active {
+            display: block;
+        }
+
+        /* Pricing Duration Toggle */
+        .pricing-duration-toggle {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 6px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            margin-top: 18px;
+        }
+
+        .pricing-duration-btn {
+            border: none;
+            background: transparent;
+            color: #475569;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .pricing-duration-btn.active {
+            background: #0f172a;
+            color: #ffffff;
+            box-shadow: 0 8px 16px rgba(15, 23, 42, 0.2);
+        }
+
+        body.dark-mode .app-showcase {
+            background: radial-gradient(120% 140% at 15% 10%, #1e293b 0%, #0f172a 55%, #0b1020 100%);
+        }
+
+        body.dark-mode .app-platform-toggle {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        body.dark-mode .app-platform-btn {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .app-platform-btn.active {
+            background: #e2e8f0;
+            color: #0f172a;
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.45);
+        }
+
+        body.dark-mode .carousel-control {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.2);
+            color: #e2e8f0;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        body.dark-mode .carousel-control:hover {
+            background: #111827;
+        }
+
+        body.dark-mode .carousel-footer,
+        body.dark-mode .carousel-empty {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .carousel-frame img {
+            mix-blend-mode: normal;
+            filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.35));
+        }
+
+        body.dark-mode .pricing-duration-toggle {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        body.dark-mode .pricing-duration-btn {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .pricing-duration-btn.active {
+            background: #e2e8f0;
+            color: #0f172a;
+            box-shadow: 0 10px 18px rgba(15, 23, 42, 0.45);
+        }
+
+        body.dark-mode .mobile-menu-badge {
+            background: rgba(99, 102, 241, 0.22) !important;
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .mobile-menu-meta-content p {
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-mode .mobile-menu-divider {
+            background: rgba(148, 163, 184, 0.2) !important;
+        }
+
+        body.dark-mode .mobile-menu-contact {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .mobile-menu-contact p {
+            color: #cbd5e1 !important;
+        }
+
+        body.dark-mode .mobile-menu-footer {
+            border-top-color: rgba(148, 163, 184, 0.2) !important;
+        }
+
+        body.dark-mode .header-nav-item.dropdown-open .dropdown-group-title {
+            color: #94a3b8 !important;
+        }
+
+        body.dark-mode .header-nav-item.dropdown-open .dropdown-link {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .header-nav-item.dropdown-open .dropdown-link:hover {
+            color: #a78bfa !important;
+        }
+
+        body.dark-mode .header-nav-item.dropdown-open .dropdown-link::before {
+            background: rgba(167, 139, 250, 0.6) !important;
+        }
+
+        @media (max-width: 768px) {
+            .app-showcase {
+                padding: 64px 0;
+            }
+
+            .carousel-control {
+                display: none;
+            }
+
+            .carousel-viewport {
+                overflow-x: hidden;
+                overflow-y: visible;
+                padding: 20px 0;
+                cursor: grab;
+            }
+
+            .pricing-duration-toggle {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
         [data-scroll-target] {
             scroll-margin-top: clamp(120px, 14vh, 200px) !important;
         }
     </style>
 </head>
+
 <body>
     <!-- Layered Header -->
     <div class="header-container">
@@ -625,13 +974,16 @@
         <div class="header-top-layer">
             <div class="header-top-content">
                 <div class="header-top-left">
-                    <a href="https://instagram.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                    <a href="https://instagram.com/fourkampus" target="_blank" rel="noopener noreferrer"
+                        class="header-top-social-btn">
                         <i class="fab fa-instagram"></i>
                     </a>
-                    <a href="https://x.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                    <a href="https://x.com/fourkampus" target="_blank" rel="noopener noreferrer"
+                        class="header-top-social-btn">
                         <i class="fab fa-x"></i>
                     </a>
-                    <a href="https://linkedin.com/uni.panel" target="_blank" rel="noopener noreferrer" class="header-top-social-btn">
+                    <a href="https://linkedin.com/fourkampus" target="_blank" rel="noopener noreferrer"
+                        class="header-top-social-btn">
                         <i class="fab fa-linkedin"></i>
                     </a>
 
@@ -641,23 +993,20 @@
                         <i class="fas fa-user-plus"></i>
                         <span>Kayıt Ol</span>
                     </a>
-                    <a href="../public/index.php" target="_blank"  rel="noopener noreferrer" class="header-top-btn portal-btn">
-                        <i class="fas fa-globe"></i>
-                        <span>Portal</span>
-                    </a>
-                    <a href="../admin-login.php" target="_blank" rel="noopener noreferrer" class="header-top-btn admin-btn">
+                    <a href="admin-login.php" target="_blank" rel="noopener noreferrer"
+                        class="header-top-btn admin-btn">
                         <i class="fas fa-shield-alt"></i>
                         <span>Admin Panel</span>
                     </a>
                 </div>
             </div>
         </div>
-        
+
         <!-- Bottom Layer -->
         <div class="header-bottom-layer">
             <div class="header-bottom-content">
                 <a href="#" class="header-logo">
-                    <img src="../assets/images/brand/nobackground_logo.png" alt="Four Kampüs" class="header-logo-img">
+                    <img src="assets/images/brand/nobackground_logo.png" alt="Four Kampüs" class="header-logo-img">
                     <span>Four Kampüs</span>
                 </a>
                 <!-- Mobile Menu Overlay -->
@@ -666,7 +1015,8 @@
                     <li class="mobile-menu-meta">
                         <div class="mobile-menu-meta-content">
                             <div class="mobile-menu-badge">Four Kampüs</div>
-                            <p>Topluluk yönetimini tek panelde toplayın. Tüm modüllere 2026 Eylül'e kadar ücretsiz erişim.</p>
+                            <p>Topluluk yönetimini tek panelde toplayın. Bandırma 17 Eylül Üniversitesi topluluklarına
+                                Profesyonel Plan 6 ay ücretsiz.</p>
                         </div>
                         <div class="mobile-menu-divider"></div>
                     </li>
@@ -679,13 +1029,17 @@
                             <div class="dropdown-group">
                                 <p class="dropdown-group-title">Genel Akış</p>
                                 <a href="#hero" data-anchor-target="hero" class="dropdown-link">Neden Four Kampüs?</a>
-                                <a href="#cozumler" data-anchor-target="cozumler" class="dropdown-link">Sorunlar & Çözümler</a>
-                                <a href="#referanslar" data-anchor-target="referanslar" class="dropdown-link">Topluluk Yorumları</a>
-                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">Hemen Başlayın</a>
+                                <a href="#cozumler" data-anchor-target="cozumler" class="dropdown-link">Sorunlar &
+                                    Çözümler</a>
+                                <a href="#referanslar" data-anchor-target="referanslar" class="dropdown-link">Topluluk
+                                    Yorumları</a>
+                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">Hemen
+                                    Başlayın</a>
                             </div>
                             <div class="dropdown-group">
                                 <p class="dropdown-group-title">Destek</p>
-                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">İletişim & Destek</a>
+                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">İletişim &
+                                    Destek</a>
                             </div>
                         </div>
                     </li>
@@ -697,17 +1051,25 @@
                         <div class="header-dropdown">
                             <div class="dropdown-group">
                                 <p class="dropdown-group-title">Çekirdek Modüller</p>
-                                <a href="#feature-etkinlik" data-anchor-target="feature-etkinlik" class="dropdown-link">Etkinlik Yönetimi</a>
-                                <a href="#feature-uyelik" data-anchor-target="feature-uyelik" class="dropdown-link">Üyelik Sistemi</a>
-                                <a href="#feature-bildirim" data-anchor-target="feature-bildirim" class="dropdown-link">Bildirim Merkezi</a>
-                                <a href="#feature-anket" data-anchor-target="feature-anket" class="dropdown-link">Anket & Geri Bildirim</a>
+                                <a href="#feature-etkinlik" data-anchor-target="feature-etkinlik"
+                                    class="dropdown-link">Etkinlik Yönetimi</a>
+                                <a href="#feature-uyelik" data-anchor-target="feature-uyelik"
+                                    class="dropdown-link">Üyelik Sistemi</a>
+                                <a href="#feature-bildirim" data-anchor-target="feature-bildirim"
+                                    class="dropdown-link">Bildirim Merkezi</a>
+                                <a href="#feature-anket" data-anchor-target="feature-anket" class="dropdown-link">Anket
+                                    & Geri Bildirim</a>
                             </div>
                             <div class="dropdown-group">
                                 <p class="dropdown-group-title">Genişleyen Yetkinlikler</p>
-                                <a href="#feature-yonetim" data-anchor-target="feature-yonetim" class="dropdown-link">Yönetim Kurulu</a>
-                                <a href="#feature-platform" data-anchor-target="feature-platform" class="dropdown-link">Çoklu Platform</a>
-                                <a href="#feature-sms" data-anchor-target="feature-sms" class="dropdown-link">SMS & Premium</a>
-                                <a href="#feature-portal" data-anchor-target="feature-portal" class="dropdown-link">Public Portal</a>
+                                <a href="#feature-yonetim" data-anchor-target="feature-yonetim"
+                                    class="dropdown-link">Yönetim Kurulu</a>
+                                <a href="#feature-platform" data-anchor-target="feature-platform"
+                                    class="dropdown-link">Çoklu Platform</a>
+                                <a href="#feature-sms" data-anchor-target="feature-sms" class="dropdown-link">SMS &
+                                    Premium</a>
+                                <a href="#feature-portal" data-anchor-target="feature-portal"
+                                    class="dropdown-link">Public Portal</a>
                             </div>
                         </div>
                     </li>
@@ -719,15 +1081,21 @@
                         <div class="header-dropdown">
                             <div class="dropdown-group">
                                 <p class="dropdown-group-title">Web Paneli</p>
-                                <a href="#screen-dashboard" data-anchor-target="screen-dashboard" class="dropdown-link">Kontrol Paneli</a>
-                                <a href="#screen-events" data-anchor-target="screen-events" class="dropdown-link">Etkinlik Görünümü</a>
-                                <a href="#screen-members" data-anchor-target="screen-members" class="dropdown-link">Üye Yönetimi</a>
+                                <a href="#screen-dashboard" data-anchor-target="screen-dashboard"
+                                    class="dropdown-link">Kontrol Paneli</a>
+                                <a href="#screen-events" data-anchor-target="screen-events"
+                                    class="dropdown-link">Etkinlik Görünümü</a>
+                                <a href="#screen-members" data-anchor-target="screen-members" class="dropdown-link">Üye
+                                    Yönetimi</a>
                             </div>
                             <div class="dropdown-group">
                                 <p class="dropdown-group-title">İşlevsel Görünümler</p>
-                                <a href="#screen-notifications" data-anchor-target="screen-notifications" class="dropdown-link">Bildirimler</a>
-                                <a href="#screen-surveys" data-anchor-target="screen-surveys" class="dropdown-link">Anketler</a>
-                                <a href="#screen-portal" data-anchor-target="screen-portal" class="dropdown-link">Public Portal</a>
+                                <a href="#screen-notifications" data-anchor-target="screen-notifications"
+                                    class="dropdown-link">Bildirimler</a>
+                                <a href="#screen-surveys" data-anchor-target="screen-surveys"
+                                    class="dropdown-link">Anketler</a>
+                                <a href="#screen-portal" data-anchor-target="screen-portal" class="dropdown-link">Public
+                                    Portal</a>
                             </div>
                         </div>
                     </li>
@@ -739,25 +1107,30 @@
                         <div class="header-dropdown">
                             <div class="dropdown-group">
                                 <p class="dropdown-group-title">Planlar & Ekstralar</p>
-                                <a href="#fiyatlandirma" data-anchor-target="fiyatlandirma" class="dropdown-link">Ücretlendirme</a>
-                                <a href="#paket-icerik" data-anchor-target="paket-icerik" class="dropdown-link">Pakete Dahil</a>
+                                <a href="#fiyatlandirma" data-anchor-target="fiyatlandirma"
+                                    class="dropdown-link">Ücretlendirme</a>
+                                <a href="#paket-icerik" data-anchor-target="paket-icerik" class="dropdown-link">Pakete
+                                    Dahil</a>
                             </div>
                             <div class="dropdown-group">
                                 <p class="dropdown-group-title">Harekete Geçin</p>
-                                <a href="#fiyatlandirma" data-anchor-target="fiyatlandirma" class="dropdown-link">Kampanya</a>
-                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">Satış ile Konuş</a>
+                                <a href="#fiyatlandirma" data-anchor-target="fiyatlandirma"
+                                    class="dropdown-link">Kampanya</a>
+                                <a href="#iletisim" data-anchor-target="iletisim" class="dropdown-link">Satış ile
+                                    Konuş</a>
                             </div>
                         </div>
                     </li>
                     <li class="mobile-menu-footer">
                         <div class="mobile-menu-divider"></div>
                         <div class="mobile-menu-contact">
-                            <p><i class="fas fa-envelope"></i> info@fourkampus.com</p>
+                            <p><i class="fas fa-envelope"></i> info@fourkampus.com.tr</p>
                             <p><i class="fas fa-phone"></i> +90 533 544 59 83</p>
                         </div>
                         <div class="mobile-menu-cta">
                             <a href="register.php" class="btn btn-primary">Ücretsiz Başla</a>
-                            <a href="#iletisim" class="btn btn-secondary" data-anchor-target="iletisim">Satış ile Konuş</a>
+                            <a href="#iletisim" class="btn btn-secondary" data-anchor-target="iletisim">Satış ile
+                                Konuş</a>
                         </div>
                     </li>
                 </ul>
@@ -779,17 +1152,19 @@
             <div class="hero-content">
                 <div class="hero-badge">
                     <i class="fas fa-star"></i>
-                    <span>2026 Eylül'e Kadar Ücretsiz</span>
+                    <span>Bandırma 17 Eylül'e Özel: 6 Ay Hediye!</span>
                 </div>
                 <h1 class="hero-title">
                     Topluluğunuzu Yönetmek<br>
                     <span class="gradient-text">Artık Çok Kolay</span>
                 </h1>
                 <p class="hero-description">
-                    Excel tabloları, WhatsApp grupları ve dağınık sistemlerden kurtulun. Tüm topluluk işlerinizi tek bir platformda yönetin. Üyelik sistemi, ücretsiz web siteniz ve email adreslerinizle birlikte. 2026 Eylül'e kadar tamamen ücretsiz!
+                    Excel tabloları, WhatsApp grupları ve dağınık sistemlerden kurtulun. Tüm topluluk işlerinizi tek bir
+                    platformda yönetin. Üyelik sistemi ve profesyonel email adresleriyle birlikte. Bandırma 17 Eylül
+                    Üniversitesi topluluklarına Profesyonel Plan 6 ay ücretsiz.
                 </p>
                 <div class="hero-buttons">
-                    <a href="#iletisim" class="btn btn-primary btn-hero-cta">
+                    <a href="register.php" class="btn btn-primary btn-hero-cta">
                         <span>Ücretsiz Başla</span>
                         <i class="fas fa-arrow-right"></i>
                     </a>
@@ -826,7 +1201,6 @@
                     </div>
                     <div class="trust-badges">
                         <span><i class="fas fa-check-circle"></i> Üyelik Sistemi</span>
-                        <span><i class="fas fa-check-circle"></i> Ücretsiz Web Sitesi</span>
                         <span><i class="fas fa-check-circle"></i> Ücretsiz Email</span>
                         <span><i class="fas fa-check-circle"></i> 7/24 Destek</span>
                     </div>
@@ -840,66 +1214,141 @@
         </div>
     </section>
 
+    <section id="mobil-uygulama" class="app-showcase" data-scroll-target="mobil-uygulama">
+        <div class="container">
+            <div class="section-header app-showcase-header">
+                <div>
+                    <h2 class="section-title">Mobil Uygulama Ekranları</h2>
+                    <p class="section-description">iOS ve Android arayüzlerimizden örnek ekranları yakından inceleyin.
+                    </p>
+                </div>
+                <div class="app-platform-toggle" role="tablist" aria-label="Mobil platform secimi">
+                    <button class="app-platform-btn active" type="button" data-platform="ios" role="tab"
+                        aria-selected="true">iOS</button>
+                    <button class="app-platform-btn" type="button" data-platform="android" role="tab"
+                        aria-selected="false">Android</button>
+                </div>
+            </div>
+            <div class="app-carousel" id="appCarousel">
+                <button class="carousel-control prev" type="button" aria-label="Onceki ekran">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="carousel-viewport">
+                    <div class="carousel-track" id="appCarouselTrack"></div>
+                </div>
+                <button class="carousel-control next" type="button" aria-label="Sonraki ekran">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="carousel-footer">
+                <span id="carouselCounter">0 / 0</span>
+            </div>
+            <div class="carousel-empty" id="carouselEmpty">Bu platform icin ekran goruntusu bulunamadi.</div>
+        </div>
+    </section>
+
     <!-- Problems & Solutions -->
-    <section id="cozumler" class="problems-solutions" data-scroll-target="cozumler">
+    <!-- Problems & Solutions - Modern Redesign -->
+    <section id="cozumler" class="solutions-section" data-scroll-target="cozumler">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Sorunlarınız, Çözümlerimiz</h2>
-                <p class="section-description">Topluluk yönetiminde yaşadığınız tüm sorunlar için hazır çözümler</p>
+                <h2 class="section-title">Neden Four Kampüs?</h2>
+                <p class="section-description">Geleneksel yöntemlerin karmaşasına son verin, modern yönetim deneyimiyle
+                    tanışın.</p>
             </div>
-            <div class="problems-grid">
-                <div class="problem-card">
-                    <div class="problem-icon"><i class="fas fa-calendar-times"></i></div>
-                    <h3>Etkinlikleri Takip Etmek Zor</h3>
-                    <p>Excel tablolarında kayboluyor, kimin geldiğini bilmiyorsunuz</p>
-                    <div class="solution">
-                        <strong>Çözüm</strong>
-                        <p>Tüm etkinlikleriniz tek yerde, katılımcılar otomatik takip ediliyor</p>
+
+            <div class="comparison-grid">
+                <!-- Card 1 -->
+                <div class="comparison-card">
+                    <div class="problem-side">
+                        <div class="status-badge problem">
+                            <i class="fas fa-times-circle"></i> Eski Yöntem
+                        </div>
+
+                        <h3>Karmaşık Etkinlik Takibi</h3>
+                        <p>Excel tablolarında kaybolan katılımcı listeleri ve kimin geldiğini takip edemediğiniz
+                            etkinlikler.</p>
+                    </div>
+                    <div class="arrow-divider">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="solution-side">
+                        <div class="status-badge solution">
+                            <i class="fas fa-check-circle"></i> Four Kampüs
+                        </div>
+
+                        <h3>Otomatik Yönetim</h3>
+                        <p>Tüm etkinlikleriniz tek panelde. QR kod ile yoklama, anlık katılımcı takibi ve raporlama.</p>
                     </div>
                 </div>
-                <div class="problem-card">
-                    <div class="problem-icon"><i class="fas fa-comments"></i></div>
-                    <h3>WhatsApp'ta Mesajlar Kayboluyor</h3>
-                    <p>Önemli duyurular grup mesajlarında kaybolup gidiyor</p>
-                    <div class="solution">
-                        <strong>Çözüm</strong>
-                        <p>Profesyonel email bildirimleri, herkes mesajınızı görüyor</p>
+
+                <!-- Card 2 -->
+                <div class="comparison-card">
+                    <div class="problem-side">
+                        <div class="status-badge problem">
+                            <i class="fas fa-times-circle"></i> Eski Yöntem
+                        </div>
+
+                        <h3>Gözden Kaçan Duyurular</h3>
+                        <p>WhatsApp gruplarında yukarıda kalan, okunmayan ve sürekli tekrar sorulan önemli duyurular.
+                        </p>
+                    </div>
+                    <div class="arrow-divider">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="solution-side">
+                        <div class="status-badge solution">
+                            <i class="fas fa-check-circle"></i> Four Kampüs
+                        </div>
+
+                        <h3>Profesyonel İletişim</h3>
+                        <p>Kurumsal email bildirimleri ve uygulama içi duyurularla %100 erişim ve okunma oranı.</p>
                     </div>
                 </div>
-                <div class="problem-card">
-                    <div class="problem-icon"><i class="fas fa-users"></i></div>
-                    <h3>Üye Bilgileri Dağınık</h3>
-                    <p>Üye listeleri farklı yerlerde, güncel bilgilere ulaşamıyorsunuz</p>
-                    <div class="solution">
-                        <strong>Çözüm</strong>
-                        <p>Tüm üyeler tek sistemde, anında arama ve filtreleme</p>
+
+                <!-- Card 3 -->
+                <div class="comparison-card">
+                    <div class="problem-side">
+                        <div class="status-badge problem">
+                            <i class="fas fa-times-circle"></i> Eski Yöntem
+                        </div>
+
+                        <h3>Dağınık Üye Verileri</h3>
+                        <p>Farklı drive dosyalarında, defterlerde tutulan ve güncelliğini yitirmiş üye bilgileri.</p>
+                    </div>
+                    <div class="arrow-divider">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    <div class="solution-side">
+                        <div class="status-badge solution">
+                            <i class="fas fa-check-circle"></i> Four Kampüs
+                        </div>
+
+                        <h3>Merkezi Üye Sistemi</h3>
+                        <p>Tek sistemde güncel üye veritabanı. Gelişmiş filtreleme, arama ve detaylı üye profilleri.</p>
                     </div>
                 </div>
-                <div class="problem-card">
-                    <div class="problem-icon"><i class="fas fa-globe"></i></div>
-                    <h3>Web Sitesi Yok veya Pahalı</h3>
-                    <p>Topluluğunuzun profesyonel bir web sitesi yok</p>
-                    <div class="solution">
-                        <strong>Çözüm</strong>
-                        <p>Ücretsiz web sitesi pakete dahil, özel domain ile kullanın</p>
+
+                <!-- Card 4 -->
+                <div class="comparison-card">
+                    <div class="problem-side">
+                        <div class="status-badge problem">
+                            <i class="fas fa-times-circle"></i> Eski Yöntem
+                        </div>
+
+                        <h3>Zorlu Geri Bildirim</h3>
+                        <p>Google Forms ile uğraşmak, link paylaşmak ve sonuçları manuel analiz etmeye çalışmak.</p>
                     </div>
-                </div>
-                <div class="problem-card">
-                    <div class="problem-icon"><i class="fas fa-envelope"></i></div>
-                    <h3>Profesyonel Email Adresi Yok</h3>
-                    <p>Gmail ile iletişim kurmak profesyonel görünmüyor</p>
-                    <div class="solution">
-                        <strong>Çözüm</strong>
-                        <p>Topluluğunuz için ücretsiz email adresleri (SMS hariç)</p>
+                    <div class="arrow-divider">
+                        <i class="fas fa-arrow-right"></i>
                     </div>
-                </div>
-                <div class="problem-card">
-                    <div class="problem-icon"><i class="fas fa-chart-bar"></i></div>
-                    <h3>Anket Yapmak Zor</h3>
-                    <p>Google Forms karmaşık, sonuçları analiz etmek zor</p>
-                    <div class="solution">
-                        <strong>Çözüm</strong>
-                        <p>Kolay anket oluşturma, otomatik sonuç analizi</p>
+                    <div class="solution-side">
+                        <div class="status-badge solution">
+                            <i class="fas fa-check-circle"></i> Four Kampüs
+                        </div>
+
+                        <h3>Akıllı Anket Sistemi</h3>
+                        <p>Saniyeler içinde anket oluşturun, otomatik analizlerle topluluğunuzun nabzını tutun.</p>
                     </div>
                 </div>
             </div>
@@ -921,7 +1370,8 @@
                         <div class="feature-number">01</div>
                         <h3 class="feature-title-large">Etkinliklerinizi Kolayca Yönetin</h3>
                         <p class="feature-description-large">
-                            Etkinlik oluşturmak artık dakikalar sürüyor. Tarih, saat, konum bilgilerini ekleyin, görsel ve videolarınızı yükleyin. Katılımcılar otomatik olarak takip ediliyor.
+                            Etkinlik oluşturmak artık dakikalar sürüyor. Tarih, saat, konum bilgilerini ekleyin, görsel
+                            ve videolarınızı yükleyin. Katılımcılar otomatik olarak takip ediliyor.
                         </p>
                         <ul class="feature-benefits">
                             <li><i class="fas fa-check"></i> Tek tıkla etkinlik oluşturma</li>
@@ -932,7 +1382,8 @@
                         </ul>
                     </div>
                     <div class="feature-showcase-visual">
-                        <iframe src="preview/events.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <iframe src="preview/events.php" class="feature-visual-iframe" frameborder="0"
+                            scrolling="no"></iframe>
                         <div class="visual-overlay">
                             <div class="visual-label">
                                 <i class="fas fa-calendar-alt"></i>
@@ -948,7 +1399,8 @@
                         <div class="feature-number">02</div>
                         <h3 class="feature-title-large">Gelişmiş Üyelik Sistemi</h3>
                         <p class="feature-description-large">
-                            Profesyonel üyelik sistemi ile tüm üyelerinizi tek yerde yönetin. Üye kayıtları, onay süreçleri, üyelik durumları ve daha fazlası. Toplu işlemlerle zaman kazanın.
+                            Profesyonel üyelik sistemi ile tüm üyelerinizi tek yerde yönetin. Üye kayıtları, onay
+                            süreçleri, üyelik durumları ve daha fazlası. Toplu işlemlerle zaman kazanın.
                         </p>
                         <ul class="feature-benefits">
                             <li><i class="fas fa-check"></i> Otomatik üyelik kayıt sistemi</li>
@@ -960,7 +1412,8 @@
                         </ul>
                     </div>
                     <div class="feature-showcase-visual">
-                        <iframe src="preview/members.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <iframe src="preview/members.php" class="feature-visual-iframe" frameborder="0"
+                            scrolling="no"></iframe>
                         <div class="visual-overlay">
                             <div class="visual-label">
                                 <i class="fas fa-users"></i>
@@ -976,7 +1429,8 @@
                         <div class="feature-number">03</div>
                         <h3 class="feature-title-large">Herkesi Anında Bilgilendirin</h3>
                         <p class="feature-description-large">
-                            Önemli duyurularınızı email ile gönderin. Toplu mesaj gönderimi ile tüm üyelere tek seferde ulaşın. Gönderim geçmişinizi takip edin.
+                            Önemli duyurularınızı email ile gönderin. Toplu mesaj gönderimi ile tüm üyelere tek seferde
+                            ulaşın. Gönderim geçmişinizi takip edin.
                         </p>
                         <ul class="feature-benefits">
                             <li><i class="fas fa-check"></i> Profesyonel email bildirimleri</li>
@@ -987,7 +1441,8 @@
                         </ul>
                     </div>
                     <div class="feature-showcase-visual">
-                        <iframe src="preview/notifications.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <iframe src="preview/notifications.php" class="feature-visual-iframe" frameborder="0"
+                            scrolling="no"></iframe>
                         <div class="visual-overlay">
                             <div class="visual-label">
                                 <i class="fas fa-bell"></i>
@@ -1003,7 +1458,8 @@
                         <div class="feature-number">04</div>
                         <h3 class="feature-title-large">Anketlerle Görüş Toplayın</h3>
                         <p class="feature-description-large">
-                            Üyelerinizin görüşlerini kolayca toplayın. Etkinliklerinize bağlı anketler oluşturun veya bağımsız anketler yapın. Sonuçları anında görün.
+                            Üyelerinizin görüşlerini kolayca toplayın. Etkinliklerinize bağlı anketler oluşturun veya
+                            bağımsız anketler yapın. Sonuçları anında görün.
                         </p>
                         <ul class="feature-benefits">
                             <li><i class="fas fa-check"></i> Kolay anket oluşturma</li>
@@ -1014,7 +1470,8 @@
                         </ul>
                     </div>
                     <div class="feature-showcase-visual">
-                        <iframe src="preview/surveys.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <iframe src="preview/surveys.php" class="feature-visual-iframe" frameborder="0"
+                            scrolling="no"></iframe>
                         <div class="visual-overlay">
                             <div class="visual-label">
                                 <i class="fas fa-poll"></i>
@@ -1030,7 +1487,8 @@
                         <div class="feature-number">05</div>
                         <h3 class="feature-title-large">Yönetim Kurulunuzu Tanıtın</h3>
                         <p class="feature-description-large">
-                            Yönetim kurulu üyelerinizi profesyonelce tanıtın. Fotoğrafları, rolleri ve iletişim bilgilerini ekleyin. Halka açık profil sayfasında gösterin.
+                            Yönetim kurulu üyelerinizi profesyonelce tanıtın. Fotoğrafları, rolleri ve iletişim
+                            bilgilerini ekleyin. Halka açık profil sayfasında gösterin.
                         </p>
                         <ul class="feature-benefits">
                             <li><i class="fas fa-check"></i> Profesyonel profil sayfaları</li>
@@ -1041,7 +1499,8 @@
                         </ul>
                     </div>
                     <div class="feature-showcase-visual">
-                        <iframe src="preview/dashboard.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <iframe src="preview/dashboard.php" class="feature-visual-iframe" frameborder="0"
+                            scrolling="no"></iframe>
                         <div class="visual-overlay">
                             <div class="visual-label">
                                 <i class="fas fa-user-tie"></i>
@@ -1052,7 +1511,8 @@
                 </div>
 
                 <!-- Feature 6 -->
-                <div class="feature-showcase-item reverse access-everywhere" id="feature-platform" data-scroll-target="feature-platform">
+                <div class="feature-showcase-item reverse access-everywhere" id="feature-platform"
+                    data-scroll-target="feature-platform">
                     <div class="feature-showcase-content">
                         <div class="feature-number">06</div>
                         <div class="access-badge">
@@ -1061,7 +1521,8 @@
                         </div>
                         <h3 class="feature-title-large access-title">Her Yerden Erişin</h3>
                         <p class="feature-description-large access-lead">
-                            Four Kampüs hem web’de hem de native uygulamalarla yanınızda. Masaüstünüzde plan yapın, telefonunuzdan yönetin, tüm ekip senkron kalsın.
+                            Four Kampüs hem web’de hem de native uygulamalarla yanınızda. Masaüstünüzde plan yapın,
+                            telefonunuzdan yönetin, tüm ekip senkron kalsın.
                         </p>
 
                         <div class="access-tabs" role="tablist" aria-label="Platform seçimi">
@@ -1108,7 +1569,8 @@
                                 <li><i class="fas fa-check"></i> Native deneyim: SwiftUI &amp; Jetpack Compose</li>
                                 <li><i class="fas fa-check"></i> Offline mod, tekrar çevrimde otomatik senkron</li>
                                 <li><i class="fas fa-check"></i> Rol bazlı erişim ve gerçek zamanlı bildirimler</li>
-                                <li><i class="fas fa-check"></i> Web &amp; mobil arayüzler arasında kesintisiz geçiş</li>
+                                <li><i class="fas fa-check"></i> Web &amp; mobil arayüzler arasında kesintisiz geçiş
+                                </li>
                             </ul>
                         </div>
 
@@ -1146,7 +1608,8 @@
                         <div class="device-preview android" data-platform="android">
                             <div class="device-shadow"></div>
                             <div class="device-frame android">
-                                <iframe src="preview/mobile.php?platform=android" frameborder="0" scrolling="no"></iframe>
+                                <iframe src="preview/mobile.php?platform=android" frameborder="0"
+                                    scrolling="no"></iframe>
                             </div>
                             <div class="device-meta">
                                 <span><i class="fab fa-android"></i> Jetpack Compose</span>
@@ -1161,7 +1624,7 @@
                                     <span class="dot red"></span>
                                     <span class="dot yellow"></span>
                                     <span class="dot green"></span>
-                                    <span class="url">portal.Four Kampüs.app</span>
+                                    <span class="url">portal.fourkampus.com.tr</span>
                                 </div>
                                 <iframe src="preview/dashboard.php" frameborder="0" scrolling="no"></iframe>
                             </div>
@@ -1186,7 +1649,9 @@
                             </span>
                         </h3>
                         <p class="feature-description-large">
-                            Email bildirimlerine ek olarak SMS gönderimi ile üyelerinize anında ulaşın. Toplu SMS gönderimi, kişiselleştirilmiş mesajlar ve gönderim raporları. Email bildirimleri ücretsizdir.
+                            Email bildirimlerine ek olarak SMS gönderimi ile üyelerinize anında ulaşın. Toplu SMS
+                            gönderimi, kişiselleştirilmiş mesajlar ve gönderim raporları. Email bildirimleri
+                            ücretsizdir.
                         </p>
                         <ul class="feature-benefits">
                             <li><i class="fas fa-check"></i> Toplu SMS gönderimi</li>
@@ -1198,12 +1663,14 @@
                         <div class="feature-premium-note">
                             <p>
                                 <i class="fas fa-info-circle"></i>
-                                <span><strong>Not:</strong> SMS gönderimi premium pakete dahildir ve ekstra ücretlidir. Her SMS için operatör tarifesine göre ücretlendirme yapılır. Email bildirimleri ücretsizdir ve sınırsızdır.</span>
+                                <span><strong>Not:</strong> SMS gönderimi Business pakete dahildir ve ekstra ücretlidir.
+                                    Her SMS için operatör tarifesine göre ücretlendirme yapılır.</span>
                             </p>
                         </div>
                     </div>
                     <div class="feature-showcase-visual">
-                        <iframe src="preview/messages.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <iframe src="preview/messages.php" class="feature-visual-iframe" frameborder="0"
+                            scrolling="no"></iframe>
                         <div class="visual-overlay">
                             <div class="visual-label">
                                 <i class="fas fa-sms"></i>
@@ -1219,7 +1686,9 @@
                         <div class="feature-number">08</div>
                         <h3 class="feature-title-large">Herkese Açık Topluluk Portalı</h3>
                         <p class="feature-description-large">
-                            Tüm topluluklarınızı tek bir portalda sergileyin. Herkes toplulukları keşfedebilir, arayabilir ve filtreleyebilir. Detaylı bilgilere erişmek için giriş yapılması gerekir. Modern, mobil-first tasarım ile profesyonel bir görünüm.
+                            Tüm topluluklarınızı tek bir portalda sergileyin. Herkes toplulukları keşfedebilir,
+                            arayabilir ve filtreleyebilir. Detaylı bilgilere erişmek için giriş yapılması gerekir.
+                            Modern, mobil-first tasarım ile profesyonel bir görünüm.
                         </p>
                         <ul class="feature-benefits">
                             <li><i class="fas fa-check"></i> Herkese açık topluluk listesi</li>
@@ -1232,7 +1701,8 @@
                         </ul>
                     </div>
                     <div class="feature-showcase-visual">
-                        <iframe src="preview/public.php" class="feature-visual-iframe" frameborder="0" scrolling="no"></iframe>
+                        <iframe src="preview/public.php" class="feature-visual-iframe" frameborder="0"
+                            scrolling="no"></iframe>
                         <div class="visual-overlay">
                             <div class="visual-label">
                                 <i class="fas fa-globe"></i>
@@ -1250,11 +1720,12 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Nasıl Görünüyor?</h2>
-                <p class="section-description">Four Kampüs'in arayüzünden kısa bir tur</p>
+                <p class="section-description">Four Kampüs'ün arayüzünden kısa bir tur</p>
             </div>
             <div class="screenshots-grid">
                 <div class="screenshot-item" id="screen-dashboard" data-scroll-target="screen-dashboard">
-                    <iframe src="preview/dashboard.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <iframe src="preview/dashboard.php" class="screenshot-iframe" frameborder="0"
+                        scrolling="yes"></iframe>
                     <div class="screenshot-overlay">
                         <div class="screenshot-label">
                             <i class="fas fa-desktop"></i>
@@ -1272,7 +1743,8 @@
                     </div>
                 </div>
                 <div class="screenshot-item" id="screen-members" data-scroll-target="screen-members">
-                    <iframe src="preview/members.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <iframe src="preview/members.php" class="screenshot-iframe" frameborder="0"
+                        scrolling="yes"></iframe>
                     <div class="screenshot-overlay">
                         <div class="screenshot-label">
                             <i class="fas fa-users"></i>
@@ -1281,7 +1753,8 @@
                     </div>
                 </div>
                 <div class="screenshot-item" id="screen-notifications" data-scroll-target="screen-notifications">
-                    <iframe src="preview/notifications.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <iframe src="preview/notifications.php" class="screenshot-iframe" frameborder="0"
+                        scrolling="yes"></iframe>
                     <div class="screenshot-overlay">
                         <div class="screenshot-label">
                             <i class="fas fa-bell"></i>
@@ -1290,7 +1763,8 @@
                     </div>
                 </div>
                 <div class="screenshot-item" id="screen-surveys" data-scroll-target="screen-surveys">
-                    <iframe src="preview/surveys.php" class="screenshot-iframe" frameborder="0" scrolling="yes"></iframe>
+                    <iframe src="preview/surveys.php" class="screenshot-iframe" frameborder="0"
+                        scrolling="yes"></iframe>
                     <div class="screenshot-overlay">
                         <div class="screenshot-label">
                             <i class="fas fa-poll"></i>
@@ -1317,9 +1791,20 @@
             <div class="section-header">
                 <h2 class="section-title">Basit ve Şeffaf Fiyatlandırma</h2>
                 <p class="section-description">İhtiyacınıza uygun paketi seçin, hemen başlayın</p>
+                <div class="pricing-duration-toggle" role="radiogroup" aria-label="Abonelik süresi">
+                    <button class="pricing-duration-btn active" type="button" data-months="1" aria-pressed="true">1
+                        Ay</button>
+                    <button class="pricing-duration-btn" type="button" data-months="3" aria-pressed="false">3
+                        Ay</button>
+                    <button class="pricing-duration-btn" type="button" data-months="6" aria-pressed="false">6
+                        Ay</button>
+                    <button class="pricing-duration-btn" type="button" data-months="12" aria-pressed="false">12
+                        Ay</button>
+                </div>
             </div>
             <div class="pricing-wrapper">
-                <div class="pricing-card">
+                <div class="pricing-card" data-plan="standard" data-monthly="0" data-free="true"
+                    data-free-label="ÜCRETSİZ">
                     <div class="pricing-header">
                         <h3 class="pricing-title">Standart</h3>
                         <div class="pricing-price">
@@ -1335,9 +1820,11 @@
                         <li><i class="fas fa-check"></i> Temel bildirimler ve otomatik yedekleme</li>
                         <li><i class="fas fa-check"></i> Standart destek (mesai saatlerinde)</li>
                     </ul>
-                    <a href="register.php" class="btn btn-secondary btn-block" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Ücretsiz Başla</a>
+                    <a href="register.php" class="btn btn-secondary btn-block"
+                        style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Ücretsiz
+                        Başla</a>
                 </div>
-                <div class="pricing-card featured">
+                <div class="pricing-card featured" data-plan="professional" data-monthly="250">
                     <div class="pricing-badge">Popüler</div>
                     <div class="pricing-header">
                         <h3 class="pricing-title">Profesyonel</h3>
@@ -1353,15 +1840,17 @@
                         <li><i class="fas fa-check"></i> Raporlar & Analitik + AI önerileri</li>
                         <li><i class="fas fa-check"></i> Öncelikli destek (24 saat içinde dönüş)</li>
                     </ul>
-                    <a href="register.php" class="btn btn-primary btn-block" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Hemen Başla</a>
+                    <a href="register.php" class="btn btn-primary btn-block"
+                        style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Hemen
+                        Başla</a>
                 </div>
-                <div class="pricing-card">
+                <div class="pricing-card" data-plan="business" data-monthly="500">
                     <div class="pricing-header">
                         <h3 class="pricing-title">Business</h3>
                         <div class="pricing-price">
                             <span class="price-amount">₺500</span>
                             <span class="price-period">/ay</span>
-            </div>
+                        </div>
                         <p class="pricing-sms-gift"><i class="fas fa-gift"></i> +500 SMS/ay hediye</p>
                     </div>
                     <ul class="pricing-features">
@@ -1374,11 +1863,14 @@
                         <li><i class="fas fa-check"></i> Özel entegrasyonlar, SSO ve müşteri temsilcisi</li>
                         <li><i class="fas fa-check"></i> 7/24 öncelikli destek ve SLA</li>
                     </ul>
-                    <a href="register.php" class="btn btn-secondary btn-block" style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Hemen Başla</a>
+                    <a href="register.php" class="btn btn-secondary btn-block"
+                        style="display: block !important; visibility: visible !important; opacity: 1 !important; margin-top: auto !important;">Hemen
+                        Başla</a>
                 </div>
             </div>
             <div class="pricing-note" id="pricingNote">
-                <p><i class="fas fa-info-circle"></i> <strong>Önemli:</strong> Tüm paketler 12 aylık abonelik için gösterilmiştir. Daha kısa süreli paketler için lütfen iletişime geçin.</p>
+                <p><i class="fas fa-info-circle"></i> <strong>Önemli:</strong> Fiyatlar seçilen süreye göre toplam tutar
+                    olarak gösterilir. Daha kısa süreli paketler için lütfen iletişime geçin.</p>
             </div>
         </div>
     </section>
@@ -1393,63 +1885,57 @@
             <div class="includes-grid">
                 <div class="include-item">
                     <div class="include-icon-wrapper">
-                    <div class="include-icon"><i class="fas fa-globe"></i></div>
-                    </div>
-                    <h3>Ücretsiz Web Sitesi</h3>
-                    <p>Topluluğunuz için özel web sitesi tahsis edilir. Özel domain ile kullanabilirsiniz.</p>
-                </div>
-                <div class="include-item">
-                    <div class="include-icon-wrapper">
-                    <div class="include-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="include-icon"><i class="fas fa-envelope"></i></div>
                     </div>
                     <h3>Ücretsiz Email</h3>
                     <p>Topluluğunuz için profesyonel email adresleri. SMS hariç tüm iletişim kanalları dahil.</p>
                 </div>
                 <div class="include-item">
                     <div class="include-icon-wrapper">
-                    <div class="include-icon"><i class="fas fa-cloud"></i></div>
+                        <div class="include-icon"><i class="fas fa-cloud"></i></div>
                     </div>
                     <h3>Bulut Hosting</h3>
                     <p>Hızlı ve güvenilir bulut sunucu altyapısı. 99.9% uptime garantisi.</p>
                 </div>
                 <div class="include-item">
                     <div class="include-icon-wrapper">
-                    <div class="include-icon"><i class="fas fa-lock"></i></div>
+                        <div class="include-icon"><i class="fas fa-lock"></i></div>
                     </div>
                     <h3>SSL Sertifikası</h3>
                     <p>Güvenli bağlantı için ücretsiz SSL sertifikası. Verileriniz şifrelenir.</p>
                 </div>
                 <div class="include-item">
                     <div class="include-icon-wrapper">
-                    <div class="include-icon"><i class="fas fa-sync-alt"></i></div>
+                        <div class="include-icon"><i class="fas fa-sync-alt"></i></div>
                     </div>
                     <h3>Otomatik Yedekleme</h3>
                     <p>Günlük otomatik yedekleme sistemi. Verileriniz her zaman güvende.</p>
                 </div>
                 <div class="include-item">
                     <div class="include-icon-wrapper">
-                    <div class="include-icon"><i class="fas fa-tools"></i></div>
+                        <div class="include-icon"><i class="fas fa-tools"></i></div>
                     </div>
                     <h3>Teknik Destek</h3>
                     <p>7/24 teknik destek hizmeti. Sorunlarınız hızlıca çözülür.</p>
                 </div>
                 <div class="include-item">
                     <div class="include-icon-wrapper">
-                    <div class="include-icon"><i class="fas fa-book"></i></div>
+                        <div class="include-icon"><i class="fas fa-book"></i></div>
                     </div>
                     <h3>Eğitim ve Dokümantasyon</h3>
                     <p>Kapsamlı kullanım kılavuzu ve video eğitimler. Ekibiniz hızlıca öğrenir.</p>
                 </div>
                 <div class="include-item">
                     <div class="include-icon-wrapper">
-                    <div class="include-icon"><i class="fas fa-rocket"></i></div>
+                        <div class="include-icon"><i class="fas fa-rocket"></i></div>
                     </div>
                     <h3>Güncellemeler</h3>
                     <p>Yeni özellikler ve güvenlik güncellemeleri otomatik olarak uygulanır.</p>
                 </div>
             </div>
             <div class="note-box">
-                <p><i class="fas fa-exclamation-circle"></i> <strong>Önemli:</strong> SMS gönderimi pakete dahil değildir. Email bildirimleri tamamen ücretsizdir ve sınırsızdır.</p>
+                <p><i class="fas fa-exclamation-circle"></i> <strong>Önemli:</strong> SMS gönderimi pakete dahil
+                    değildir. Email bildirimleri tamamen ücretsizdir ve sınırsızdır.</p>
             </div>
         </div>
     </section>
@@ -1475,7 +1961,8 @@
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
-                        <p class="testimonial-text">"Four Kampüs sayesinde etkinlik yönetimi artık çok kolay. Üye takibi ve bildirimler otomatik, zaman kazandık!"</p>
+                        <p class="testimonial-text">"Four Kampüs sayesinde etkinlik yönetimi artık çok kolay. Üye takibi
+                            ve bildirimler otomatik, zaman kazandık!"</p>
                     </div>
                     <div class="testimonial-card">
                         <div class="testimonial-header">
@@ -1492,7 +1979,8 @@
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
-                        <p class="testimonial-text">"Ücretsiz web sitesi ve email adresleri harika! Profesyonel görünüyoruz ve maliyet sıfır."</p>
+                        <p class="testimonial-text">"Email adresleri ve bildirimler harika! Profesyonel görünüyoruz ve
+                            işlerimiz hızlandı."</p>
                     </div>
                     <div class="testimonial-card">
                         <div class="testimonial-header">
@@ -1509,7 +1997,8 @@
                                 <i class="fas fa-star"></i>
                             </div>
                         </div>
-                        <p class="testimonial-text">"Anket sistemi mükemmel çalışıyor. Üyelerimizin görüşlerini kolayca topluyoruz."</p>
+                        <p class="testimonial-text">"Anket sistemi mükemmel çalışıyor. Üyelerimizin görüşlerini kolayca
+                            topluyoruz."</p>
                     </div>
                 </div>
             </div>
@@ -1530,7 +2019,7 @@
                         <div class="contact-icon"><i class="fas fa-envelope"></i></div>
                         <div>
                             <strong>Email</strong>
-                            <p>info@Four Kampüs.com</p>
+                            <p>info@fourkampus.com.tr</p>
                         </div>
                     </div>
                     <div class="contact-item">
@@ -1550,8 +2039,8 @@
                     <div class="contact-benefits">
                         <h4>Neden Four Kampüs?</h4>
                         <ul>
-                            <li><i class="fas fa-check"></i> 2026 Eylül'e kadar ücretsiz</li>
-                            <li><i class="fas fa-check"></i> Ücretsiz web sitesi</li>
+                            <li><i class="fas fa-check"></i> Bandırma 17 Eylül Üniversitesi topluluklarına Profesyonel
+                                Plan 6 ay ücretsiz</li>
                             <li><i class="fas fa-check"></i> Ücretsiz email adresleri</li>
                             <li><i class="fas fa-check"></i> 7/24 teknik destek</li>
                             <li><i class="fas fa-check"></i> Kolay kullanım</li>
@@ -1577,7 +2066,8 @@
                     </div>
                     <div class="form-group">
                         <label for="message">Mesajınız *</label>
-                        <textarea id="message" name="message" rows="5" required placeholder="Four Kampüs hakkında sorularınız veya özel istekleriniz..."></textarea>
+                        <textarea id="message" name="message" rows="5" required
+                            placeholder="Four Kampüs hakkında sorularınız veya özel istekleriniz..."></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Gönder</button>
                     <p class="form-note">Formu göndererek gizlilik politikamızı kabul etmiş olursunuz.</p>
@@ -1609,26 +2099,32 @@
             <div class="footer-content">
                 <div class="footer-section footer-brand">
                     <div class="footer-logo-large">
-                        <img src="../assets/images/brand/nobackground_logo.png" alt="Four Kampüs" class="footer-logo-large-img">
+                        <img src="assets/images/brand/nobackground_logo.png" alt="Four Kampüs"
+                            class="footer-logo-large-img">
                     </div>
                     <div class="footer-logo">
                         <span class="logo-text">Four Kampüs</span>
                     </div>
                     <p class="footer-description">
-                        Üniversite toplulukları için modern ve güvenli yönetim sistemi. 
-                        2026 Eylül'e kadar tamamen ücretsiz, ücretsiz web sitesi ve email adresleri dahil. Üyelik sistemi ile profesyonel yönetim.
+                        Üniversite toplulukları için modern ve güvenli yönetim sistemi.
+                        Bandırma 17 Eylül Üniversitesi topluluklarına Profesyonel Plan 6 ay ücretsiz; email adresleri
+                        dahil. Üyelik sistemi ile profesyonel yönetim.
                     </p>
                     <div class="footer-social">
-                        <a href="https://instagram.com/uni.panel" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+                        <a href="https://instagram.com/fourkampus" target="_blank" rel="noopener noreferrer"
+                            class="social-link" aria-label="Instagram">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="https://x.com/uni.panel" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="X (Twitter)">
+                        <a href="https://x.com/fourkampus" target="_blank" rel="noopener noreferrer" class="social-link"
+                            aria-label="X (Twitter)">
                             <i class="fab fa-x-twitter"></i>
                         </a>
-                        <a href="https://linkedin.com/company/uni.panel" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
+                        <a href="https://linkedin.com/company/fourkampus" target="_blank" rel="noopener noreferrer"
+                            class="social-link" aria-label="LinkedIn">
                             <i class="fab fa-linkedin-in"></i>
                         </a>
-                        <a href="https://github.com/fourkampus" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="GitHub">
+                        <a href="https://github.com/fourkampus" target="_blank" rel="noopener noreferrer"
+                            class="social-link" aria-label="GitHub">
                             <i class="fab fa-github"></i>
                         </a>
                     </div>
@@ -1658,7 +2154,7 @@
                     <ul>
                         <li>
                             <i class="fas fa-envelope"></i>
-                            <a href="mailto:info@fourkampus.com">info@fourkampus.com</a>
+                            <a href="mailto:info@fourkampus.com.tr">info@fourkampus.com.tr</a>
                         </li>
                         <li>
                             <i class="fas fa-phone"></i>
@@ -1714,4 +2210,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

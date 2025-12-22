@@ -238,7 +238,7 @@ function send_backup_notification_email($db, $club_id, $to_email, $backup_file, 
 
 function auto_backup_send_mail($to, $subject, $message, $from_name, $from_email, $config = []) {
     try {
-        $host = $config['host'] ?? 'smtp.gmail.com';
+        $host = $config['host'] ?? 'ms8.guzel.net.tr';
         $port = (int)($config['port'] ?? 587);
         $secure = strtolower($config['secure'] ?? 'tls');
         $username = $config['username'] ?? '';
@@ -328,31 +328,45 @@ function auto_backup_send_mail($to, $subject, $message, $from_name, $from_email,
             return false;
         }
 
-        $envelopeFrom = (stripos($host, 'gmail.com') !== false) ? $username : $from_email;
-        $write('MAIL FROM: <' . $envelopeFrom . '>');
-        if (strpos($read(), '250') !== 0) {
+        $envelopeFrom = $username;
+        $write('MAIL FROM:<' . $envelopeFrom . '>');
+        $mf = $read();
+        if (strpos($mf, '250') !== 0) {
+            $write('RSET');
+            $read();
             fclose($fp);
             return false;
         }
 
-        $write('RCPT TO: <' . $to . '>');
+        $write('RCPT TO:<' . $to . '>');
         $rc = $read();
         if (strpos($rc, '250') !== 0 && strpos($rc, '251') !== 0) {
+            $write('RSET');
+            $read();
             fclose($fp);
             return false;
         }
 
         $write('DATA');
-        if (strpos($read(), '354') !== 0) {
+        $dt = $read();
+        if (strpos($dt, '354') !== 0) {
+            $write('RSET');
+            $read();
             fclose($fp);
             return false;
         }
 
-        $headers = "From: $from_name <$from_email>\r\n";
+        $encodedFromName = '=?UTF-8?B?' . base64_encode($from_name) . '?=';
+        $headers = "From: $encodedFromName <$envelopeFrom>\r\n";
+        $headers .= "Reply-To: $from_email\r\n";
         $headers .= "To: <$to>\r\n";
-        $headers .= "Subject: $subject\r\n";
+        $headers .= "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n";
+        $headers .= "Date: " . date('r') . "\r\n";
+        $headers .= "Message-ID: <" . md5(uniqid(microtime(), true)) . "@" . $host . ">\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "X-Mailer: Four Kampüs Backup System\r\n";
+        $headers .= "\r\n";
 
         fputs($fp, $headers . $message . "\r\n.\r\n");
         if (strpos($read(), '250') !== 0) {

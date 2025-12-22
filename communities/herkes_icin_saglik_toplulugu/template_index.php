@@ -766,11 +766,11 @@ function save_smtp_settings($post) {
 
 function send_test_email() {
     try {
-        $to = 'admin@foursoftware.com.tr';
+        $to = 'admin@fourkampus.com.tr';
         $subject = 'TEST MAİLİ - ' . date('Y-m-d H:i:s');
         $message = 'Bu bir test mailidir. SMTP ayarları çalışıyor!';
         $club_name = 'Test Topluluk';
-        $from_email = 'admin@foursoftware.com.tr';
+        $from_email = 'admin@fourkampus.com.tr';
         
         // Debug bilgilerini ekrana yazdır
         $debug_info = "=== MAIL DEBUG ===\n";
@@ -796,7 +796,7 @@ function send_test_email() {
         $mail_sent = send_gmail_smtp($to, $subject, $message, $club_name, $from_email);
         
         if ($mail_sent) {
-            echo "BAŞARILI: Test maili gönderildi! admin@foursoftware.com.tr adresine kontrol edin.\n\nDEBUG:\n$debug_info";
+            echo "BAŞARILI: Test maili gönderildi! admin@fourkampus.com.tr adresine kontrol edin.\n\nDEBUG:\n$debug_info";
         } else {
             echo "HATA: Test maili gönderilemedi!\n\nDEBUG:\n$debug_info";
         }
@@ -5537,7 +5537,7 @@ $partner_logos = get_partner_logos();
                         $config_path = __DIR__ . '/../../config/credentials.php';
                         if (file_exists($config_path)) {
                             $config = require $config_path;
-                            $default_username = $config['smtp']['username'] ?? 'admin@foursoftware.com.tr';
+                            $default_username = $config['smtp']['username'] ?? 'admin@fourkampus.com.tr';
                             $default_password = $config['smtp']['password'] ?? '';
                             
                             // Username kaydet
@@ -8221,7 +8221,7 @@ $partner_logos = get_partner_logos();
     
     // Test Mail Gönderme Function
     function sendTestMail() {
-        if (confirm('Test maili gönderilsin mi? admin@foursoftware.com.tr adresine gönderilecek.')) {
+        if (confirm('Test maili gönderilsin mi? admin@fourkampus.com.tr adresine gönderilecek.')) {
             fetch('index.php', {
                 method: 'POST',
                 headers: {

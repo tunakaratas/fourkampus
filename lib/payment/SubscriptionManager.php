@@ -1388,8 +1388,13 @@ class SubscriptionManager {
      */
     public function checkAndUpdateSubscriptionStatus() {
         try {
+            // Tabloyu oluştur (eğer yoksa)
+            $this->createSubscriptionTable();
+            
+            $expired_count = 0;
+            
             // Süresi dolmuş paid abonelikleri kontrol et
-            $expired_stmt = $this->db->prepare("
+            $expired_stmt = @$this->db->prepare("
                 UPDATE subscriptions 
                 SET is_active = 0, 
                     payment_status = 'expired',
@@ -1400,16 +1405,19 @@ class SubscriptionManager {
                 AND is_active = 1
                 AND end_date < datetime('now')
             ");
-            $expired_stmt->bindValue(1, $this->communityId, \SQLITE3_TEXT);
-            $expired_stmt->execute();
-            $expired_count = $this->db->changes();
             
-            if ($expired_count > 0) {
-                $this->logSubscriptionAction(null, 'subscriptions_expired', "{$expired_count} adet abonelik süresi doldu", []);
+            if ($expired_stmt) {
+                $expired_stmt->bindValue(1, $this->communityId, \SQLITE3_TEXT);
+                $expired_stmt->execute();
+                $expired_count = $this->db->changes();
+                
+                if ($expired_count > 0) {
+                    $this->logSubscriptionAction(null, 'subscriptions_expired', "{$expired_count} adet abonelik süresi doldu", []);
+                }
             }
             
             // Standart aboneliği her zaman aktif yap
-            $standard_stmt = $this->db->prepare("
+            $standard_stmt = @$this->db->prepare("
                 UPDATE subscriptions 
                 SET is_active = 1, 
                     payment_status = 'success',
@@ -1417,8 +1425,11 @@ class SubscriptionManager {
                 WHERE community_id = ? 
                 AND tier = 'standard'
             ");
-            $standard_stmt->bindValue(1, $this->communityId, \SQLITE3_TEXT);
-            $standard_stmt->execute();
+            
+            if ($standard_stmt) {
+                $standard_stmt->bindValue(1, $this->communityId, \SQLITE3_TEXT);
+                $standard_stmt->execute();
+            }
             
             return ['success' => true, 'expired_count' => $expired_count];
         } catch (\Exception $e) {

@@ -98,9 +98,9 @@ function build_base_url() {
     // Script'in çalıştığı dizini bul (api klasörü)
     $scriptPath = $_SERVER['SCRIPT_NAME'] ?? '';
     
-    // /unipanel/api/products.php ise /unipanel'e çevir
-    if (strpos($scriptPath, '/unipanel/api') !== false) {
-        $basePath = '/unipanel';
+    // /fourkampus/api/products.php ise /fourkampus'a çevir
+    if (strpos($scriptPath, '/fourkampus/api') !== false) {
+        $basePath = '/fourkampus';
     } elseif (strpos($scriptPath, '/api') !== false) {
         // /api/products.php -> base path'i bul
         $basePath = str_replace('/api', '', dirname($scriptPath));

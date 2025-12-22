@@ -138,7 +138,7 @@ class CommunitiesService {
                 if ($campaign_result !== false) $campaign_count = (int)$campaign_result;
                 
                 // Base URL
-                $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'foursoftware.com.tr');
+                $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'fourkampus.com.tr');
                 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
                 $baseUrl = $protocol . '://' . $host;
                 
@@ -274,7 +274,7 @@ class CommunitiesService {
             ConnectionPool::releaseConnection($db_path, $poolId, true);
             
             // Base URL
-            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'foursoftware.com.tr');
+            $host = $_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'fourkampus.com.tr');
             $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? 'https' : 'http';
             $baseUrl = $protocol . '://' . $host;
             

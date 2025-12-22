@@ -12,23 +12,30 @@ if (!defined('COMMUNITIES_ROOT')) {
     define('COMMUNITIES_ROOT', PROJECT_ROOT . '/communities');
 }
 
-if (!function_exists('unipanel_normalize_path')) {
+if (!function_exists('fourkampus_normalize_path')) {
     /**
      * Normalize file paths to use forward slashes and trim trailing separators.
      */
-    function unipanel_normalize_path(string $path): string
+    function fourkampus_normalize_path(string $path): string
     {
         return rtrim(str_replace('\\', '/', $path), '/');
     }
 }
 
-if (!function_exists('unipanel_resolve_community_base_path')) {
+// Geriye dönük uyumluluk için eski fonksiyon adını da destekle
+if (!function_exists('unipanel_normalize_path')) {
+    function unipanel_normalize_path(string $path): string {
+        return fourkampus_normalize_path($path);
+    }
+}
+
+if (!function_exists('fourkampus_resolve_community_base_path')) {
     /**
      * Resolve the active community folder path based on available context.
      *
      * @throws RuntimeException when the path cannot be resolved.
      */
-    function unipanel_resolve_community_base_path(): string
+    function fourkampus_resolve_community_base_path(): string
     {
         $candidates = [];
 
@@ -36,8 +43,8 @@ if (!function_exists('unipanel_resolve_community_base_path')) {
             $candidates[] = COMMUNITY_BASE_PATH;
         }
 
-        if (defined('UNIPANEL_COMMUNITY_PATH')) {
-            $candidates[] = UNIPANEL_COMMUNITY_PATH;
+        if (defined('FOURKAMPUS_COMMUNITY_PATH')) {
+            $candidates[] = FOURKAMPUS_COMMUNITY_PATH;
         }
 
         foreach (['communityBasePath', 'COMMUNITY_BASE_PATH'] as $globalKey) {
@@ -46,7 +53,7 @@ if (!function_exists('unipanel_resolve_community_base_path')) {
             }
         }
 
-        foreach (['UNIPANEL_COMMUNITY_PATH'] as $key) {
+        foreach (['FOURKAMPUS_COMMUNITY_PATH'] as $key) {
             if (!empty($_SERVER[$key])) {
                 $candidates[] = $_SERVER[$key];
             }
@@ -57,9 +64,9 @@ if (!function_exists('unipanel_resolve_community_base_path')) {
         }
 
         $slugSources = [
-            defined('UNIPANEL_COMMUNITY') ? UNIPANEL_COMMUNITY : null,
-            getenv('UNIPANEL_COMMUNITY') ?: null,
-            $_SERVER['UNIPANEL_COMMUNITY_SLUG'] ?? null,
+            defined('FOURKAMPUS_COMMUNITY') ? FOURKAMPUS_COMMUNITY : null,
+            getenv('FOURKAMPUS_COMMUNITY') ?: null,
+            $_SERVER['FOURKAMPUS_COMMUNITY_SLUG'] ?? null,
             $_GET['community'] ?? null,
             $_GET['club'] ?? null,
         ];
@@ -82,7 +89,7 @@ if (!function_exists('unipanel_resolve_community_base_path')) {
         if ($scriptFilename) {
             $scriptDir = realpath(dirname($scriptFilename));
             if ($scriptDir) {
-                $normalized = unipanel_normalize_path($scriptDir);
+                $normalized = fourkampus_normalize_path($scriptDir);
                 $needle = '/communities/';
                 $pos = strpos($normalized, $needle);
                 if ($pos !== false) {
@@ -100,7 +107,7 @@ if (!function_exists('unipanel_resolve_community_base_path')) {
 
         $cwd = getcwd();
         if ($cwd) {
-            $normalized = unipanel_normalize_path($cwd);
+            $normalized = fourkampus_normalize_path($cwd);
             $needle = '/communities/';
             $pos = strpos($normalized, $needle);
             if ($pos !== false) {
@@ -118,7 +125,7 @@ if (!function_exists('unipanel_resolve_community_base_path')) {
         foreach ($candidates as $candidate) {
             $real = realpath($candidate);
             if ($real && is_dir($real)) {
-                return unipanel_normalize_path($real);
+                return fourkampus_normalize_path($real);
             }
         }
 
@@ -128,7 +135,14 @@ if (!function_exists('unipanel_resolve_community_base_path')) {
 }
 
 if (!defined('COMMUNITY_BASE_PATH')) {
-    define('COMMUNITY_BASE_PATH', unipanel_resolve_community_base_path());
+    define('COMMUNITY_BASE_PATH', fourkampus_resolve_community_base_path());
+}
+
+// Geriye dönük uyumluluk için eski fonksiyon adını da destekle
+if (!function_exists('unipanel_resolve_community_base_path')) {
+    function unipanel_resolve_community_base_path(): string {
+        return fourkampus_resolve_community_base_path();
+    }
 }
 
 if (!defined('COMMUNITY_ID')) {

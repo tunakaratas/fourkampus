@@ -148,37 +148,37 @@ function render_support_view($db) {
     ?>
     
     <div class="support-view max-w-6xl mx-auto">
-        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Destek Talebi</h2>
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sorununuzu bize iletin, size yardımcı olalım</p>
+                <h2 class="text-2xl font-bold text-gray-900">Destek Talebi</h2>
+                <p class="text-sm text-gray-500 mt-1">Sorununuzu bize iletin, size yardımcı olalım</p>
             </div>
             
             <?php if ($ticket_success): ?>
-                <div class="mb-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                    <p class="text-sm text-green-800 dark:text-green-200"><?= $ticket_success ?></p>
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="text-sm text-green-800"><?= $ticket_success ?></p>
                 </div>
             <?php endif; ?>
             
             <?php if ($ticket_error): ?>
-                <div class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                    <p class="text-sm text-red-800 dark:text-red-200"><?= htmlspecialchars($ticket_error) ?></p>
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p class="text-sm text-red-800"><?= htmlspecialchars($ticket_error) ?></p>
                 </div>
             <?php endif; ?>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- SSS Bölümü -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Sık Sorulan Sorular</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Sık Sorulan Sorular</h3>
                     <div class="space-y-3 max-h-[600px] overflow-y-auto">
                         <?php foreach ($faq_items as $index => $faq): ?>
-                            <div class="faq-item border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="selectFAQ(<?= $index ?>)">
+                            <div class="faq-item border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="selectFAQ(<?= $index ?>)">
                                 <div class="flex items-start justify-between">
                                     <div class="flex-1">
-                                        <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+                                        <h4 class="text-sm font-medium text-gray-900 mb-2">
                                             <?= htmlspecialchars($faq['question']) ?>
                                         </h4>
-                                        <p class="text-xs text-gray-600 dark:text-gray-400 hidden faq-answer">
+                                        <p class="text-xs text-gray-600 hidden faq-answer">
                                             <?= htmlspecialchars($faq['answer']) ?>
                                         </p>
                                     </div>
@@ -193,34 +193,34 @@ function render_support_view($db) {
                 
                 <!-- Destek Talebi Formu -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Destek Talebi Oluştur</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Destek Talebi Oluştur</h3>
                     <form method="POST" action="?view=support" id="supportTicketForm" class="space-y-4">
                         <input type="hidden" name="action" value="create_support_ticket">
                         <?= csrf_token_field() ?>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Konu <span class="text-red-500">*</span>
                             </label>
                             <input type="text" name="subject" id="ticket-subject" required maxlength="200" 
-                                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500"
                                    placeholder="Destek talebinizin konusunu yazın">
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Mesaj <span class="text-red-500">*</span>
                             </label>
                             <textarea name="message" id="ticket-message" required rows="8" maxlength="5000"
-                                      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                                       placeholder="Sorununuzu veya talebinizi detaylı bir şekilde açıklayın..."></textarea>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <p class="text-xs text-gray-500 mt-1">
                                 <span id="char-count">0</span> / 5000 karakter
                             </p>
                         </div>
                         
                         <button type="submit" 
-                                class="w-full px-4 py-2 text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                class="w-full px-4 py-2 text-sm font-medium text-white color-primary hover-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                             Gönder
                         </button>
                     </form>
@@ -320,4 +320,3 @@ function render_support_view($db) {
     
     <?php
 }
-

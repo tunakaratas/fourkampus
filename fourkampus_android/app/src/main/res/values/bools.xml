@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Cleartext traffic - Production'da false, debug'da true -->
+    <!-- Bu değer build variant'a göre override edilecek -->
+    <bool name="allow_cleartext_traffic">false</bool>
+</resources>
+

@@ -5,8 +5,8 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) {
-    // Session settings should be handled by the main entry point (login.php or index.php)
-    // but we ensure it's started here if not already.
+    // SuperAdmin paneli için özel session adı kullan
+    session_name('FK_SUPERADMIN');
     session_start();
 }
 

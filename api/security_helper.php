@@ -18,8 +18,8 @@ function isProduction() {
 function setSecureCORS() {
     // İzin verilen origin'ler
     $allowed_origins = [
-        'https://foursoftware.com.tr',
-        'https://www.foursoftware.com.tr',
+        'https://fourkampus.com.tr',
+        'https://www.fourkampus.com.tr',
         'https://community.foursoftware.net',
         'https://app.foursoftware.net',
         'https://admin.foursoftware.net',
@@ -45,7 +45,7 @@ function setSecureCORS() {
     } elseif (empty($origin)) {
         // Origin yoksa (mobile app'lerden gelebilir) production domain'e izin ver
         if (isProduction()) {
-            header('Access-Control-Allow-Origin: https://foursoftware.com.tr');
+            header('Access-Control-Allow-Origin: https://fourkampus.com.tr');
         } else {
             header('Access-Control-Allow-Origin: http://localhost');
         }

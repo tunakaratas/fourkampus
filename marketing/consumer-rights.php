@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tüketici Hakları - UniFour</title>
-    <meta name="description" content="UniFour tüketici hakları bildirimi. Tüketicinin hakları ve şikayet başvuru yolları.">
+    <title>Tüketici Hakları - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs tüketici hakları bildirimi. Tüketicinin hakları ve şikayet başvuru yolları.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -164,7 +164,7 @@
             <div class="legal-section">
                 <h2>1. Genel Bilgiler</h2>
                 <p>
-                    6502 sayılı Tüketicinin Korunması Hakkında Kanun uyarınca, UniFour platformu 
+                    6502 sayılı Tüketicinin Korunması Hakkında Kanun uyarınca, Four Kampüs platformu 
                     üzerinden yapılan alışverişlerde tüketicilerin hakları korunmaktadır. Bu sayfa, 
                     tüketici haklarınız ve bu hakları nasıl kullanabileceğiniz hakkında bilgi vermektedir.
                 </p>
@@ -221,7 +221,7 @@
                     Herhangi bir sorun yaşadığınızda öncelikle bizimle iletişime geçin:
                 </p>
                 <div class="highlight-box">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                     <p><strong>Şikayet Formu:</strong> <a href="complaint-form.php" style="color: #6366f1; font-weight: 600;">Şikayet Formu</a></p>
@@ -309,7 +309,7 @@
                     Tüketici haklarınız hakkında sorularınız için:
                 </p>
                 <div class="highlight-box">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                     <p><strong>Şikayet Formu:</strong> <a href="complaint-form.php" style="color: #6366f1; font-weight: 600;">Şikayet Formu</a></p>

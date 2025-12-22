@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Base config: Emulator localhost (10.0.2.2) için cleartext izni -->
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+    
+    <!-- Domain config: 10.0.2.2 (Android Emulator localhost) için cleartext izni -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
+    
+    <!-- Debug: Sadece system certificates (user certificates güvenlik riski) -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <!-- User certificates kaldırıldı - güvenlik için -->
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
+

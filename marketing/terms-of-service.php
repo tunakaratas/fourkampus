@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kullanım Koşulları - UniFour</title>
-    <meta name="description" content="UniFour kullanım koşulları. Platform kullanımı, haklar ve yükümlülükler hakkında detaylı bilgiler.">
+    <title>Kullanım Koşulları - Four Kampüs</title>
+    <meta name="description" content="Four Kampüs kullanım koşulları. Platform kullanımı, haklar ve yükümlülükler hakkında detaylı bilgiler.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -174,22 +174,21 @@
             <div class="legal-section">
                 <h2>1. Genel Hükümler</h2>
                 <p>
-                    Bu Kullanım Koşulları, <strong>UniFour</strong> platformunu kullanırken geçerlidir. 
+                    Bu Kullanım Koşulları, <strong>Four Kampüs</strong> platformunu kullanırken geçerlidir. 
                     Platformu kullanarak bu koşulları kabul etmiş sayılırsınız. Eğer bu koşulları 
                     kabul etmiyorsanız, lütfen platformu kullanmayın.
                 </p>
                 <p>
-                    UniFour, üniversite toplulukları için topluluk yönetim sistemi hizmeti sunmaktadır. 
+                    Four Kampüs, üniversite toplulukları için topluluk yönetim sistemi hizmeti sunmaktadır. 
                     Platform, web tabanlı yönetim paneli ve mobil uygulamalar aracılığıyla hizmet vermektedir.
                 </p>
             </div>
             
             <div class="legal-section">
                 <h2>2. Hizmet Tanımı</h2>
-                <p>UniFour platformu aşağıdaki hizmetleri sunmaktadır:</p>
+                <p>Four Kampüs platformu aşağıdaki hizmetleri sunmaktadır:</p>
                 <ul>
                     <li><strong>Topluluk Yönetim Paneli:</strong> Etkinlik, üye, bildirim ve anket yönetimi</li>
-                    <li><strong>Web Sitesi:</strong> Topluluğunuz için ücretsiz web sitesi</li>
                     <li><strong>Email Hizmetleri:</strong> Topluluk için ücretsiz email adresleri (SMS hariç)</li>
                     <li><strong>Mobil Uygulamalar:</strong> iOS (SwiftUI) ve Android (Jetpack Compose) uygulamaları</li>
                     <li><strong>Gerçek Zamanlı Senkronizasyon:</strong> Tüm platformlar arasında 0.4 saniye senkron</li>
@@ -222,13 +221,12 @@
                     <p>
                         <i class="fas fa-gift"></i> 
                         <strong>İlk Yıl Ücretsiz:</strong> Tüm topluluklar ilk yıl tamamen ücretsiz hizmet alır. 
-                        Ücretsiz web sitesi, email adresleri ve tüm özellikler dahildir.
+                        Email adresleri ve tüm özellikler dahildir.
                     </p>
                 </div>
                 <h3>4.1. Ücretsiz Dönem</h3>
                 <ul>
                     <li>İlk 12 ay tamamen ücretsiz</li>
-                    <li>Ücretsiz web sitesi ve domain desteği</li>
                     <li>Ücretsiz email adresleri (SMS hariç)</li>
                     <li>Tüm platform özelliklerine erişim</li>
                     <li>7/24 teknik destek</li>
@@ -289,7 +287,7 @@
                 <h2>7. Fikri Mülkiyet Hakları</h2>
                 <h3>7.1. Platform Hakları</h3>
                 <p>
-                    UniFour platformu, yazılım, tasarım, logo ve marka hakları UniFour'a aittir. 
+                    Four Kampüs platformu, yazılım, tasarım, logo ve marka hakları Four Kampüs'e aittir. 
                     Platform içeriği telif hakkı koruması altındadır.
                 </p>
                 
@@ -347,7 +345,7 @@
                 <h2>10. Sorumluluk Reddi</h2>
                 <h3>10.1. Hizmet Sorumluluğu</h3>
                 <p>
-                    UniFour, platform hizmetlerini "olduğu gibi" sunar. Aşağıdaki durumlarda 
+                    Four Kampüs, platform hizmetlerini "olduğu gibi" sunar. Aşağıdaki durumlarda 
                     sorumluluk kabul edilmez:
                 </p>
                 <ul>
@@ -361,7 +359,7 @@
                 <h3>10.2. İçerik Sorumluluğu</h3>
                 <p>
                     Platform üzerinden paylaşılan içeriklerden (etkinlik, görsel, video, metin) 
-                    kullanıcılar sorumludur. UniFour, kullanıcı içeriklerinden sorumlu değildir.
+                    kullanıcılar sorumludur. Four Kampüs, kullanıcı içeriklerinden sorumlu değildir.
                 </p>
             </div>
             
@@ -377,7 +375,7 @@
                 
                 <h3>11.2. Teknik Destek</h3>
                 <ul>
-                    <li><strong>E-posta:</strong> info@unifour.com</li>
+                    <li><strong>E-posta:</strong> info@fourkampus.com.tr</li>
                     <li><strong>Telefon:</strong> +90 533 544 59 83</li>
                     <li><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</li>
                     <li><strong>Yanıt Süresi:</strong> 24 saat içinde (iş günleri)</li>
@@ -433,7 +431,7 @@
                 
                 <h3>14.3. Devir</h3>
                 <p>
-                    Bu koşullar, UniFour'un izni olmadan devredilemez. UniFour, haklarını ve 
+                    Bu koşullar, Four Kampüs'ün izni olmadan devredilemez. Four Kampüs, haklarını ve 
                     yükümlülüklerini üçüncü taraflara devredebilir.
                 </p>
             </div>
@@ -444,7 +442,7 @@
                     Kullanım koşulları hakkında sorularınız için bizimle iletişime geçebilirsiniz:
                 </p>
                 <div class="contact-info">
-                    <p><strong>E-posta:</strong> info@unifour.com</p>
+                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
                     <p><strong>Telefon:</strong> +90 533 544 59 83</p>
                     <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
                 </div>
@@ -460,4 +458,3 @@
     </div>
 </body>
 </html>
-
