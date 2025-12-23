@@ -932,13 +932,13 @@ try {
     
     // Güvenli hata yanıtı
     http_response_code(500);
-    sendResponse(false, null, null, 'Sunucu hatası: ' . $e->getMessage());
+    sendResponse(false, null, null, 'Sunucu hatası: ' . $e->getMessage() . ' (line ' . $e->getLine() . ' in ' . basename($e->getFile()) . ')');
 } catch (Error $e) {
     // PHP 7+ Error sınıfı için
     error_log("Communities API Fatal Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
     error_log("Stack trace: " . $e->getTraceAsString());
     
     http_response_code(500);
-    sendResponse(false, null, null, 'Sunucu hatası: ' . $e->getMessage());
+    sendResponse(false, null, null, 'Sunucu hatası: ' . $e->getMessage() . ' (line ' . $e->getLine() . ' in ' . basename($e->getFile()) . ')');
 }
 
