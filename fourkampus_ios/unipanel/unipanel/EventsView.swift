@@ -141,7 +141,10 @@ struct EventsView: View {
         .navigationBarTitleDisplayMode(.large)
         .onAppear {
             isActive = true
-            Task { await viewModel.refreshIfStale() }
+            Task {
+                // Her girişte taze veri çek (maxAge: 3sn - kazara çift tetiklemeyi önlemek için)
+                await viewModel.refreshIfStale(maxAge: 3)
+            }
         }
         .onDisappear {
             isActive = false
@@ -149,8 +152,11 @@ struct EventsView: View {
         .task(id: isActive) {
             guard isActive else { return }
             while isActive {
-                try? await Task.sleep(nanoseconds: 60_000_000_000)
-                await viewModel.refreshIfStale(maxAge: 60)
+                // Her 30 saniyede bir sessizce yenile (Eskiden 60 idi)
+                try? await Task.sleep(nanoseconds: 30_000_000_000)
+                if isActive {
+                    await viewModel.refreshIfStale(maxAge: 30)
+                }
             }
         }
         .toolbar {
@@ -195,17 +201,9 @@ struct EventsView: View {
         .task(id: communitiesViewModel.selectedUniversity) {
             // Üniversite değiştiğinde veya View ilk yüklendiğinde çalışır
             // ViewModel'e university bilgisini aktar
-            viewModel.selectedUniversity = communitiesViewModel.selectedUniversity
-            
-            // Eğer data hiç yüklenmediyse yükle
-            if !viewModel.hasInitiallyLoaded || viewModel.displayedEvents.isEmpty {
-                 #if DEBUG
-                 print("📱 EventsView task: Reloading events for university: \(communitiesViewModel.selectedUniversity?.name ?? "All")")
-                 #endif
-                 await viewModel.loadEvents()
-            } else {
-                // Sadece filtrele (client-side)
-                viewModel.applyFilters()
+            // NOT: ViewModel.selectedUniversity didSet bloğu otomatik olarak loadEvents'i çağıracaktır.
+            if viewModel.selectedUniversity?.id != communitiesViewModel.selectedUniversity?.id {
+                viewModel.selectedUniversity = communitiesViewModel.selectedUniversity
             }
             
             // Onaylı etkinlik ID'lerini yükle

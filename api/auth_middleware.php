@@ -216,45 +216,61 @@ function optionalAuth() {
  * @return bool
  */
 function checkRateLimit($maxRequests = 200, $timeWindow = 60) {
-    // Güvenli IP adresini al
-    $ip = getRealIP();
-    
-    // Cache dosyası yolu (güvenli hash)
-    $ipHash = hash('sha256', $ip . 'unipanel_salt_2025');
-    $cacheFile = __DIR__ . '/../system/cache/rate_limit_' . substr($ipHash, 0, 16) . '.json';
-    $cacheDir = dirname($cacheFile);
-    
-    if (!is_dir($cacheDir)) {
-        @mkdir($cacheDir, 0755, true);
-    }
-    
-    $now = time();
-    $requests = [];
-    
-    if (file_exists($cacheFile)) {
-        $data = json_decode(file_get_contents($cacheFile), true);
-        if ($data && isset($data['requests']) && is_array($data['requests'])) {
-            $requests = $data['requests'];
+    try {
+        // Güvenli IP adresini al
+        $ip = getRealIP();
+        
+        // Cache dosyası yolu (güvenli hash)
+        $ipHash = hash('sha256', $ip . 'unipanel_salt_2025');
+        $cacheFile = __DIR__ . '/../system/cache/rate_limit_' . substr($ipHash, 0, 16) . '.json';
+        $cacheDir = dirname($cacheFile);
+        
+        if (!is_dir($cacheDir)) {
+            if (!@mkdir($cacheDir, 0755, true)) {
+                // Klasör oluşturulamıyorsa - rate limiting'i atla, isteğe devam et
+                return true;
+            }
         }
+        
+        // Yazma izni yoksa atla
+        if (!is_writable($cacheDir)) {
+            return true;
+        }
+        
+        $now = time();
+        $requests = [];
+        
+        if (file_exists($cacheFile) && is_readable($cacheFile)) {
+            $data = @json_decode(@file_get_contents($cacheFile), true);
+            if ($data && isset($data['requests']) && is_array($data['requests'])) {
+                $requests = $data['requests'];
+            }
+        }
+        
+        // Eski istekleri temizle (timeWindow dışında kalanlar)
+        $requests = array_filter($requests, function($timestamp) use ($now, $timeWindow) {
+            return is_numeric($timestamp) && ($now - (int)$timestamp) < $timeWindow;
+        });
+        
+        // Yeni isteği ekle
+        $requests[] = $now;
+        
+        // Limit kontrolü
+        if (count($requests) > $maxRequests) {
+            // Limit aşıldı - dosyayı güncelle
+            @file_put_contents($cacheFile, json_encode(['requests' => array_slice($requests, -$maxRequests), 'last_updated' => $now]), LOCK_EX);
+            return false;
+        }
+        
+        // Cache'i güncelle (atomic write)
+        @file_put_contents($cacheFile, json_encode(['requests' => $requests, 'last_updated' => $now]), LOCK_EX);
+        return true;
+    } catch (Exception $e) {
+        // Rate limiting başarısız olursa, isteğe izin ver (fail-open)
+        return true;
+    } catch (Error $e) {
+        // PHP Error durumunda da izin ver
+        return true;
     }
-    
-    // Eski istekleri temizle (timeWindow dışında kalanlar)
-    $requests = array_filter($requests, function($timestamp) use ($now, $timeWindow) {
-        return is_numeric($timestamp) && ($now - (int)$timestamp) < $timeWindow;
-    });
-    
-    // Yeni isteği ekle
-    $requests[] = $now;
-    
-    // Limit kontrolü
-    if (count($requests) > $maxRequests) {
-        // Limit aşıldı - dosyayı güncelle
-        @file_put_contents($cacheFile, json_encode(['requests' => array_slice($requests, -$maxRequests), 'last_updated' => $now]), LOCK_EX);
-        return false;
-    }
-    
-    // Cache'i güncelle (atomic write)
-    @file_put_contents($cacheFile, json_encode(['requests' => $requests, 'last_updated' => $now]), LOCK_EX);
-    return true;
 }
 

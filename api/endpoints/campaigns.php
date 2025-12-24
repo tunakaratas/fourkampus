@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once __DIR__ . '/../lib/autoload.php';
 require_once __DIR__ . '/auth_middleware.php';
 require_once __DIR__ . '/connection_pool.php';
+require_once __DIR__ . '/../../api/university_helper.php';
 
 // Rate limiting (200 istek/dakika - 10k kullanıcı için optimize edildi)
 if (!checkRateLimit(200, 60)) {
@@ -48,15 +49,7 @@ $publicCache = Cache::getInstance(__DIR__ . '/../system/cache');
  * University filter helpers (shared behavior with api/communities.php and api/universities.php)
  */
 function normalize_university_id($value) {
-    $value = trim((string)$value);
-    if ($value === '') {
-        return '';
-    }
-    // Türkçe karakter desteği için mb_strtolower kullan
-    $normalized = mb_strtolower($value, 'UTF-8');
-    // Boşluk, tire ve alt çizgi karakterlerini kaldır
-    $normalized = str_replace([' ', '-', '_'], '', $normalized);
-    return $normalized;
+    return normalizeUniversityName($value);
 }
 
 function get_requested_university_id() {

@@ -237,14 +237,23 @@ try {
         
         if ($existing_request) {
             $status = $existing_request['status'] ?? 'pending';
-            ConnectionPool::releaseConnection($db_path, $poolId, false);
             if ($status === 'pending') {
+                ConnectionPool::releaseConnection($db_path, $poolId, false);
                 sendResponse(false, null, null, 'Üyelik başvurunuz zaten inceleniyor.');
             } elseif ($status === 'approved') {
-                // Approved ise zaten üye sayıl
+                ConnectionPool::releaseConnection($db_path, $poolId, false);
                 sendResponse(false, null, null, 'Zaten topluluğun üyesisiniz.');
             } else {
-                sendResponse(false, null, null, 'Daha önce bir başvuru yapmışsınız.');
+                // Rejected veya diğer durumlar - önceki başvuruyu sil ve yeni başvuru yap
+                try {
+                    $delete_old = $db->prepare("DELETE FROM membership_requests WHERE club_id = 1 AND (user_id = ? OR LOWER(email) = LOWER(?))");
+                    $delete_old->bindValue(1, $user_id, SQLITE3_INTEGER);
+                    $delete_old->bindValue(2, $user_email, SQLITE3_TEXT);
+                    $delete_old->execute();
+                } catch (Exception $e) {
+                    secureLog('membership_status', 'Eski başvuru silme hatası: ' . $e->getMessage());
+                }
+                // Devam et - yeni başvuru oluşturacak
             }
         }
         

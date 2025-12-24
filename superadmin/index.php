@@ -4,6 +4,7 @@
 // =================================================================
 
 $superadminConfig = require __DIR__ . '/config.php';
+require_once __DIR__ . '/../api/university_helper.php';
 
 // SQLite3 sabitlerini tanımla (eğer tanımlı değilse)
 if (!defined('SQLITE3_INTEGER')) define('SQLITE3_INTEGER', 1);
@@ -833,21 +834,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 }
 
 // Üniversiteler ve bölümler listesi
-// Not: Bu listeler admin-login.php ile aynı olmalı
-$universities = [
-    'Bandırma 17 Eylül Üniversitesi', 'İstanbul Üniversitesi', 'Ankara Üniversitesi', 'Hacettepe Üniversitesi', 'Boğaziçi Üniversitesi',
-    'Orta Doğu Teknik Üniversitesi', 'İstanbul Teknik Üniversitesi', 'Gazi Üniversitesi', 'Ege Üniversitesi',
-    'Dokuz Eylül Üniversitesi', 'Marmara Üniversitesi', 'Yıldız Teknik Üniversitesi', 'Anadolu Üniversitesi',
-    'Selçuk Üniversitesi', 'Akdeniz Üniversitesi', 'Çukurova Üniversitesi', 'Erciyes Üniversitesi',
-    'Uludağ Üniversitesi', 'Atatürk Üniversitesi', 'Ondokuz Mayıs Üniversitesi', 'Karadeniz Teknik Üniversitesi',
-    'Pamukkale Üniversitesi', 'Süleyman Demirel Üniversitesi', 'Kocaeli Üniversitesi', 'Sakarya Üniversitesi',
-    'Trakya Üniversitesi', 'Çanakkale Onsekiz Mart Üniversitesi', 'Balıkesir Üniversitesi', 'Adnan Menderes Üniversitesi',
-    'Muğla Sıtkı Koçman Üniversitesi', 'Bursa Teknik Üniversitesi', 'İzmir Yüksek Teknoloji Enstitüsü', 'Gebze Teknik Üniversitesi',
-    'Sabancı Üniversitesi', 'Koç Üniversitesi', 'Bilkent Üniversitesi', 'Özyeğin Üniversitesi',
-    'Bahçeşehir Üniversitesi', 'İstanbul Bilgi Üniversitesi', 'İstanbul Kültür Üniversitesi', 'Yeditepe Üniversitesi',
-    'Maltepe Üniversitesi', 'Kadir Has Üniversitesi', 'İstanbul Aydın Üniversitesi', 'Altınbaş Üniversitesi',
-    'İstanbul Medipol Üniversitesi', 'Acıbadem Üniversitesi', 'Bezmialem Vakıf Üniversitesi', 'Diğer'
-];
+// Not: Bu listeler merkezi university_helper.php'den alınmaktadır
+$universities = getUniversityList();
+sort($universities);
 
 $departments = [
     'Bilgisayar Mühendisliği', 'Yazılım Mühendisliği', 'Elektrik-Elektronik Mühendisliği', 'Endüstri Mühendisliği',
@@ -7158,20 +7147,8 @@ function loadMoreSuperadminEvents() {
                         <select name="university" id="editCommunityUniversity" required class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
                             <option value="">Üniversite Seçiniz</option>
                             <?php
-                            $universities = [
-                                'Bandırma 17 Eylül Üniversitesi', 'İstanbul Üniversitesi', 'Ankara Üniversitesi', 'Hacettepe Üniversitesi', 'Boğaziçi Üniversitesi',
-                                'Orta Doğu Teknik Üniversitesi', 'İstanbul Teknik Üniversitesi', 'Gazi Üniversitesi', 'Ege Üniversitesi',
-                                'Dokuz Eylül Üniversitesi', 'Marmara Üniversitesi', 'Yıldız Teknik Üniversitesi', 'Anadolu Üniversitesi',
-                                'Selçuk Üniversitesi', 'Akdeniz Üniversitesi', 'Çukurova Üniversitesi', 'Erciyes Üniversitesi',
-                                'Uludağ Üniversitesi', 'Atatürk Üniversitesi', 'Ondokuz Mayıs Üniversitesi', 'Karadeniz Teknik Üniversitesi',
-                                'Pamukkale Üniversitesi', 'Süleyman Demirel Üniversitesi', 'Kocaeli Üniversitesi', 'Sakarya Üniversitesi',
-                                'Trakya Üniversitesi', 'Çanakkale Onsekiz Mart Üniversitesi', 'Balıkesir Üniversitesi', 'Adnan Menderes Üniversitesi',
-                                'Muğla Sıtkı Koçman Üniversitesi', 'Bursa Teknik Üniversitesi', 'İzmir Yüksek Teknoloji Enstitüsü', 'Gebze Teknik Üniversitesi',
-                                'Sabancı Üniversitesi', 'Koç Üniversitesi', 'Bilkent Üniversitesi', 'Özyeğin Üniversitesi',
-                                'Bahçeşehir Üniversitesi', 'İstanbul Bilgi Üniversitesi', 'İstanbul Kültür Üniversitesi', 'Yeditepe Üniversitesi',
-                                'Maltepe Üniversitesi', 'Kadir Has Üniversitesi', 'İstanbul Aydın Üniversitesi', 'Altınbaş Üniversitesi',
-                                'İstanbul Medipol Üniversitesi', 'Acıbadem Üniversitesi', 'Bezmialem Vakıf Üniversitesi', 'Diğer'
-                            ];
+                            $universities = getUniversityList();
+                            sort($universities);
                             foreach ($universities as $univ): ?>
                                 <option value="<?= htmlspecialchars($univ) ?>"><?= htmlspecialchars($univ) ?></option>
                             <?php endforeach; ?>

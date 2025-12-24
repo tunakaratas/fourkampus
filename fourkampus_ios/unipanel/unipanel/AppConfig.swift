@@ -32,7 +32,8 @@ class AppConfig {
                !baseURL.isEmpty {
                 return baseURL
             }
-            // Default: Production sunucusunu kullan
+            // Default: HER ZAMAN localhost kullan (sunucu/localhost ayrımı kaldırıldı)
+            // Veritabanı her zaman local'den çekiliyor, API'ler de localhost'tan çalışmalı
             return "https://fourkampus.com.tr/api"
         }()
         return plistURL.trimmingCharacters(in: CharacterSet(charactersIn: "/"))

@@ -14,6 +14,7 @@ struct MarketView: View {
     @State private var selectedProduct: Product?
     @State private var showCart = false
     @State private var showFilters = false
+    @State private var showOrderHistory = false
     @State private var layoutMode: LayoutMode = .list
     @EnvironmentObject var authViewModel: AuthViewModel
     @EnvironmentObject var communitiesViewModel: CommunitiesViewModel
@@ -49,6 +50,18 @@ struct MarketView: View {
         .navigationTitle("Market")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                // Sipariş Geçmişi Butonu
+                if authViewModel.isAuthenticated {
+                    Button(action: {
+                        showOrderHistory = true
+                    }) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .font(.system(size: 18))
+                            .foregroundColor(Color(hex: "6366f1"))
+                    }
+                }
+            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 12) {
                     Button(action: {
@@ -88,12 +101,26 @@ struct MarketView: View {
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showOrderHistory) {
+            OrderHistoryView()
+                .environmentObject(authViewModel)
+        }
         .onAppear {
             // MarketViewModel'e topluluk listesini ver (topluluk isimlerini göstermek için)
             viewModel.availableCommunities = communitiesViewModel.communities
+            // Üniversite filtresini senkronize et
+            viewModel.selectedUniversity = communitiesViewModel.selectedUniversity?.name
         }
         .onChange(of: communitiesViewModel.communities) { newCommunities in
             viewModel.availableCommunities = newCommunities
+        }
+        .onChange(of: communitiesViewModel.selectedUniversity) { newUniversity in
+            // Üniversite değiştiğinde MarketViewModel'i güncelle
+            if let uni = newUniversity, uni.id != "all" {
+                viewModel.selectedUniversity = uni.name
+            } else {
+                viewModel.selectedUniversity = nil
+            }
         }
         .task {
             if !viewModel.hasInitiallyLoaded {
@@ -297,7 +324,7 @@ struct MarketView: View {
     
     private var categoryFilterSection: some View {
         Group {
-            if !viewModel.categories.isEmpty {
+            if !viewModel.productCategories.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         CategoryChip(
@@ -310,14 +337,14 @@ struct MarketView: View {
                             }
                         )
                         
-                        ForEach(viewModel.categories, id: \.self) { category in
+                        ForEach(viewModel.productCategories) { category in
                             CategoryChip(
-                                title: category,
-                                icon: "tag.fill",
-                                isSelected: viewModel.selectedCategory == category,
+                                title: category.name,
+                                icon: category.icon,
+                                isSelected: viewModel.selectedCategory == category.name,
                                 color: Color(hex: "6366f1"),
                                 action: {
-                                    viewModel.selectedCategory = viewModel.selectedCategory == category ? nil : category
+                                    viewModel.selectedCategory = viewModel.selectedCategory == category.name ? nil : category.name
                                 }
                             )
                         }
@@ -471,7 +498,8 @@ struct ProductGridCard: View {
             generator.impactOccurred()
             onTap?()
         }) {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Image Section
                 let imageURL: String? = {
                     if let imageURLs = product.imageURLs, !imageURLs.isEmpty {
                         return imageURLs[0]
@@ -493,24 +521,17 @@ struct ProductGridCard: View {
                                         .aspectRatio(contentMode: .fill)
                                 case .failure(_):
                                     ZStack {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(
-                                                LinearGradient(
-                                                    colors: [Color(hex: "6366f1").opacity(0.2), Color(hex: "8b5cf6").opacity(0.1)],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
+                                        Color(UIColor.secondarySystemBackground)
                                         Image(systemName: "bag.fill")
                                             .font(.system(size: 32))
-                                            .foregroundColor(Color(hex: "6366f1"))
+                                            .foregroundColor(Color(hex: "6366f1").opacity(0.3))
                                     }
                                 case .empty:
                                     ZStack {
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .fill(Color(UIColor.secondarySystemBackground))
-                                        ProgressView()
-                                            .tint(Color(hex: "6366f1"))
+                                        Color(UIColor.secondarySystemBackground)
+                                        Image(systemName: "photo")
+                                            .font(.system(size: 28))
+                                            .foregroundColor(Color(hex: "6366f1").opacity(0.2))
                                     }
                                 @unknown default:
                                     EmptyView()
@@ -518,112 +539,102 @@ struct ProductGridCard: View {
                             }
                         } else {
                             ZStack {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [Color(hex: "6366f1").opacity(0.2), Color(hex: "8b5cf6").opacity(0.1)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
+                                Color(UIColor.secondarySystemBackground)
                                 Image(systemName: "bag.fill")
                                     .font(.system(size: 32))
-                                    .foregroundColor(Color(hex: "6366f1"))
+                                    .foregroundColor(Color(hex: "6366f1").opacity(0.3))
                             }
                         }
                     }
-                    .frame(maxWidth: .infinity, minHeight: 180, maxHeight: 180)
-                    .aspectRatio(1.0, contentMode: .fill)
+                    .frame(height: 160)
+                    .frame(maxWidth: .infinity)
                     .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
                     
-                    if isVerified {
-                        VerifiedBadgeTag(text: "Onaylı", style: .subtle)
-                            .padding(8)
-                    }
-                    
-                    if product.stock <= 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 10))
-                            Text("Tükendi")
-                                .font(.system(size: 10, weight: .medium))
+                    // Badges
+                    VStack(alignment: .trailing, spacing: 6) {
+                        if isVerified {
+                            Text("Onaylı")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color(hex: "6366f1"))
+                                .cornerRadius(6)
                         }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color(hex: "ef4444"))
-                        .cornerRadius(8)
-                        .padding(8)
+                        
+                        if product.stock <= 0 {
+                            Text("Tükendi")
+                                .font(.system(size: 10, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color(hex: "ef4444"))
+                                .cornerRadius(6)
+                        }
                     }
+                    .padding(8)
                 }
-                .frame(height: 180)
                 
+                // Content Section
                 VStack(alignment: .leading, spacing: 6) {
+                    // Title
                     Text(product.name)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 14, weight: .bold))
                         .foregroundColor(.primary)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(height: 36, alignment: .topLeading)
                     
-                    VStack(alignment: .leading, spacing: 4) {
+                    // Meta info
+                    VStack(alignment: .leading, spacing: 2) {
                         if let communityName = communityName {
                             HStack(spacing: 4) {
                                 Image(systemName: "person.3.fill")
                                     .font(.system(size: 10))
-                                    .foregroundColor(.secondary)
                                 Text(communityName)
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
+                                    .font(.system(size: 10))
                             }
+                            .foregroundColor(.secondary)
                         }
+                        
                         if let universityName = universityName {
                             HStack(spacing: 4) {
                                 Image(systemName: "building.2.fill")
                                     .font(.system(size: 10))
-                                    .foregroundColor(.secondary)
                                 Text(universityName)
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.secondary)
-                                    .lineLimit(1)
+                                    .font(.system(size: 10))
                             }
-                        }
-                    }
-                    
-                    if product.totalPrice != nil {
-                        Text(product.formattedTotalPrice)
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(Color(hex: "6366f1"))
-                        Text(product.formattedPrice)
-                            .font(.system(size: 11))
                             .foregroundColor(.secondary)
-                            .strikethrough()
-                    } else {
-                        Text(product.formattedPrice)
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(Color(hex: "6366f1"))
-                    }
-                    
-                    if product.stock > 0 {
-                        HStack(spacing: 4) {
-                            Image(systemName: "checkmark.circle.fill")
-                                .font(.system(size: 10))
-                            Text("Stokta")
-                                .font(.system(size: 10, weight: .medium))
                         }
-                        .foregroundColor(Color(hex: "10b981"))
+                    }
+                    .lineLimit(1)
+                    
+                    Spacer(minLength: 4)
+                    
+                    // Price Section
+                    VStack(alignment: .leading, spacing: 0) {
+                        if product.totalPrice != nil {
+                            Text(product.formattedTotalPrice)
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(Color(hex: "6366f1"))
+                            Text(product.formattedPrice)
+                                .font(.system(size: 10))
+                                .foregroundColor(.secondary)
+                                .strikethrough()
+                        } else {
+                            Text(product.formattedPrice)
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(Color(hex: "6366f1"))
+                        }
                     }
                 }
+                .padding(12)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: 280, maxHeight: 280)
-            .padding(12)
             .background(Color(UIColor.secondarySystemBackground))
             .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+            .frame(height: 320)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -740,27 +751,33 @@ struct MarketFiltersView: View {
 struct ProductCardSkeleton: View {
     var body: some View {
         HStack(spacing: 16) {
-            SkeletonView()
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(UIColor.secondarySystemBackground))
                 .frame(width: 100, height: 100)
-                .cornerRadius(12)
             
             VStack(alignment: .leading, spacing: 8) {
-                SkeletonView()
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color(UIColor.secondarySystemBackground))
                     .frame(width: 200, height: 20)
-                    .cornerRadius(4)
-                SkeletonView()
+                
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color(UIColor.secondarySystemBackground))
                     .frame(width: 150, height: 16)
-                    .cornerRadius(4)
-                SkeletonView()
+                
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color(UIColor.secondarySystemBackground))
                     .frame(width: 100, height: 24)
-                    .cornerRadius(4)
             }
             
             Spacer()
         }
         .padding(16)
-        .background(Color(UIColor.secondarySystemBackground))
+        .background(Color(UIColor.systemBackground))
         .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color(UIColor.separator).opacity(0.1), lineWidth: 1)
+        )
     }
 }
 

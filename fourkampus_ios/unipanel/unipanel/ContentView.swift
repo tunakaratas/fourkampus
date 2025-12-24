@@ -1309,15 +1309,7 @@ struct NativeAdCard: View {
                                     #endif
                                     return correctedURL
                                 } else {
-                                    #if DEBUG
-                                    #if targetEnvironment(simulator)
-                                    let baseURL = "http://127.0.0.1/fourkampus"
-                                    #else
-                                    let baseURL = "http://localhost/fourkampus"
-                                    #endif
-                                    #else
-                                    let baseURL = "https://foursoftware.com.tr/fourkampus"
-                                    #endif
+                                    let baseURL = AppConfig.shared.imageBaseURL
                                     let cleanPath = imageURLString.hasPrefix("/") ? imageURLString : "/\(imageURLString)"
                                     return "\(baseURL)\(cleanPath)"
                                 }
@@ -1329,34 +1321,13 @@ struct NativeAdCard: View {
                                         .resizable()
                                         .aspectRatio(contentMode: .fill)
                                 } placeholder: {
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color(hex: "8b5cf6"),
-                                            Color(hex: "6366f1")
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
+                                    Color(hex: "6366f1")
                                 }
                             } else {
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(hex: "8b5cf6"),
-                                        Color(hex: "6366f1")
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
+                                Color(hex: "6366f1")
                             }
                         } else {
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(hex: "8b5cf6"),
-                                    Color(hex: "6366f1")
-                                ]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
+                            Color(hex: "6366f1")
                         }
                         
                         // Dark gradient overlay for text readability
@@ -1394,15 +1365,7 @@ struct NativeAdCard: View {
                                                     #endif
                                                     return correctedURL
                                                 } else {
-                                                    #if DEBUG
-                                                    #if targetEnvironment(simulator)
-                                                    let baseURL = "http://127.0.0.1/fourkampus"
-                                                    #else
-                                                    let baseURL = "http://localhost/fourkampus"
-                                                    #endif
-                                                    #else
-                                                    let baseURL = "https://foursoftware.com.tr/fourkampus"
-                                                    #endif
+                                                    let baseURL = AppConfig.shared.imageBaseURL
                                                     let cleanPath = logoURLString.hasPrefix("/") ? logoURLString : "/\(logoURLString)"
                                                     return "\(baseURL)\(cleanPath)"
                                                 }
@@ -1564,15 +1527,7 @@ struct NativeAdCard: View {
                                 #endif
                                 return correctedURL
                             } else {
-                                #if DEBUG
-                                #if targetEnvironment(simulator)
-                                let baseURL = "http://127.0.0.1/fourkampus"
-                                #else
-                                let baseURL = "http://localhost/fourkampus"
-                                #endif
-                                #else
-                                let baseURL = "https://foursoftware.com.tr/fourkampus"
-                                #endif
+                                let baseURL = AppConfig.shared.imageBaseURL
                                 let cleanPath = logoURLString.hasPrefix("/") ? logoURLString : "/\(logoURLString)"
                                 return "\(baseURL)\(cleanPath)"
                             }
@@ -1656,13 +1611,7 @@ struct AdLogoDetailView: View {
                     } placeholder: {
                         ZStack {
                             RoundedRectangle(cornerRadius: 20)
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color(hex: "8b5cf6"), Color(hex: "6366f1")],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
+                                .fill(Color(hex: "6366f1"))
                                 .frame(width: 200, height: 200)
                             Image(systemName: "megaphone.fill")
                                 .font(.system(size: 80, weight: .medium))

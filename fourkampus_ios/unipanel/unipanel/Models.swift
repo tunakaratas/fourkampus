@@ -2163,9 +2163,15 @@ struct Product: Identifiable, Hashable, Codable {
         
         // Created at
         if let createdAtString = try? container.decodeIfPresent(String.self, forKey: .createdAt) {
-            let formatter = ISO8601DateFormatter()
-            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-            createdAt = formatter.date(from: createdAtString)
+            // Birden fazla format dene
+            let isoFormatter = ISO8601DateFormatter()
+            isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+            
+            let sqliteFormatter = DateFormatter()
+            sqliteFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+            sqliteFormatter.locale = Locale(identifier: "en_US_POSIX")
+            
+            createdAt = isoFormatter.date(from: createdAtString) ?? sqliteFormatter.date(from: createdAtString)
         } else {
             createdAt = nil
         }
@@ -2236,6 +2242,345 @@ struct CartItem: Identifiable, Hashable {
         return String(format: "%.2f", totalPrice).replacingOccurrences(of: ".", with: ",") + " ₺"
     }
 }
+
+// MARK: - Order Status Enum
+enum OrderStatus: String, Codable {
+    case pending = "pending"
+    case confirmed = "confirmed"
+    case processing = "processing"
+    case shipped = "shipped"
+    case delivered = "delivered"
+    case cancelled = "cancelled"
+    
+    var displayName: String {
+        switch self {
+        case .pending: return "Beklemede"
+        case .confirmed: return "Onaylandı"
+        case .processing: return "Hazırlanıyor"
+        case .shipped: return "Kargoya Verildi"
+        case .delivered: return "Teslim Edildi"
+        case .cancelled: return "İptal Edildi"
+        }
+    }
+    
+    var color: String {
+        switch self {
+        case .pending: return "FCD34D" // Yellow
+        case .confirmed: return "10B981" // Green
+        case .processing: return "6366F1" // Indigo
+        case .shipped: return "3B82F6" // Blue
+        case .delivered: return "059669" // Emerald
+        case .cancelled: return "EF4444" // Red
+        }
+    }
+}
+
+// MARK: - Payment Status Enum
+enum PaymentStatus: String, Codable {
+    case pending = "pending"
+    case paid = "paid"
+    case failed = "failed"
+    case refunded = "refunded"
+    
+    var displayName: String {
+        switch self {
+        case .pending: return "Ödeme Bekleniyor"
+        case .paid: return "Ödendi"
+        case .failed: return "Ödeme Başarısız"
+        case .refunded: return "İade Edildi"
+        }
+    }
+}
+
+// MARK: - Order Item Model
+struct OrderItem: Identifiable, Codable, Hashable {
+    let id: Int
+    let orderId: Int
+    let productId: Int
+    let communityId: String
+    let communityName: String?
+    let productName: String
+    let productCategory: String?
+    let quantity: Int
+    let unitPrice: Double
+    let unitTotal: Double
+    let lineSubtotal: Double
+    let lineTotal: Double
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case orderId = "order_id"
+        case productId = "product_id"
+        case communityId = "community_id"
+        case communityName = "community_name"
+        case productName = "product_name"
+        case productCategory = "product_category"
+        case quantity
+        case unitPrice = "unit_price"
+        case unitTotal = "unit_total"
+        case lineSubtotal = "line_subtotal"
+        case lineTotal = "line_total"
+    }
+    
+    var formattedUnitPrice: String {
+        String(format: "%.2f", unitPrice).replacingOccurrences(of: ".", with: ",") + " ₺"
+    }
+    
+    var formattedLineTotal: String {
+        String(format: "%.2f", lineTotal).replacingOccurrences(of: ".", with: ",") + " ₺"
+    }
+}
+
+// MARK: - Order Model
+struct Order: Identifiable, Codable, Hashable {
+    let id: Int
+    let orderNumber: String
+    let userId: String?
+    let userEmail: String
+    let userName: String
+    let userPhone: String?
+    let subtotal: Double
+    let commission: Double
+    let total: Double
+    let status: OrderStatus
+    let paymentStatus: PaymentStatus
+    let paymentId: String?
+    let paymentMethod: String?
+    let notes: String?
+    let createdAt: Date?
+    let updatedAt: Date?
+    let paidAt: Date?
+    var items: [OrderItem]?
+    var itemsCount: Int?
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case orderNumber = "order_number"
+        case userId = "user_id"
+        case userEmail = "user_email"
+        case userName = "user_name"
+        case userPhone = "user_phone"
+        case subtotal
+        case commission
+        case total
+        case status
+        case paymentStatus = "payment_status"
+        case paymentId = "payment_id"
+        case paymentMethod = "payment_method"
+        case notes
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case paidAt = "paid_at"
+        case items
+        case itemsCount = "items_count"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        // ID - Int veya String
+        if let intId = try? container.decode(Int.self, forKey: .id) {
+            id = intId
+        } else if let stringId = try? container.decode(String.self, forKey: .id), let intId = Int(stringId) {
+            id = intId
+        } else {
+            id = 0
+        }
+        
+        orderNumber = try container.decode(String.self, forKey: .orderNumber)
+        userId = try container.decodeIfPresent(String.self, forKey: .userId)
+        userEmail = try container.decode(String.self, forKey: .userEmail)
+        userName = try container.decode(String.self, forKey: .userName)
+        userPhone = try container.decodeIfPresent(String.self, forKey: .userPhone)
+        
+        subtotal = try container.decode(Double.self, forKey: .subtotal)
+        commission = try container.decode(Double.self, forKey: .commission)
+        total = try container.decode(Double.self, forKey: .total)
+        
+        // Status - string'den enum'a dönüştür
+        if let statusString = try? container.decode(String.self, forKey: .status) {
+            status = OrderStatus(rawValue: statusString) ?? .pending
+        } else {
+            status = .pending
+        }
+        
+        if let paymentStatusString = try? container.decode(String.self, forKey: .paymentStatus) {
+            paymentStatus = PaymentStatus(rawValue: paymentStatusString) ?? .pending
+        } else {
+            paymentStatus = .pending
+        }
+        
+        paymentId = try container.decodeIfPresent(String.self, forKey: .paymentId)
+        paymentMethod = try container.decodeIfPresent(String.self, forKey: .paymentMethod)
+        notes = try container.decodeIfPresent(String.self, forKey: .notes)
+        
+        // Date parsing
+        createdAt = Self.parseDate(try container.decodeIfPresent(String.self, forKey: .createdAt))
+        updatedAt = Self.parseDate(try container.decodeIfPresent(String.self, forKey: .updatedAt))
+        paidAt = Self.parseDate(try container.decodeIfPresent(String.self, forKey: .paidAt))
+        
+        items = try container.decodeIfPresent([OrderItem].self, forKey: .items)
+        itemsCount = try container.decodeIfPresent(Int.self, forKey: .itemsCount)
+    }
+    
+    private static func parseDate(_ dateString: String?) -> Date? {
+        guard let dateString = dateString, !dateString.isEmpty else { return nil }
+        
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        
+        // SQLite datetime format
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        if let date = formatter.date(from: dateString) {
+            return date
+        }
+        
+        // ISO8601
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = isoFormatter.date(from: dateString) {
+            return date
+        }
+        
+        return nil
+    }
+    
+    var formattedSubtotal: String {
+        String(format: "%.2f", subtotal).replacingOccurrences(of: ".", with: ",") + " ₺"
+    }
+    
+    var formattedTotal: String {
+        String(format: "%.2f", total).replacingOccurrences(of: ".", with: ",") + " ₺"
+    }
+    
+    var formattedDate: String {
+        guard let date = createdAt else { return "-" }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM yyyy, HH:mm"
+        formatter.locale = Locale(identifier: "tr_TR")
+        return formatter.string(from: date)
+    }
+}
+
+// MARK: - Product Category Model
+struct ProductCategory: Identifiable, Codable, Hashable {
+    let name: String
+    let icon: String
+    let slug: String
+    let productCount: Int?
+    
+    var id: String { slug }
+    
+    enum CodingKeys: String, CodingKey {
+        case name
+        case icon
+        case slug
+        case productCount = "product_count"
+    }
+}
+
+// MARK: - Products Response (v2 API)
+struct ProductsV2Response: Codable {
+    let products: [Product]
+    let pagination: ProductsPagination
+    let filters: ProductsFilters?
+    
+    struct ProductsPagination: Codable {
+        let limit: Int
+        let offset: Int
+        let total: Int
+        let hasMore: Bool
+        
+        enum CodingKeys: String, CodingKey {
+            case limit, offset, total
+            case hasMore = "has_more"
+        }
+    }
+    
+    struct ProductsFilters: Codable {
+        let categories: [String]?
+        let priceRange: PriceRange?
+        
+        struct PriceRange: Codable {
+            let min: Double
+            let max: Double
+        }
+        
+        enum CodingKeys: String, CodingKey {
+            case categories
+            case priceRange = "price_range"
+        }
+    }
+}
+
+// MARK: - Orders Response (v2 API)
+struct OrdersV2Response: Codable {
+    let orders: [Order]
+    let pagination: OrdersPagination
+    
+    struct OrdersPagination: Codable {
+        let page: Int
+        let limit: Int
+        let total: Int
+        let hasMore: Bool
+        
+        enum CodingKeys: String, CodingKey {
+            case page, limit, total
+            case hasMore = "has_more"
+        }
+    }
+}
+
+// MARK: - Create Order Response
+struct CreateOrderResponse: Codable {
+    let orderId: Int
+    let orderNumber: String
+    let subtotal: Double
+    let commission: Double
+    let total: Double
+    let items: [CreateOrderItem]
+    let customer: CreateOrderCustomer
+    let paymentForm: String?
+    
+    struct CreateOrderItem: Codable {
+        let productId: Int
+        let communityId: String
+        let communityName: String
+        let productName: String
+        let quantity: Int
+        let unitPrice: Double
+        let unitTotal: Double
+        let lineSubtotal: Double
+        let lineTotal: Double
+        
+        enum CodingKeys: String, CodingKey {
+            case productId = "product_id"
+            case communityId = "community_id"
+            case communityName = "community_name"
+            case productName = "product_name"
+            case quantity
+            case unitPrice = "unit_price"
+            case unitTotal = "unit_total"
+            case lineSubtotal = "line_subtotal"
+            case lineTotal = "line_total"
+        }
+    }
+    
+    struct CreateOrderCustomer: Codable {
+        let name: String
+        let email: String
+        let phone: String
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case orderId = "order_id"
+        case orderNumber = "order_number"
+        case subtotal, commission, total
+        case items, customer
+        case paymentForm = "payment_form"
+    }
+}
+
 // MARK: - Color Extension
 extension Color {
     init(hex: String) {
@@ -2263,3 +2608,48 @@ extension Color {
     }
 }
 
+// MARK: - Product Filters Model
+struct ProductFilters {
+    var category: String?
+    var community: String?
+    var university: String?
+    var minPrice: Double?
+    var maxPrice: Double?
+    var inStock: Int? // 1 or nil
+    var search: String?
+    var sort: String = "newest"
+    var limit: Int = 20
+    var offset: Int = 0
+    
+    /// Build query string from filters for v2 API
+    func toQueryString() -> String {
+        var params: [String] = []
+        
+        if let category = category, !category.isEmpty {
+            params.append("category=\(category.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? category)")
+        }
+        if let community = community, !community.isEmpty {
+            params.append("community_id=\(community)")
+        }
+        if let university = university, !university.isEmpty, university != "all" {
+            params.append("university_id=\(university.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? university)")
+        }
+        if let minPrice = minPrice {
+            params.append("min_price=\(minPrice)")
+        }
+        if let maxPrice = maxPrice {
+            params.append("max_price=\(maxPrice)")
+        }
+        if inStock == 1 {
+            params.append("in_stock=1")
+        }
+        if let search = search, !search.isEmpty {
+            params.append("search=\(search.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? search)")
+        }
+        params.append("sort=\(sort)")
+        params.append("limit=\(limit)")
+        params.append("offset=\(offset)")
+        
+        return params.joined(separator: "&")
+    }
+}

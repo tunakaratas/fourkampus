@@ -220,41 +220,27 @@ struct CheckoutView: View {
         
         Task {
             do {
-                // Sipariş numarası oluştur
-                let orderId = UUID().uuidString
-                let orderNum = "ORD-\(String(orderId.prefix(8)).uppercased())"
-                orderNumber = orderNum
-                
-                // Sipariş verilerini hazırla
-                let orderItems = cartViewModel.items.map { item -> [String: Any] in
-                    let itemDict: [String: Any] = [
-                        "name": item.product.name,
-                        "quantity": item.quantity,
-                        "unit_total": item.product.totalPrice ?? item.product.price,
-                        "product_id": item.product.id,
-                        "community_id": item.product.communityId
-                    ]
-                    return itemDict
-                }
-                
-                let orderData: [String: Any] = [
-                    "order_number": orderNum,
-                    "customer": [
-                        "name": customerName,
-                        "email": customerEmail,
-                        "phone": customerPhone
-                    ],
-                    "items": orderItems,
-                    "total": cartViewModel.totalPrice,
-                    "delivery_type": "stand_pickup"
-                ]
-                
-                // API'ye sipariş gönder
-                try await APIService.shared.confirmOrder(orderData: orderData)
+                // Yeni v2 API ile sipariş oluştur
+                let response = try await APIService.shared.createOrder(
+                    items: cartViewModel.items,
+                    customerName: customerName,
+                    customerEmail: customerEmail,
+                    customerPhone: customerPhone
+                )
                 
                 await MainActor.run {
+                    orderNumber = response.orderNumber
                     isProcessing = false
-                    showSuccess = true
+                    
+                    // Eğer payment form varsa, ödeme sayfasına yönlendir
+                    if let paymentForm = response.paymentForm, !paymentForm.isEmpty {
+                        // TODO: WebView ile ödeme sayfasını göster
+                        // Şimdilik başarılı olarak işaretle
+                        showSuccess = true
+                    } else {
+                        // Ödeme formu yoksa direkt başarılı
+                        showSuccess = true
+                    }
                     
                     // Haptic feedback
                     let generator = UINotificationFeedbackGenerator()

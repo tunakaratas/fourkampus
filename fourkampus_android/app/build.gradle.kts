@@ -28,17 +28,17 @@ android {
                 "proguard-rules.pro"
             )
             // Localhost Base URL (hosting bağlantısı kaldırıldı)
-            buildConfigField("String", "BASE_URL", "\"https://fourkampus.com.tr/api/\"")
-            buildConfigField("String", "LOCAL_BASE_URL", "\"https://fourkampus.com.tr/api/\"")
-            buildConfigField("String", "PRODUCTION_BASE_URL", "\"https://fourkampus.com.tr/api/\"")
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2/unipanel/api/\"")
+            buildConfigField("String", "LOCAL_BASE_URL", "\"http://10.0.2.2/unipanel/api/\"")
+            buildConfigField("String", "PRODUCTION_BASE_URL", "\"https://community.foursoftware.net/unipanel/api/\"")
         }
         debug {
             isMinifyEnabled = false // Debug için minify kapalı (daha hızlı build)
             isShrinkResources = false
             // Debug Base URL (Android Emulator için)
-            buildConfigField("String", "BASE_URL", "\"https://fourkampus.com.tr/api/\"")
-            buildConfigField("String", "LOCAL_BASE_URL", "\"https://fourkampus.com.tr/api/\"")
-            buildConfigField("String", "PRODUCTION_BASE_URL", "\"https://fourkampus.com.tr/api/\"")
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2/unipanel/api/\"")
+            buildConfigField("String", "LOCAL_BASE_URL", "\"http://10.0.2.2/unipanel/api/\"")
+            buildConfigField("String", "PRODUCTION_BASE_URL", "\"https://community.foursoftware.net/unipanel/api/\"")
         }
     }
     compileOptions {

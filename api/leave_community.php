@@ -4,6 +4,23 @@
  * DELETE /api/leave_community.php?community_id={id} - Topluluktan ayrıl
  */
 
+// Global error handler - tüm hataları yakala ve JSON döndür
+set_error_handler(function($severity, $message, $file, $line) {
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
+
+set_exception_handler(function($exception) {
+    http_response_code(200); // 500 yerine 200 döndür, iOS JSON parse edebilsin
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'success' => false,
+        'data' => null,
+        'message' => null,
+        'error' => 'Bir hata oluştu: ' . $exception->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+});
+
 require_once __DIR__ . '/security_helper.php';
 require_once __DIR__ . '/../lib/autoload.php';
 require_once __DIR__ . '/auth_middleware.php';

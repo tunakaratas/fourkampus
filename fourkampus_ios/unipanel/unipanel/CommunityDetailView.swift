@@ -158,23 +158,25 @@ struct CommunityDetailView: View {
                 VStack {
                     HStack(spacing: 12) {
                         Image(systemName: "checkmark.circle.fill")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 22, weight: .semibold))
                             .foregroundColor(.white)
                         Text("Topluluktan başarıyla ayrıldınız")
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.white)
                         Spacer()
+                        Button(action: {
+                            withAnimation { showLeaveSuccess = false }
+                        }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white.opacity(0.8))
+                        }
                     }
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [Color(hex: "10b981"), Color(hex: "059669")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(16)
-                    .shadow(color: Color(hex: "10b981").opacity(0.4), radius: 12, x: 0, y: 6)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color(hex: "10b981"))
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     Spacer()
@@ -188,24 +190,26 @@ struct CommunityDetailView: View {
                 VStack {
                     HStack(spacing: 12) {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 20, weight: .semibold))
+                            .font(.system(size: 22, weight: .semibold))
                             .foregroundColor(.white)
                         Text(errorMessage)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.white)
                             .lineLimit(2)
                         Spacer()
+                        Button(action: {
+                            withAnimation { leaveErrorMessage = nil }
+                        }) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white.opacity(0.8))
+                        }
                     }
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [Color(hex: "ef4444"), Color(hex: "dc2626")],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(16)
-                    .shadow(color: Color(hex: "ef4444").opacity(0.4), radius: 12, x: 0, y: 6)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(Color(hex: "ef4444"))
+                    .cornerRadius(12)
+                    .shadow(color: Color.black.opacity(0.15), radius: 8, x: 0, y: 4)
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     Spacer()
@@ -539,10 +543,17 @@ struct CommunityDetailView: View {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             
-            // Üyelik durumunu yenile
+            // ANINDA UI güncelle - üyelik durumunu "none" olarak ayarla
             await MainActor.run {
-                loadMembershipStatus()
+                membershipStatus = MembershipStatus(
+                    status: "none",
+                    isMember: false,
+                    isPending: false,
+                    requestId: nil,
+                    createdAt: nil
+                )
                 showLeaveSuccess = true
+                isLeavingCommunity = false
                 
                 // 3 saniye sonra success mesajını kapat
                 Task {
@@ -553,19 +564,51 @@ struct CommunityDetailView: View {
                 }
             }
             
-            // Üye listesini yenile
-            await viewModel.refreshMembers()
+            // Arka planda üye listesini yenile
+            Task {
+                await viewModel.refreshMembers()
+            }
             
             #if DEBUG
-            print("✅ Topluluktan başarıyla ayrıldı")
+            print("✅ Topluluktan başarıyla ayrıldı - UI anında güncellendi")
             #endif
+            return
         } catch {
-            // Haptic feedback (error)
+            // Önce membership status'u kontrol et - belki işlem gerçekten başarılı olmuştur
+            do {
+                let status = try await APIService.shared.getMembershipStatus(communityId: community.id)
+                if !status.isMember && status.status != "member" {
+                    // İşlem başarılı olmuş ama API hatası almışız - success göster
+                    await MainActor.run {
+                        membershipStatus = status
+                        showLeaveSuccess = true
+                        isLeavingCommunity = false
+                        Task {
+                            try? await Task.sleep(nanoseconds: 3_000_000_000)
+                            await MainActor.run {
+                                showLeaveSuccess = false
+                            }
+                        }
+                    }
+                    #if DEBUG
+                    print("✅ Topluluktan ayrılma başarılı (status kontrolü ile doğrulandı)")
+                    #endif
+                    return
+                }
+            } catch {
+                // Status kontrolü de başarısız oldu
+                #if DEBUG
+                print("⚠️ Status kontrolü başarısız: \(error.localizedDescription)")
+                #endif
+            }
+            
+            // Gerçekten hata var - göster
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.error)
             
             await MainActor.run {
                 leaveErrorMessage = error.localizedDescription
+                isLeavingCommunity = false
                 
                 // 5 saniye sonra hata mesajını kapat
                 Task {
@@ -580,8 +623,6 @@ struct CommunityDetailView: View {
             print("❌ Topluluktan ayrılma hatası: \(error.localizedDescription)")
             #endif
         }
-        
-        isLeavingCommunity = false
     }
     
     // Üniversite kontrolü yap ve gerekirse uyarı göster
@@ -2235,27 +2276,18 @@ struct ProductCard: View {
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
                         case .failure(_):
-                            // Hata durumunda placeholder göster
                             ZStack {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [Color(hex: "6366f1").opacity(0.2), Color(hex: "8b5cf6").opacity(0.1)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
+                                Color(UIColor.secondarySystemBackground)
                                 Image(systemName: "bag.fill")
                                     .font(.system(size: 24))
-                                    .foregroundColor(Color(hex: "6366f1"))
+                                    .foregroundColor(Color(hex: "6366f1").opacity(0.3))
                             }
                         case .empty:
-                            // Yükleniyor
                             ZStack {
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(UIColor.secondarySystemBackground))
-                                ProgressView()
-                                    .tint(Color(hex: "6366f1"))
+                                Color(UIColor.secondarySystemBackground)
+                                Image(systemName: "photo")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(Color(hex: "6366f1").opacity(0.2))
                             }
                         @unknown default:
                             EmptyView()
@@ -2265,19 +2297,13 @@ struct ProductCard: View {
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 } else {
                     ZStack {
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "6366f1").opacity(0.2), Color(hex: "8b5cf6").opacity(0.1)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
+                        Color(UIColor.secondarySystemBackground)
                         Image(systemName: "bag.fill")
                             .font(.system(size: 24))
-                            .foregroundColor(Color(hex: "6366f1"))
+                            .foregroundColor(Color(hex: "6366f1").opacity(0.3))
                     }
                     .frame(width: 100, height: 100)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
                 
                 // Content
@@ -2416,33 +2442,21 @@ struct ProductDetailView: View {
                                 case .success(let image):
                                     image
                                         .resizable()
-                                        .aspectRatio(contentMode: .fit)
-                                        .frame(maxWidth: .infinity)
-                                        .frame(maxHeight: 400)
+                                        .aspectRatio(contentMode: .fill)
                                 case .failure(_):
-                                    // Hata durumunda placeholder göster
                                     ZStack {
-                                        Rectangle()
-                                            .fill(
-                                                LinearGradient(
-                                                    colors: [Color(hex: "6366f1").opacity(0.2), Color(hex: "8b5cf6").opacity(0.1)],
-                                                    startPoint: .topLeading,
-                                                    endPoint: .bottomTrailing
-                                                )
-                                            )
+                                        Color(UIColor.secondarySystemBackground)
                                         Image(systemName: "bag.fill")
                                             .font(.system(size: 48))
-                                            .foregroundColor(Color(hex: "6366f1"))
+                                            .foregroundColor(Color(hex: "6366f1").opacity(0.2))
                                     }
-                                    .frame(height: 300)
                                 case .empty:
-                                    // Yükleniyor
                                     ZStack {
-                                        Rectangle()
-                                            .fill(Color(UIColor.secondarySystemBackground))
-                                        ProgressView()
+                                        Color(UIColor.secondarySystemBackground)
+                                        Image(systemName: "photo")
+                                            .font(.system(size: 48))
+                                            .foregroundColor(Color(hex: "6366f1").opacity(0.1))
                                     }
-                                    .frame(height: 300)
                                 @unknown default:
                                     EmptyView()
                                 }
@@ -2450,11 +2464,9 @@ struct ProductDetailView: View {
                         }
                     }
                     .tabViewStyle(.page)
-                    .frame(height: 400)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .frame(height: 350)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                 } else if let imagePath = product.imageURL ?? product.imagePath {
-                    // Tek görsel (geriye dönük uyumluluk)
-                    // Eğer zaten tam URL ise direkt kullan, değilse fullImageURL ile formatla
                     let finalImageURL = (imagePath.hasPrefix("http://") || imagePath.hasPrefix("https://")) 
                         ? imagePath 
                         : (APIService.fullImageURL(from: imagePath) ?? imagePath)
@@ -2464,40 +2476,28 @@ struct ProductDetailView: View {
                         case .success(let image):
                             image
                                 .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(maxWidth: .infinity)
-                                .frame(maxHeight: 400)
+                                .aspectRatio(contentMode: .fill)
                         case .failure(_):
-                            // Hata durumunda placeholder göster
                             ZStack {
-                                Rectangle()
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [Color(hex: "6366f1").opacity(0.2), Color(hex: "8b5cf6").opacity(0.1)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                    )
+                                Color(UIColor.secondarySystemBackground)
                                 Image(systemName: "bag.fill")
                                     .font(.system(size: 48))
-                                    .foregroundColor(Color(hex: "6366f1"))
+                                    .foregroundColor(Color(hex: "6366f1").opacity(0.2))
                             }
-                            .frame(height: 300)
                         case .empty:
-                            // Yükleniyor
                             ZStack {
-                                Rectangle()
-                                    .fill(Color(UIColor.secondarySystemBackground))
-                                ProgressView()
-                                    .tint(Color(hex: "6366f1"))
+                                Color(UIColor.secondarySystemBackground)
+                                Image(systemName: "photo")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(Color(hex: "6366f1").opacity(0.1))
                             }
                         @unknown default:
                             EmptyView()
                         }
                     }
+                    .frame(height: 350)
                     .frame(maxWidth: .infinity)
-                    .frame(maxHeight: 400)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
                     .onAppear {
                         #if DEBUG
                         print("🖼️ Product Detail Image - imagePath: \(imagePath), final URL: \(finalImageURL)")
@@ -2757,7 +2757,6 @@ struct ProductDetailView: View {
                             let generator = UINotificationFeedbackGenerator()
                             generator.notificationOccurred(.success)
                             showSuccessMessage = true
-                            // Sepete eklendiğinde callback'i çağır
                             onAddToCart?()
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 showSuccessMessage = false
@@ -2766,19 +2765,13 @@ struct ProductDetailView: View {
                             HStack {
                                 Image(systemName: cartViewModel.isInCart(product.id) ? "checkmark.cart.fill" : "cart.badge.plus")
                                 Text(cartViewModel.isInCart(product.id) ? "Sepette" : "Sepete Ekle")
-                                    .font(.system(size: 16, weight: .semibold))
+                                    .font(.system(size: 16, weight: .bold))
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color(hex: "10b981"), Color(hex: "059669")],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(14)
+                            .padding(.vertical, 16)
+                            .background(Color(hex: "10b981"))
+                            .cornerRadius(12)
                         }
                         
                         // Satın Al
@@ -2786,26 +2779,19 @@ struct ProductDetailView: View {
                             cartViewModel.addItem(product, quantity: quantity)
                             let generator = UINotificationFeedbackGenerator()
                             generator.notificationOccurred(.success)
-                            // Sepete eklendiğinde callback'i çağır
                             onAddToCart?()
-                            // TODO: Ödeme sayfasına yönlendir
+                            // Go to cart or checkout
                         }) {
                             HStack {
                                 Image(systemName: "creditcard.fill")
                                 Text("Satın Al")
-                                    .font(.system(size: 16, weight: .semibold))
+                                    .font(.system(size: 16, weight: .bold))
                             }
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 14)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color(hex: "6366f1"), Color(hex: "8b5cf6")],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(14)
+                            .padding(.vertical, 16)
+                            .background(Color(hex: "6366f1"))
+                            .cornerRadius(12)
                         }
                     }
                     .padding(.horizontal, 20)

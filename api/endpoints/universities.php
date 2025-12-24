@@ -4,8 +4,9 @@
  * GET /api/universities.php - Tüm üniversiteleri listele
  */
 
-require_once __DIR__ . '/security_helper.php';
-require_once __DIR__ . '/../lib/autoload.php';
+require_once __DIR__ . '/../security_helper.php';
+require_once __DIR__ . '/../../lib/autoload.php';
+require_once __DIR__ . '/../university_helper.php';
 
 header('Content-Type: application/json; charset=utf-8');
 setSecureCORS();
@@ -29,106 +30,74 @@ function sendResponse($success, $data = null, $message = null, $error = null) {
 }
 
 try {
-    $communities_dir = __DIR__ . '/../communities';
+    $communities_dir = __DIR__ . '/../../communities';
     $universities = [];
     $universityMap = [];
     
-    if (!is_dir($communities_dir)) {
-        sendResponse(true, []);
+    // Master listeyi al
+    $masterList = getUniversityList();
+    foreach ($masterList as $uniName) {
+        $slug = getUniversitySlug($uniName);
+        $universityMap[$slug] = [
+            'id' => $slug,
+            'name' => $uniName,
+            'community_count' => 0
+        ];
     }
     
-    $dirs = scandir($communities_dir);
-    $excluded_dirs = ['.', '..', 'assets', 'public', 'templates', 'system', 'docs'];
-    
-    // Tüm toplulukları tarayarak üniversiteleri bul
-    foreach ($dirs as $dir) {
-        if (in_array($dir, $excluded_dirs) || !is_dir($communities_dir . '/' . $dir)) {
-            continue;
-        }
+    if (is_dir($communities_dir)) {
+        $dirs = scandir($communities_dir);
+        $excluded_dirs = ['.', '..', 'assets', 'public', 'templates', 'system', 'docs'];
         
-        $db_path = $communities_dir . '/' . $dir . '/unipanel.sqlite';
-        if (!file_exists($db_path)) {
-            continue;
-        }
-        
-        try {
-            $db = new SQLite3($db_path);
-            $db->exec('PRAGMA journal_mode = WAL');
-            
-            // Settings tablosunu oluştur (eğer yoksa)
-            $db->exec("CREATE TABLE IF NOT EXISTS settings (
-                id INTEGER PRIMARY KEY,
-                club_id INTEGER,
-                setting_key TEXT NOT NULL,
-                setting_value TEXT NOT NULL
-            )");
-            
-            $settings_query = $db->query("SELECT setting_key, setting_value FROM settings WHERE club_id = 1");
-            $settings = [];
-            if ($settings_query !== false) {
-                while ($row = $settings_query->fetchArray(SQLITE3_ASSOC)) {
-                    $settings[$row['setting_key']] = $row['setting_value'];
-                }
+        // Tüm toplulukları tarayarak üniversiteleri bul ve sayıları topla
+        foreach ($dirs as $dir) {
+            if (in_array($dir, $excluded_dirs) || !is_dir($communities_dir . '/' . $dir)) {
+                continue;
             }
             
-            // Üniversite bilgisini al (university veya organization field'ından)
-            $university = $settings['university'] ?? $settings['organization'] ?? null;
+            $db_path = $communities_dir . '/' . $dir . '/unipanel.sqlite';
+            if (!file_exists($db_path)) {
+                continue;
+            }
             
-            if ($university && !empty($university)) {
-                // Üniversite adını normalize et
-                $university = trim($university);
+            try {
+                $db = new SQLite3($db_path);
+                $db->exec('PRAGMA journal_mode = WAL');
                 
-                if (!isset($universityMap[$university])) {
-                    $universityMap[$university] = [
-                        'id' => strtolower(str_replace([' ', '-', '_'], '', $university)),
-                        'name' => $university,
-                        'community_count' => 0
-                    ];
+                $settings_query = @$db->query("SELECT setting_value FROM settings WHERE setting_key = 'university' AND club_id = 1");
+                if ($settings_query) {
+                    $row = $settings_query->fetchArray(SQLITE3_ASSOC);
+                    $university = $row['setting_value'] ?? null;
+                    
+                    if ($university) {
+                        $slug = getUniversitySlug($university);
+                        if (isset($universityMap[$slug])) {
+                            $universityMap[$slug]['community_count']++;
+                        } else {
+                            // Master listede yoksa bile ekle
+                            $universityMap[$slug] = [
+                                'id' => $slug,
+                                'name' => $university,
+                                'community_count' => 1
+                            ];
+                        }
+                    }
                 }
-                $universityMap[$university]['community_count']++;
+                
+                $db->close();
+            } catch (Exception $e) {
+                // Hata durumunda devam et
             }
-            
-            $db->close();
-        } catch (Exception $e) {
-            // Hata durumunda devam et
         }
     }
     
-    // Map'i array'e çevir ve sırala
+    // Map'i array'e çevir
     $universities = array_values($universityMap);
     
-    // İsme göre sırala
+    // İsme göre sırala (Tümü hariç)
     usort($universities, function($a, $b) {
-        return strcmp($a['name'], $b['name']);
-    });
-    
-    // Test için örnek üniversiteler ekle (eğer yoksa)
-    $testUniversities = [
-        'İstanbul Üniversitesi',
-        'Ankara Üniversitesi',
-        'Boğaziçi Üniversitesi',
-        'Orta Doğu Teknik Üniversitesi',
-        'Hacettepe Üniversitesi',
-        'İstanbul Teknik Üniversitesi',
-        'Galatasaray Üniversitesi',
-        'Koç Üniversitesi',
-        'Sabancı Üniversitesi',
-        'Bilkent Üniversitesi'
-    ];
-    
-    foreach ($testUniversities as $testUni) {
-        $testUniId = strtolower(str_replace([' ', '-', '_'], '', $testUni));
-        if (!isset($universityMap[$testUni])) {
-            $universities[] = [
-                'id' => $testUniId,
-                'name' => $testUni,
-                'community_count' => 0
-            ];
-        }
-    }
-    
-    // Tekrar sırala
-    usort($universities, function($a, $b) {
+        if ($a['name'] === 'Diğer') return 1;
+        if ($b['name'] === 'Diğer') return -1;
         return strcmp($a['name'], $b['name']);
     });
     
@@ -145,4 +114,5 @@ try {
     $response = sendSecureErrorResponse('İşlem sırasında bir hata oluştu', $e);
     sendResponse($response['success'], $response['data'], $response['message'], $response['error']);
 }
+
 

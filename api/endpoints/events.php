@@ -10,6 +10,7 @@ require_once __DIR__ . '/../security_helper.php';
 require_once __DIR__ . '/../../lib/autoload.php';
 require_once __DIR__ . '/../auth_middleware.php';
 require_once __DIR__ . '/../connection_pool.php';
+require_once __DIR__ . '/../university_helper.php';
 
 header('Content-Type: application/json; charset=utf-8');
 setSecureCORS();
@@ -51,15 +52,7 @@ $publicCache = Cache::getInstance(__DIR__ . '/../../system/cache');
  * University filter helpers (shared behavior with api/communities.php and api/universities.php)
  */
 function normalize_university_id($value) {
-    $value = trim((string)$value);
-    if ($value === '') {
-        return '';
-    }
-    // Türkçe karakter desteği için mb_strtolower kullan
-    $normalized = mb_strtolower($value, 'UTF-8');
-    // Boşluk, tire ve alt çizgi karakterlerini kaldır
-    $normalized = str_replace([' ', '-', '_'], '', $normalized);
-    return $normalized;
+    return normalizeUniversityName($value);
 }
 
 function get_requested_university_id() {
@@ -245,6 +238,8 @@ try {
     $communities_dir = __DIR__ . '/../../communities';
     $all_events = [];
     $requested_university_id = get_requested_university_id();
+    $search_query = $_GET['q'] ?? $_GET['search'] ?? $_GET['s'] ?? '';
+    $search_query = mb_strtolower(trim($search_query), 'UTF-8');
     
     // Debug log (her zaman - sorun tespiti için)
     // if (defined('DEBUG') && DEBUG && $requested_university_id !== '') {
@@ -881,6 +876,26 @@ try {
                     if (!$row) {
                         break; // No more rows
                     }
+                    
+                    // Arama filtresi (Backend)
+                    if ($search_query !== '') {
+                        $search_target = mb_strtolower(
+                            ($row['title'] ?? '') . ' ' . 
+                            ($row['description'] ?? '') . ' ' . 
+                            ($row['location'] ?? '') . ' ' . 
+                            $community_name . ' ' . 
+                            ($settings['university'] ?? ''), 
+                            'UTF-8'
+                        );
+                        if (mb_strpos($search_target, $search_query) === false) {
+                            continue;
+                        }
+                    }
+                    
+                    // Visibility check (relaxed)
+                    // if (isset($row['visibility']) && $row['visibility'] === 'private') {
+                    //     continue;
+                    // }
                     // Anket kontrolü
                     $has_survey = false;
                     try {
@@ -1051,20 +1066,38 @@ try {
     
     usort($all_events, function($a, $b) use ($sort) {
         if ($sort === 'created_at') {
-            // Created At'e göre sırala (En yeni en üstte)
-            $dateA = $a['created_at'] ?? '';
-            $dateB = $b['created_at'] ?? '';
-            return strcmp($dateB, $dateA); // Descending
-        } else {
-            // Tarihe göre sırala (Varsayılan)
-            $dateA = ($a['date'] ?? '') . ' ' . ($a['time'] ?? '');
-            $dateB = ($b['date'] ?? '') . ' ' . ($b['time'] ?? '');
-            return strcmp($dateB, $dateA); // Descending order
+            $dateA = (string)($a['created_at'] ?? $a['date'] ?? '');
+            $dateB = (string)($b['created_at'] ?? $b['date'] ?? '');
+            if ($dateA !== $dateB) {
+                return strcmp($dateB, $dateA);
+            }
         }
+        
+        // Default / Fallback: Tarih + Saat + ID (Sayısal)
+        $dateA = ($a['date'] ?? '') . ' ' . ($a['time'] ?? '');
+        $dateB = ($b['date'] ?? '') . ' ' . ($b['time'] ?? '');
+        
+        if ($dateA !== $dateB) {
+            return strcmp($dateB, $dateA); // En yeni tarih en üstte
+        }
+        
+        // Aynı tarihliyse ID'si büyük olan (genelde daha yeni eklenen) en üstte
+        $idA = (int)($a['id'] ?? 0);
+        $idB = (int)($b['id'] ?? 0);
+        return $idB - $idA;
     });
     
     // Toplam sayı
     $total_count = count($all_events);
+    
+    // Debug: İlk 3 etkinliği logla (Sıralama kontrolü için)
+    if ($total_count > 0) {
+        $first_titles = [];
+        for($i=0; $i < min(3, $total_count); $i++) {
+            $first_titles[] = ($all_events[$i]['title'] ?? 'N/A') . " (" . ($all_events[$i]['created_at'] ?? $all_events[$i]['date'] ?? 'No Date') . ")";
+        }
+        error_log("Events API: Top results: " . implode(", ", $first_titles));
+    }
     
     // Pagination uygula (sadece tüm topluluklar için)
     if (!isset($_GET['community_id']) && !isset($_GET['id'])) {

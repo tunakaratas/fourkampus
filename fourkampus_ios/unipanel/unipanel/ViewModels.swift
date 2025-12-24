@@ -834,8 +834,18 @@ class EventsViewModel: ObservableObject {
     // YENİ SİSTEM: Üniversite filtresi - Client-side filtreleme
     var selectedUniversity: University? = nil {
         didSet {
-            // Üniversite değiştiğinde filtreleri uygula
-            applyFilters()
+            // Üniversite değiştiğinde sadece filtreleme yetmez, server'dan da çekmeliyiz
+            // Çünkü artık üniversite filtrelemesi server-side yapılıyor.
+            if oldValue?.id != selectedUniversity?.id {
+                #if DEBUG
+                print("🔄 EventsViewModel: University changed to \(selectedUniversity?.name ?? "All"), triggering reload...")
+                #endif
+                Task {
+                    await loadEvents(forceReload: true)
+                }
+            } else {
+                applyFilters()
+            }
         }
     }
     
@@ -852,11 +862,14 @@ class EventsViewModel: ObservableObject {
     }
     
     init() {
-        // Search text changes debounce
+        // Search text changes debounce - Enable server-side search
         $searchText
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .dropFirst() // Skip initial value
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [weak self] _ in
-                self?.applyFilters()
+                Task {
+                    await self?.loadEvents(forceReload: true)
+                }
             }
             .store(in: &cancellables)
     }
@@ -871,16 +884,9 @@ class EventsViewModel: ObservableObject {
         print("   Selected University: \(selectedUniversity?.name ?? "None/All")")
         #endif
 
-        // 1. University Filter (Client-side)
-        if let selectedUni = selectedUniversity, selectedUni.id != "all" {
-            let selectedNormalized = normalizeUniversityName(selectedUni.name)
-            result = result.filter { event in
-                guard let eventUniName = event.university, !eventUniName.isEmpty else {
-                    return false
-                }
-                return normalizeUniversityName(eventUniName) == selectedNormalized
-            }
-        }
+        // 1. University Filter is now handled server-side. 
+        // We trust the server to return events for the selected university.
+        // No client-side filtering needed here to avoid normalization mismatches.
         
         // 2. My Communities Filter
         if showOnlyMyCommunities {
@@ -944,12 +950,16 @@ class EventsViewModel: ObservableObject {
             }
         }
         
-        // 9. Search Filter
+        // 9. Search Filter (Local fallback/secondary)
         if !searchText.isEmpty {
+            let searchLower = searchText.lowercased()
             result = result.filter { event in
-                event.title.localizedCaseInsensitiveContains(searchText) ||
-                event.description.localizedCaseInsensitiveContains(searchText) ||
-                (event.location?.localizedCaseInsensitiveContains(searchText) ?? false)
+                event.title.lowercased().contains(searchLower) ||
+                event.description.lowercased().contains(searchLower) ||
+                event.communityName.lowercased().contains(searchLower) ||
+                (event.location?.lowercased().contains(searchLower) ?? false) ||
+                (event.university?.lowercased().contains(searchLower) ?? false) ||
+                event.id.contains(searchLower)
             }
         }
         
@@ -968,15 +978,30 @@ class EventsViewModel: ObservableObject {
         case .date:
             result.sort { $0.date > $1.date }
         case .name:
-            result.sort { $0.title < $1.title }
+            result.sort {
+                if $0.title != $1.title {
+                    return $0.title < $1.title
+                }
+                return (Int($0.id) ?? 0) > (Int($1.id) ?? 0)
+            }
         case .category:
-            result.sort { $0.category.rawValue < $1.category.rawValue }
+            result.sort {
+                if $0.category.rawValue != $1.category.rawValue {
+                    return $0.category.rawValue < $1.category.rawValue
+                }
+                return (Int($0.id) ?? 0) > (Int($1.id) ?? 0)
+            }
         case .newest:
             result.sort {
-                if let date1 = $0.createdAt, let date2 = $1.createdAt {
-                    return date1 > date2
+                let d1 = $0.createdAt ?? $0.date
+                let d2 = $1.createdAt ?? $1.date
+                if d1 != d2 {
+                    return d1 > d2
                 }
-                return $0.id > $1.id
+                // Fallback to numeric ID comparison if dates are identical
+                let id1 = Int($0.id) ?? 0
+                let id2 = Int($1.id) ?? 0
+                return id1 > id2
             }
         }
         
@@ -996,7 +1021,9 @@ class EventsViewModel: ObservableObject {
              return
         }
         
-        state = .loading
+        if allEvents.isEmpty {
+            state = .loading
+        }
         
         do {
             // Pagination sıfırla
@@ -1005,10 +1032,14 @@ class EventsViewModel: ObservableObject {
             // Sort parametresini belirle (Backend sorting için)
             let sortParam = "created_at"
             
+            // Hedef üniversite ID'sini belirle
+            let targetUniversityId = universityId ?? selectedUniversity?.id
+            
             // API isteği
             let loadedEvents = try await APIService.shared.getEvents(
                 communityId: nil,
-                universityId: nil,
+                universityId: targetUniversityId,
+                search: searchText.isEmpty ? nil : searchText,
                 limit: 200, // İlk yüklemede 200 adet çek (hızlı)
                 offset: 0,
                 sort: sortParam
@@ -1066,7 +1097,8 @@ class EventsViewModel: ObservableObject {
             // API'den yeni batch çek
             let newEvents = try await APIService.shared.getEvents(
                 communityId: nil,
-                universityId: nil,
+                universityId: selectedUniversity?.id,
+                search: searchText.isEmpty ? nil : searchText,
                 limit: loadMoreBatchSize,
                 offset: offset,
                 sort: sortParam
@@ -1158,13 +1190,16 @@ class EventsViewModel: ObservableObject {
     }
     
     func refreshEvents(universityId: String? = nil) async {
-        // YENİ SİSTEM: Üniversite filtresi kaldırıldı - universityId parametresi artık kullanılmıyor
+        // Hedef üniversite ID'sini belirle
+        let targetId = universityId ?? selectedUniversity?.id
         
         // Refresh işlemi - force load
         errorMessage = nil
         
         // Force refresh
-        await loadEvents(universityId: nil, forceReload: true)
+        // Force refresh - don't clear allEvents here to avoid UI flicker
+        // loadEvents will replace allEvents when done
+        await loadEvents(universityId: targetId, forceReload: true)
     }
     
     func refreshIfStale(maxAge: TimeInterval = 30) async {
@@ -1172,7 +1207,7 @@ class EventsViewModel: ObservableObject {
         if let lastRefreshAt, now.timeIntervalSince(lastRefreshAt) < maxAge {
             return
         }
-        await refreshEvents(universityId: nil)
+        await refreshEvents(universityId: selectedUniversity?.id)
     }
     
     /// Background refresh - uygulama arka planda olduğunda çağrılır
@@ -1187,10 +1222,13 @@ class EventsViewModel: ObservableObject {
             // Sort parametresini belirle
             let sortParam = "created_at"
             
-            // Üniversite filtresi kaldırıldı - her zaman nil gönder
+            // Seçili üniversiteye göre çek
+            let targetId = selectedUniversity?.id
+            
             let loadedEvents = try await APIService.shared.getEvents(
                 communityId: nil,
-                universityId: nil,
+                universityId: targetId,
+                search: searchText.isEmpty ? nil : searchText,
                 limit: 200,
                 offset: 0,
                 sort: sortParam
@@ -2555,13 +2593,33 @@ class MarketViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var hasInitiallyLoaded = false
     @Published var searchText = ""
-    @Published var selectedCategory: String? = nil
+    @Published var selectedCategory: String? = nil {
+        didSet {
+            // Kategori değiştiğinde API'den yeniden yükle
+            Task {
+                await loadProducts(isRefresh: true)
+            }
+        }
+    }
     @Published var sortOption: SortOption = .newest
     @Published var minPrice: Double? = nil
     @Published var maxPrice: Double? = nil
     @Published var showOnlyInStock: Bool = false
     @Published var selectedCommunityId: String? = nil // Topluluk filtresi
-    @Published var selectedUniversity: String? = nil // Üniversite filtresi (market için eklendi)
+    @Published var selectedUniversity: String? = nil { // Üniversite filtresi (market için eklendi)
+        didSet {
+            // Üniversite değiştiğinde API'den yeniden yükle
+            Task {
+                await loadProducts(isRefresh: true)
+            }
+            #if DEBUG
+            print("🎯 MarketViewModel: selectedUniversity değişti: \(selectedUniversity ?? "nil")")
+            #endif
+        }
+    }
+    
+    @Published var productCategories: [ProductCategory] = []
+    @Published var isLoadingCategories = false
     
     enum SortOption: String, CaseIterable {
         case priceLowToHigh = "price_low"
@@ -2582,7 +2640,7 @@ class MarketViewModel: ObservableObject {
     }
     
     var hasActiveFilters: Bool {
-        selectedCategory != nil || minPrice != nil || maxPrice != nil || showOnlyInStock || selectedCommunityId != nil
+        selectedCategory != nil || minPrice != nil || maxPrice != nil || showOnlyInStock || selectedCommunityId != nil || (selectedUniversity != nil && !selectedUniversity!.isEmpty)
     }
     
     // Lazy loading için
@@ -2601,33 +2659,13 @@ class MarketViewModel: ObservableObject {
     private var filteredAllProducts: [Product] {
         var filtered = allProducts
         
-        // Topluluk filtresi
-        if let selectedCommunityId = selectedCommunityId {
-            filtered = filtered.filter { $0.communityId == selectedCommunityId }
-        }
+        // NOT: Üniversite ve Topluluk filtreleri artık SERVER tarafında yapılıyor.
+        // Burada tekrar filtrelemek, availableCommunities listesi eksikse ürünlerin gizlenmesine neden olur.
+        // Sadece kategori (opsiyonel hızlı geçiş için) ve arama filtresini tutuyoruz.
         
-        // Üniversite filtresi
-        if let selectedUniversity = selectedUniversity, !selectedUniversity.isEmpty, selectedUniversity != "all" {
-            filtered = filtered.filter { product in
-                // Ürünün topluluğunu bul
-                if let community = availableCommunities.first(where: { $0.id == product.communityId }) {
-                    // Topluluğun üniversitesi seçili üniversiteyle eşleşmeli
-                    // Veya topluluğun üniversitesi yoksa (global) göster
-                    let communityUni = community.university
-                    if let communityUni = communityUni, !communityUni.isEmpty {
-                         // Üniversite id normalizasyonu yapılması gerekebilir ama basit string karşılaştırması deniyoruz
-                         // Çünkü community modelindeki university alanı isim olabilir.
-                         // Normalize etmeye çalışalım veya direct match.
-                         // APIService.normalize... yok.
-                         // Burada community.university genellikle isim (örn: "İstanbul Üniversitesi").
-                         // selectedUniversity de isim mi ID mi?
-                         // CommunitiesViewModel'de string olarak tutuluyor.
-                         return communityUni == selectedUniversity
-                    }
-                    return true // Global ürünler (üniversitesi olmayan) görünsün
-                }
-                return true // Topluluk bulunamadıysa (güvenli) göster
-            }
+        // Kategori filtresi (Hızlı geçiş için yerel filtreleme)
+        if let selectedCategory = selectedCategory {
+            filtered = filtered.filter { $0.category == selectedCategory }
         }
         
         // Search filter - geliştirilmiş arama
@@ -2693,7 +2731,10 @@ class MarketViewModel: ObservableObject {
     }
     
     var categories: [String] {
-        Array(Set(allProducts.map { $0.category })).sorted()
+        if !productCategories.isEmpty {
+            return productCategories.map { $0.name }.sorted()
+        }
+        return Array(Set(allProducts.map { $0.category })).sorted()
     }
     
     var availableUniversities: [String] {
@@ -2711,49 +2752,70 @@ class MarketViewModel: ObservableObject {
             allProducts = []
             displayedCount = 0
         }
-        // YENİ SİSTEM: Üniversite filtresi kaldırıldı - universityId parametresi artık kullanılmıyor
+        
+        // Kategorileri de yükle
+        Task {
+            await loadCategories()
+        }
         
         do {
-            // Pagination ile ilk batch'i çek (20 item - hızlı yükleme için optimize edildi)
-            // Üniversite filtresi kaldırıldı - her zaman nil gönder
-            let loadedProducts = try await APIService.shared.getAllProducts(
-                universityId: nil,
+            // v2 API kullan
+            let filters = ProductFilters(
+                category: selectedCategory,
+                community: selectedCommunityId,
+                university: selectedUniversity,
+                minPrice: minPrice,
+                maxPrice: maxPrice,
+                inStock: showOnlyInStock ? 1 : nil,
+                sort: sortOption.rawValue,
                 limit: 20,
                 offset: 0
             )
-            // Tüm yüklenen ürünleri sakla (lazy loading için)
-            allProducts = loadedProducts
-            displayedCount = min(loadMoreBatchSize, loadedProducts.count)
-            currentOffset = loadedProducts.count
-            // API'de daha fazla ürün var mı kontrol et (20'den az gelirse yok demektir)
-            hasMoreFromAPI = loadedProducts.count >= 20
-            // Filtrelenmiş ürünlerden ilk batch'i göster
+            
+            let response = try await APIService.shared.getProductsV2(filters: filters)
+            
+            allProducts = response.products
+            displayedCount = min(loadMoreBatchSize, response.products.count)
+            currentOffset = response.products.count
+            hasMoreFromAPI = response.pagination.hasMore
+            
             updateDisplayedProducts()
             hasInitiallyLoaded = true
             isLoading = false
         } catch {
-            // Cancelled hatalarını ve timeout hatalarını ignore et
             let isCancelled = (error as? URLError)?.code == .cancelled || error is CancellationError
             let isTimeout = String(describing: type(of: error)).contains("TimeoutError")
             
             if isCancelled || isTimeout {
-                // Cancelled/timeout hatası - cache'den veri yüklemeyi dene
                 if !products.isEmpty {
-                    // Zaten veri varsa, sadece isLoading'i false yap
                     isLoading = false
                     return
                 }
-                // Veri yoksa, boş array kullan (yeniden deneme yapılacak)
                 allProducts = []
                 displayedCount = 0
                 products = []
                 isLoading = false
-                hasInitiallyLoaded = true // Boş durum göster
+                hasInitiallyLoaded = true
                 return
             }
-            // @MainActor ile işaretlendiği için MainActor.run gereksiz
             errorMessage = ErrorHandler.userFriendlyMessage(from: error)
             isLoading = false
+        }
+    }
+    
+    func loadCategories() async {
+        guard !isLoadingCategories else { return }
+        isLoadingCategories = true
+        
+        do {
+            let loadedCategories = try await APIService.shared.getProductCategories()
+            self.productCategories = loadedCategories
+            isLoadingCategories = false
+        } catch {
+            #if DEBUG
+            print("❌ Kategoriler yüklenemedi: \(error.localizedDescription)")
+            #endif
+            isLoadingCategories = false
         }
     }
     
@@ -2794,15 +2856,22 @@ class MarketViewModel: ObservableObject {
         isLoadingMore = true
         
         do {
-            // API'den bir sonraki batch'i çek (20 item - optimize edildi)
-            // Üniversite filtresi kaldırıldı - her zaman nil gönder
-            let loadedProducts = try await APIService.shared.getAllProducts(
-                universityId: nil,
+            // v2 API kullan
+            let filters = ProductFilters(
+                category: selectedCategory,
+                community: selectedCommunityId,
+                university: selectedUniversity,
+                minPrice: minPrice,
+                maxPrice: maxPrice,
+                inStock: showOnlyInStock ? 1 : nil,
+                sort: sortOption.rawValue,
                 limit: 20,
                 offset: currentOffset
             )
             
-            if loadedProducts.isEmpty {
+            let response = try await APIService.shared.getProductsV2(filters: filters)
+            
+            if response.products.isEmpty {
                 // Daha fazla ürün yok
                 hasMoreFromAPI = false
                 isLoadingMore = false
@@ -2810,26 +2879,24 @@ class MarketViewModel: ObservableObject {
             }
             
             // Yeni ürünleri ekle
-            allProducts.append(contentsOf: loadedProducts)
-            currentOffset += loadedProducts.count
-            // API'de daha fazla ürün var mı kontrol et (20'den az gelirse yok demektir)
-            hasMoreFromAPI = loadedProducts.count >= 20
+            allProducts.append(contentsOf: response.products)
+            currentOffset += response.products.count
+            hasMoreFromAPI = response.pagination.hasMore
             
-            // Gösterilecek sayıyı artır
-            displayedCount = min(displayedCount + loadMoreBatchSize, filteredAllProducts.count)
+            // Gösterilecek sayıyı güncelle
+            displayedCount = filteredAllProducts.count
             products = filteredProducts
             
             isLoadingMore = false
             
             #if DEBUG
-            print("📄 Lazy loading (API): \(displayedCount)/\(filteredAllProducts.count) ürün gösteriliyor (API'den \(loadedProducts.count) yeni ürün)")
+            print("📄 Lazy loading (API): \(displayedCount) ürün gösteriliyor (API'den \(response.products.count) yeni ürün)")
             #endif
         } catch {
             isLoadingMore = false
             #if DEBUG
             print("⚠️ Lazy loading hatası: \(error.localizedDescription)")
             #endif
-            // Hata durumunda sessizce ignore et
         }
     }
     
@@ -2908,5 +2975,146 @@ class CartViewModel: ObservableObject {
     
     func isInCart(_ productId: String) -> Bool {
         return items.contains { $0.product.id == productId }
+    }
+}
+
+// MARK: - Orders ViewModel
+@MainActor
+class OrdersViewModel: ObservableObject {
+    @Published var orders: [Order] = []
+    @Published var selectedOrder: Order?
+    @Published var isLoading = false
+    @Published var isLoadingMore = false
+    @Published var errorMessage: String?
+    @Published var hasInitiallyLoaded = false
+    
+    private var currentPage = 1
+    private var hasMore = true
+    private let pageSize = 20
+    
+    var isEmpty: Bool {
+        orders.isEmpty && hasInitiallyLoaded && !isLoading
+    }
+    
+    /// Load orders from API
+    func loadOrders(forceRefresh: Bool = false) async {
+        if isLoading && !forceRefresh {
+            return
+        }
+        
+        if hasInitiallyLoaded && !forceRefresh && !orders.isEmpty {
+            return
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        
+        if forceRefresh {
+            currentPage = 1
+            hasMore = true
+        }
+        
+        do {
+            let response = try await APIService.shared.getOrders(page: currentPage, limit: pageSize)
+            
+            if forceRefresh {
+                orders = response.orders
+            } else {
+                orders = response.orders
+            }
+            
+            hasMore = response.pagination.hasMore
+            hasInitiallyLoaded = true
+            isLoading = false
+            
+            #if DEBUG
+            print("✅ \(orders.count) sipariş yüklendi")
+            #endif
+        } catch {
+            #if DEBUG
+            print("❌ Siparişler yüklenemedi: \(error.localizedDescription)")
+            #endif
+            errorMessage = ErrorHandler.userFriendlyMessage(from: error)
+            isLoading = false
+            hasInitiallyLoaded = true
+        }
+    }
+    
+    /// Load more orders (pagination)
+    func loadMore() async {
+        guard !isLoadingMore && hasMore && !isLoading else {
+            return
+        }
+        
+        isLoadingMore = true
+        currentPage += 1
+        
+        do {
+            let response = try await APIService.shared.getOrders(page: currentPage, limit: pageSize)
+            
+            orders.append(contentsOf: response.orders)
+            hasMore = response.pagination.hasMore
+            isLoadingMore = false
+            
+            #if DEBUG
+            print("✅ \(response.orders.count) ek sipariş yüklendi (toplam: \(orders.count))")
+            #endif
+        } catch {
+            #if DEBUG
+            print("❌ Ek siparişler yüklenemedi: \(error.localizedDescription)")
+            #endif
+            currentPage -= 1
+            isLoadingMore = false
+        }
+    }
+    
+    /// Refresh orders
+    func refresh() async {
+        await loadOrders(forceRefresh: true)
+    }
+    
+    /// Load single order details
+    func loadOrderDetails(orderId: String) async {
+        do {
+            let order = try await APIService.shared.getOrder(id: orderId)
+            selectedOrder = order
+            
+            // Update in list if present
+            if let index = orders.firstIndex(where: { $0.id == order.id }) {
+                orders[index] = order
+            }
+            
+            #if DEBUG
+            print("✅ Sipariş detayı yüklendi: \(order.orderNumber)")
+            #endif
+        } catch {
+            #if DEBUG
+            print("❌ Sipariş detayı yüklenemedi: \(error.localizedDescription)")
+            #endif
+            errorMessage = ErrorHandler.userFriendlyMessage(from: error)
+        }
+    }
+    
+    /// Create a new order
+    func createOrder(items: [CartItem], customerName: String, customerEmail: String, customerPhone: String) async throws -> CreateOrderResponse {
+        #if DEBUG
+        print("📦 Sipariş oluşturuluyor...")
+        #endif
+        
+        let response = try await APIService.shared.createOrder(
+            items: items,
+            customerName: customerName,
+            customerEmail: customerEmail,
+            customerPhone: customerPhone
+        )
+        
+        #if DEBUG
+        print("✅ Sipariş oluşturuldu: \(response.orderNumber)")
+        #endif
+        
+        // Refresh orders list
+        await loadOrders(forceRefresh: true)
+        
+        return response
     }
 }

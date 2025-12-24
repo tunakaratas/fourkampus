@@ -1298,7 +1298,7 @@ private func loadFromCache<T: Decodable>(_ type: T.Type, for endpoint: String) -
     /// universityId verilirse (ve communityId nil ise) sadece seçili üniversitenin etkinlikleri döner.
     /// communityId verilirse sadece o topluluğun etkinlikleri döner.
     /// universityId verilirse (ve communityId nil ise) sadece seçili üniversitenin etkinlikleri döner.
-    func getEvents(communityId: String? = nil, universityId: String? = nil, limit: Int = 200, offset: Int = 0, sort: String? = nil) async throws -> [Event] {
+    func getEvents(communityId: String? = nil, universityId: String? = nil, search: String? = nil, limit: Int = 200, offset: Int = 0, sort: String? = nil) async throws -> [Event] {
         var endpoint = "events.php"
         var params: [String] = []
         
@@ -1308,6 +1308,10 @@ private func loadFromCache<T: Decodable>(_ type: T.Type, for endpoint: String) -
             #if DEBUG
             SecureLogger.d("APIService", "getEvents - universityId: '\(universityId)' -> encoded: '\(encodedId)'")
             #endif
+        }
+        
+        if let search = search, !search.isEmpty {
+            params.append("q=\(encodeQueryValue(search))")
         }
         
         if let communityId = communityId {
@@ -1808,11 +1812,12 @@ private func loadFromCache<T: Decodable>(_ type: T.Type, for endpoint: String) -
     /// Request membership to a community
     func requestMembership(communityId: String) async throws -> MembershipStatus {
         struct MembershipStatusResponse: Codable {
-            let status: String
-            let isMember: Bool
-            let isPending: Bool
+            let status: String?
+            let isMember: Bool?
+            let isPending: Bool?
             let requestId: String?
             let createdAt: String?
+            let message: String?
             
             enum CodingKeys: String, CodingKey {
                 case status
@@ -1820,13 +1825,15 @@ private func loadFromCache<T: Decodable>(_ type: T.Type, for endpoint: String) -
                 case isPending = "is_pending"
                 case requestId = "request_id"
                 case createdAt = "created_at"
+                case message
             }
             
             init(from decoder: Decoder) throws {
                 let container = try decoder.container(keyedBy: CodingKeys.self)
-                status = try container.decode(String.self, forKey: .status)
-                isMember = try container.decode(Bool.self, forKey: .isMember)
-                isPending = try container.decode(Bool.self, forKey: .isPending)
+                status = try? container.decodeIfPresent(String.self, forKey: .status)
+                isMember = try? container.decodeIfPresent(Bool.self, forKey: .isMember)
+                isPending = try? container.decodeIfPresent(Bool.self, forKey: .isPending)
+                message = try? container.decodeIfPresent(String.self, forKey: .message)
                 
                 // requestId Int veya String olabilir
                 if let intId = try? container.decode(Int.self, forKey: .requestId) {
@@ -1839,26 +1846,37 @@ private func loadFromCache<T: Decodable>(_ type: T.Type, for endpoint: String) -
             }
         }
         
-        struct MembershipRequestAPIResponse: Codable {
-            let success: Bool
-            let data: MembershipStatusResponse?
-            let message: String?
-            let error: String?
-        }
-        
         let endpoint = "membership_status.php?community_id=\(encodeQueryValue(communityId))"
-        let data: MembershipStatusResponse = try await request(
+        
+        // Use wrapper to handle both success and error responses
+        let wrapper: APIResponseWrapper<MembershipStatusResponse> = try await request(
             endpoint: endpoint,
             method: "POST",
             body: nil
         )
         
+        guard wrapper.success else {
+            throw APIError.apiError(wrapper.error ?? wrapper.message ?? "Üyelik başvurusu gönderilemedi")
+        }
+        
+        // data mevcut ve başarılı bir yanıt ise
+        if let data = wrapper.data {
+            return MembershipStatus(
+                status: data.status ?? "pending",
+                isMember: data.isMember ?? false,
+                isPending: data.isPending ?? true,
+                requestId: data.requestId,
+                createdAt: data.createdAt
+            )
+        }
+        
+        // data null ama success true ise, pending olarak kabul et
         return MembershipStatus(
-            status: data.status,
-            isMember: data.isMember,
-            isPending: data.isPending,
-            requestId: data.requestId,
-            createdAt: data.createdAt
+            status: "pending",
+            isMember: false,
+            isPending: true,
+            requestId: nil,
+            createdAt: nil
         )
     }
     
@@ -1913,6 +1931,163 @@ private func loadFromCache<T: Decodable>(_ type: T.Type, for endpoint: String) -
     
     func getProduct(id: String, communityId: String) async throws -> Product {
         let result: Product = try await request(endpoint: "products.php?id=\(id)&community_id=\(communityId)")
+        return result
+    }
+    
+    // MARK: - Market v2 API
+    
+    /// Product filters for v2 API
+    // ProductFilters Models.swift'e taşındı
+    
+    /// Get products using v2 API with advanced filters
+    func getProductsV2(filters: ProductFilters) async throws -> ProductsV2Response {
+        #if DEBUG
+        print("🛍️ [v2] Ürünler çekiliyor...")
+        #endif
+        
+        let queryString = filters.toQueryString()
+        let endpoint = "v2/market/products.php?\(queryString)"
+        
+        let result: ProductsV2Response = try await request(endpoint: endpoint, useCache: false)
+        
+        #if DEBUG
+        print("✅ [v2] \(result.products.count) ürün çekildi (toplam: \(result.pagination.total))")
+        #endif
+        
+        return result
+    }
+    
+    /// Get single product using v2 API
+    func getProductV2(id: Int, communityId: String) async throws -> Product {
+        let endpoint = "v2/market/products.php?id=\(id)&community_id=\(communityId)"
+        let result: Product = try await request(endpoint: endpoint, useCache: false)
+        return result
+    }
+    
+    /// Get product categories
+    func getProductCategories(communityId: String? = nil, universityId: String? = nil) async throws -> [ProductCategory] {
+        #if DEBUG
+        print("📂 Kategoriler çekiliyor...")
+        #endif
+        
+        var params: [String] = []
+        if let communityId = communityId, !communityId.isEmpty {
+            params.append("community_id=\(communityId)")
+        }
+        if let universityId = universityId, !universityId.isEmpty, universityId != "all" {
+            params.append("university_id=\(universityId.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? universityId)")
+        }
+        
+        let endpoint = params.isEmpty 
+            ? "v2/market/categories.php" 
+            : "v2/market/categories.php?\(params.joined(separator: "&"))"
+        
+        struct CategoriesResponse: Codable {
+            let categories: [ProductCategory]
+            let total: Int
+        }
+        
+        let result: CategoriesResponse = try await request(endpoint: endpoint, useCache: true)
+        
+        #if DEBUG
+        print("✅ \(result.categories.count) kategori çekildi")
+        #endif
+        
+        return result.categories
+    }
+    
+    // MARK: - Orders v2 API
+    
+    /// Create a new order
+    func createOrder(items: [CartItem], customerName: String, customerEmail: String, customerPhone: String) async throws -> CreateOrderResponse {
+        #if DEBUG
+        print("📦 Sipariş oluşturuluyor...")
+        #endif
+        
+        struct OrderRequest: Codable {
+            struct OrderItem: Codable {
+                let productId: Int
+                let communityId: String
+                let quantity: Int
+                
+                enum CodingKeys: String, CodingKey {
+                    case productId = "product_id"
+                    case communityId = "community_id"
+                    case quantity
+                }
+            }
+            
+            struct Customer: Codable {
+                let name: String
+                let email: String
+                let phone: String
+            }
+            
+            let items: [OrderItem]
+            let customer: Customer
+        }
+        
+        let orderItems = items.map { item in
+            OrderRequest.OrderItem(
+                productId: Int(item.product.id) ?? 0,
+                communityId: item.product.communityId,
+                quantity: item.quantity
+            )
+        }
+        
+        let orderRequest = OrderRequest(
+            items: orderItems,
+            customer: OrderRequest.Customer(
+                name: customerName,
+                email: customerEmail,
+                phone: customerPhone
+            )
+        )
+        
+        let body = try APIService.encoder.encode(orderRequest)
+        
+        let result: CreateOrderResponse = try await request(
+            endpoint: "v2/market/orders.php",
+            method: "POST",
+            body: body
+        )
+        
+        #if DEBUG
+        print("✅ Sipariş oluşturuldu: \(result.orderNumber)")
+        #endif
+        
+        return result
+    }
+    
+    /// Get user's orders
+    func getOrders(page: Int = 1, limit: Int = 20) async throws -> OrdersV2Response {
+        #if DEBUG
+        print("📋 Siparişler çekiliyor (sayfa: \(page))...")
+        #endif
+        
+        let endpoint = "v2/market/orders.php?page=\(page)&limit=\(limit)"
+        let result: OrdersV2Response = try await request(endpoint: endpoint, useCache: false)
+        
+        #if DEBUG
+        print("✅ \(result.orders.count) sipariş çekildi")
+        #endif
+        
+        return result
+    }
+    
+    /// Get single order details
+    func getOrder(id: String) async throws -> Order {
+        #if DEBUG
+        print("📋 Sipariş detayı çekiliyor: \(id)...")
+        #endif
+        
+        let endpoint = "v2/market/orders.php?id=\(id)"
+        let result: Order = try await request(endpoint: endpoint, useCache: false)
+        
+        #if DEBUG
+        print("✅ Sipariş çekildi: \(result.orderNumber)")
+        #endif
+        
         return result
     }
     

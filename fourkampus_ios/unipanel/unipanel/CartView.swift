@@ -24,13 +24,7 @@ struct CartView: View {
                     
                     ZStack {
                         Circle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [Color(hex: "6366f1").opacity(0.1), Color(hex: "8b5cf6").opacity(0.05)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
+                            .fill(Color(hex: "6366f1").opacity(0.1))
                             .frame(width: 160, height: 160)
                         
                         Image(systemName: "cart.badge.plus")
@@ -112,13 +106,7 @@ struct CartView: View {
                                 .foregroundColor(Color(hex: "6366f1").opacity(0.6))
                         }
                         .padding(16)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: "6366f1").opacity(0.1), Color(hex: "8b5cf6").opacity(0.05)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .background(Color(hex: "6366f1").opacity(0.08))
                         .cornerRadius(16)
                         .padding(.horizontal, 20)
                     }
@@ -244,62 +232,30 @@ struct CartView: View {
                                 }
                             }) {
                                 HStack(spacing: 16) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.white.opacity(0.2))
-                                            .frame(width: 44, height: 44)
-                                        
-                                        Image(systemName: "creditcard.fill")
-                                            .font(.system(size: 20, weight: .semibold))
-                                            .foregroundColor(.white)
-                                    }
+                                    Image(systemName: "creditcard.fill")
+                                        .font(.system(size: 20, weight: .semibold))
+                                        .foregroundColor(.white)
                                     
-                                    VStack(alignment: .leading, spacing: 4) {
+                                    VStack(alignment: .leading, spacing: 2) {
                                         Text("Ödemeye Geç")
-                                            .font(.system(size: 18, weight: .bold))
-                                            .foregroundColor(.white)
-                                        
+                                            .font(.system(size: 16, weight: .bold))
                                         Text(cartViewModel.formattedTotalPrice)
-                                            .font(.system(size: 14, weight: .medium))
-                                            .foregroundColor(.white.opacity(0.9))
+                                            .font(.system(size: 13, weight: .medium))
+                                            .opacity(0.9)
                                     }
+                                    .foregroundColor(.white)
                                     
                                     Spacer()
                                     
-                                    Image(systemName: "arrow.right.circle.fill")
-                                        .font(.system(size: 24))
-                                        .foregroundColor(.white.opacity(0.9))
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 18, weight: .bold))
+                                        .foregroundColor(.white)
                                 }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 20)
-                                .padding(.horizontal, 20)
-                                .background(
-                                    ZStack {
-                                        // Gradient Background
-                                        LinearGradient(
-                                            colors: acceptedTerms ? 
-                                                [Color(hex: "6366f1"), Color(hex: "8b5cf6"), Color(hex: "a855f7")] : 
-                                                [Color.gray.opacity(0.6), Color.gray.opacity(0.4)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
-                                        
-                                        // Shine effect
-                                        if acceptedTerms {
-                                            LinearGradient(
-                                                colors: [Color.white.opacity(0.2), Color.clear],
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        }
-                                    }
-                                )
-                                .cornerRadius(20)
-                                .shadow(color: acceptedTerms ? Color(hex: "6366f1").opacity(0.4) : Color.clear, radius: 12, x: 0, y: 6)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                )
+                                .padding(.vertical, 18)
+                                .padding(.horizontal, 24)
+                                .background(acceptedTerms ? Color(hex: "6366f1") : Color.gray.opacity(0.3))
+                                .cornerRadius(16)
+                                .shadow(color: acceptedTerms ? Color(hex: "6366f1").opacity(0.3) : Color.clear, radius: 8, x: 0, y: 4)
                             }
                             .disabled(!acceptedTerms)
                             .scaleEffect(acceptedTerms ? 1.0 : 0.98)

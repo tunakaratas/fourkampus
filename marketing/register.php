@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/../api/university_helper.php'; ?>
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -573,55 +574,13 @@
                                         class="form-select w-full px-4 py-3.5 pl-12 border-2 rounded-2xl outline-none font-medium"
                                         style="border-color: var(--border-color); color: var(--text-primary);">
                                     <option value="">Üniversite seçiniz</option>
-                                    <option value="Bandırma 17 Eylül Üniversitesi">Bandırma 17 Eylül Üniversitesi</option>
-                                    <option value="İstanbul Üniversitesi">İstanbul Üniversitesi</option>
-                                    <option value="Ankara Üniversitesi">Ankara Üniversitesi</option>
-                                    <option value="Hacettepe Üniversitesi">Hacettepe Üniversitesi</option>
-                                    <option value="Boğaziçi Üniversitesi">Boğaziçi Üniversitesi</option>
-                                    <option value="Orta Doğu Teknik Üniversitesi">Orta Doğu Teknik Üniversitesi</option>
-                                    <option value="İstanbul Teknik Üniversitesi">İstanbul Teknik Üniversitesi</option>
-                                    <option value="Gazi Üniversitesi">Gazi Üniversitesi</option>
-                                    <option value="Ege Üniversitesi">Ege Üniversitesi</option>
-                                    <option value="Dokuz Eylül Üniversitesi">Dokuz Eylül Üniversitesi</option>
-                                    <option value="Marmara Üniversitesi">Marmara Üniversitesi</option>
-                                    <option value="Yıldız Teknik Üniversitesi">Yıldız Teknik Üniversitesi</option>
-                                    <option value="Anadolu Üniversitesi">Anadolu Üniversitesi</option>
-                                    <option value="Selçuk Üniversitesi">Selçuk Üniversitesi</option>
-                                    <option value="Akdeniz Üniversitesi">Akdeniz Üniversitesi</option>
-                                    <option value="Çukurova Üniversitesi">Çukurova Üniversitesi</option>
-                                    <option value="Erciyes Üniversitesi">Erciyes Üniversitesi</option>
-                                    <option value="Uludağ Üniversitesi">Uludağ Üniversitesi</option>
-                                    <option value="Atatürk Üniversitesi">Atatürk Üniversitesi</option>
-                                    <option value="Ondokuz Mayıs Üniversitesi">Ondokuz Mayıs Üniversitesi</option>
-                                    <option value="Karadeniz Teknik Üniversitesi">Karadeniz Teknik Üniversitesi</option>
-                                    <option value="Pamukkale Üniversitesi">Pamukkale Üniversitesi</option>
-                                    <option value="Süleyman Demirel Üniversitesi">Süleyman Demirel Üniversitesi</option>
-                                    <option value="Kocaeli Üniversitesi">Kocaeli Üniversitesi</option>
-                                    <option value="Sakarya Üniversitesi">Sakarya Üniversitesi</option>
-                                    <option value="Trakya Üniversitesi">Trakya Üniversitesi</option>
-                                    <option value="Çanakkale Onsekiz Mart Üniversitesi">Çanakkale Onsekiz Mart Üniversitesi</option>
-                                    <option value="Balıkesir Üniversitesi">Balıkesir Üniversitesi</option>
-                                    <option value="Adnan Menderes Üniversitesi">Adnan Menderes Üniversitesi</option>
-                                    <option value="Muğla Sıtkı Koçman Üniversitesi">Muğla Sıtkı Koçman Üniversitesi</option>
-                                    <option value="Bursa Teknik Üniversitesi">Bursa Teknik Üniversitesi</option>
-                                    <option value="İzmir Yüksek Teknoloji Enstitüsü">İzmir Yüksek Teknoloji Enstitüsü</option>
-                                    <option value="Gebze Teknik Üniversitesi">Gebze Teknik Üniversitesi</option>
-                                    <option value="Sabancı Üniversitesi">Sabancı Üniversitesi</option>
-                                    <option value="Koç Üniversitesi">Koç Üniversitesi</option>
-                                    <option value="Bilkent Üniversitesi">Bilkent Üniversitesi</option>
-                                    <option value="Özyeğin Üniversitesi">Özyeğin Üniversitesi</option>
-                                    <option value="Bahçeşehir Üniversitesi">Bahçeşehir Üniversitesi</option>
-                                    <option value="İstanbul Bilgi Üniversitesi">İstanbul Bilgi Üniversitesi</option>
-                                    <option value="İstanbul Kültür Üniversitesi">İstanbul Kültür Üniversitesi</option>
-                                    <option value="Yeditepe Üniversitesi">Yeditepe Üniversitesi</option>
-                                    <option value="Maltepe Üniversitesi">Maltepe Üniversitesi</option>
-                                    <option value="Kadir Has Üniversitesi">Kadir Has Üniversitesi</option>
-                                    <option value="İstanbul Aydın Üniversitesi">İstanbul Aydın Üniversitesi</option>
-                                    <option value="Altınbaş Üniversitesi">Altınbaş Üniversitesi</option>
-                                    <option value="İstanbul Medipol Üniversitesi">İstanbul Medipol Üniversitesi</option>
-                                    <option value="Acıbadem Üniversitesi">Acıbadem Üniversitesi</option>
-                                    <option value="Bezmialem Vakıf Üniversitesi">Bezmialem Vakıf Üniversitesi</option>
-                                    <option value="Diğer">Diğer</option>
+                                    <?php 
+                                    $universities = getUniversityList();
+                                    sort($universities);
+                                    foreach ($universities as $uni): 
+                                    ?>
+                                        <option value="<?= $uni ?>"><?= $uni ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
