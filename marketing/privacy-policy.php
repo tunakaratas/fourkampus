@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gizlilik Politikası - Four Kampüs</title>
-    <meta name="description" content="Four Kampüs gizlilik politikası. Kişisel verilerinizin korunması ve güvenliği hakkında detaylı bilgiler.">
+    <meta name="description" content="Four Kampüs (UniPanel/UniFour) mobil uygulaması ve web platformu için gizlilik politikası. Kişisel verilerinizin toplanması ve korunması hakkında detaylı bilgiler.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
             padding: 8rem 2rem 4rem;
             line-height: 1.8;
             color: #334155;
+            background-color: #f8fafc;
         }
         
         .legal-header {
@@ -109,6 +110,7 @@
             padding: 1.5rem;
             border-radius: 0.75rem;
             margin-top: 2rem;
+            border: 1px solid #e2e8f0;
         }
         
         .contact-info p {
@@ -154,245 +156,126 @@
         
         <div class="legal-header">
             <h1><i class="fas fa-shield-alt"></i> Gizlilik Politikası</h1>
-            <p>Son Güncelleme: <?= date('d.m.Y') ?></p>
+            <p>Son Güncelleme: 24.12.2025</p>
         </div>
         
         <div class="legal-content">
             <div class="legal-section">
-                <h2>1. Genel Bilgiler</h2>
+                <h2>1. Giriş</h2>
                 <p>
-                    <strong>Four Kampüs</strong> olarak, kişisel verilerinizin korunmasına büyük önem vermekteyiz. 
-                    Bu Gizlilik Politikası, Four Kampüs platformunu kullanırken toplanan, işlenen ve saklanan 
-                    kişisel verileriniz hakkında bilgi vermek amacıyla hazırlanmıştır.
+                    <strong>Four Kampüs</strong> (önceki adıyla UniPanel/UniFour) olarak, kişisel verilerinizin güvenliğine ve gizliliğine en üst düzeyde önem veriyoruz. 
+                    Bu Gizlilik Politikası, mobil uygulamamızı ve web platformumuzu kullandığınızda toplanan verilerin türlerini, kullanım amaçlarını, 
+                    saklama koşullarını ve haklarınızı şeffaf bir şekilde açıklamaktadır.
                 </p>
-                <p>
-                    Bu politika, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği 
-                    Genel Veri Koruma Tüzüğü (GDPR) kapsamında hazırlanmıştır.
-                </p>
-            </div>
-            
-            <div class="legal-section">
-                <h2>2. Veri Sorumlusu</h2>
-                <p>
-                    <strong>Four Kampüs</strong> hizmetlerini sunan veri sorumlusu:
-                </p>
-                <div class="contact-info">
-                    <p><strong>Şirket Adı:</strong> Four Kampüs</p>
-                    <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
-                    <p><strong>Telefon:</strong> +90 533 544 59 83</p>
-                    <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
-                </div>
-            </div>
-            
-            <div class="legal-section">
-                <h2>3. Toplanan Kişisel Veriler</h2>
-                <h3>3.1. Topluluk Yöneticileri İçin</h3>
-                <p>Topluluk kayıt işlemi sırasında aşağıdaki veriler toplanmaktadır:</p>
-                <ul>
-                    <li><strong>Kimlik Bilgileri:</strong> Ad, soyad, kullanıcı adı</li>
-                    <li><strong>İletişim Bilgileri:</strong> E-posta adresi, telefon numarası</li>
-                    <li><strong>Topluluk Bilgileri:</strong> Topluluk adı, üniversite bilgisi, klasör adı</li>
-                    <li><strong>Güvenlik Bilgileri:</strong> Şifre (hash'lenmiş olarak saklanır)</li>
-                    <li><strong>Teknik Bilgiler:</strong> IP adresi, tarayıcı bilgisi, cihaz bilgisi</li>
-                </ul>
-                
-                <h3>3.2. E-Ticaret İşlemleri İçin</h3>
-                <p>Satın alma işlemleri sırasında aşağıdaki veriler toplanmaktadır:</p>
-                <ul>
-                    <li><strong>Kimlik Bilgileri:</strong> Ad, soyad</li>
-                    <li><strong>İletişim Bilgileri:</strong> E-posta adresi, telefon numarası</li>
-                    <li><strong>Adres Bilgileri:</strong> Teslimat adresi (fiziksel ürünler için)</li>
-                    <li><strong>Ödeme Bilgileri:</strong> Ödeme yöntemi, işlem bilgileri (kart bilgileri saklanmaz)</li>
-                    <li><strong>Sipariş Bilgileri:</strong> Sipariş numarası, ürün/hizmet bilgileri, tutar</li>
-                    <li><strong>Fatura Bilgileri:</strong> Fatura adresi, vergi numarası (varsa)</li>
-                </ul>
-                
-                <h3>3.3. Platform Kullanımı Sırasında</h3>
-                <ul>
-                    <li>Giriş/çıkış kayıtları ve zaman damgaları</li>
-                    <li>Platform içi aktiviteler (etkinlik oluşturma, üye ekleme, bildirim gönderme vb.)</li>
-                    <li>Hata logları ve teknik performans verileri</li>
-                    <li>Kullanım istatistikleri ve analitik veriler</li>
-                </ul>
-            </div>
-            
-            <div class="legal-section">
-                <h2>4. Verilerin İşlenme Amaçları</h2>
-                <p>Toplanan kişisel veriler aşağıdaki amaçlarla işlenmektedir:</p>
-                <ul>
-                    <li>Topluluk hesabı oluşturma ve yönetimi</li>
-                    <li>Platform hizmetlerinin sunulması ve geliştirilmesi</li>
-                    <li>Kullanıcı kimlik doğrulama ve güvenlik</li>
-                    <li>Teknik destek ve müşteri hizmetleri</li>
-                    <li>E-ticaret işlemlerinin gerçekleştirilmesi (sipariş, ödeme, teslimat)</li>
-                    <li>Fatura düzenleme ve muhasebe işlemleri</li>
-                    <li>İade ve iptal işlemlerinin yönetimi</li>
-                    <li>Yasal yükümlülüklerin yerine getirilmesi</li>
-                    <li>Platform güvenliğinin sağlanması ve kötüye kullanımın önlenmesi</li>
-                    <li>İstatistiksel analizler ve raporlama</li>
-                    <li>Yeni özellikler ve hizmetlerin geliştirilmesi</li>
-                </ul>
-            </div>
-            
-            <div class="legal-section">
-                <h2>5. Verilerin İşlenme Hukuki Sebepleri</h2>
-                <p>Kişisel verileriniz aşağıdaki hukuki sebeplere dayanarak işlenmektedir:</p>
-                <ul>
-                    <li>KVKK Madde 5/2-c: "Sözleşmenin kurulması veya ifasıyla doğrudan doğruya ilgili olması"</li>
-                    <li>KVKK Madde 5/2-e: "Veri sorumlusunun hukuki yükümlülüğünü yerine getirebilmesi"</li>
-                    <li>KVKK Madde 5/2-f: "İlgili kişinin temel hak ve özgürlüklerine zarar vermemek kaydıyla veri sorumlusunun meşru menfaatleri"</li>
-                    <li>Açık rıza (bildirim gönderimi, pazarlama faaliyetleri için)</li>
-                </ul>
-            </div>
-            
-            <div class="legal-section">
-                <h2>6. Verilerin Saklanma Süresi</h2>
-                <p>
-                    Kişisel verileriniz, işlenme amaçlarının gerektirdiği süre boyunca saklanmaktadır. 
-                    Genel olarak:
-                </p>
-                <ul>
-                    <li><strong>Aktif Hesaplar:</strong> Hesap aktif olduğu sürece saklanır</li>
-                    <li><strong>Silinen Hesaplar:</strong> Hesap silindikten sonra 30 gün içinde tamamen silinir</li>
-                    <li><strong>Yasal Yükümlülükler:</strong> Yasal saklama süreleri boyunca saklanır</li>
-                    <li><strong>Log Kayıtları:</strong> Güvenlik amaçlı 12 ay saklanır</li>
-                </ul>
-            </div>
-            
-            <div class="legal-section">
-                <h2>7. Veri Güvenliği</h2>
                 <div class="highlight-box">
                     <p>
-                        <i class="fas fa-shield-alt"></i> 
-                        <strong>Güvenlik Önlemleri:</strong> Verileriniz TLS 1.3 protokolü ile şifrelenir 
-                        ve SOC 2 uyumlu altyapıda güvenle saklanır.
+                        <i class="fas fa-info-circle"></i> 
+                        Bu politika, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ve ilgili uluslararası standartlara tam uyumlu olarak hazırlanmıştır.
                     </p>
                 </div>
-                <h3>7.1. Teknik Önlemler</h3>
-                <ul>
-                    <li><strong>Şifreleme:</strong> Tüm veriler TLS 1.3 ile şifrelenir</li>
-                    <li><strong>Veritabanı Güvenliği:</strong> SQLite veritabanları şifrelenmiş ve yedeklenmiş durumda</li>
-                    <li><strong>Şifre Yönetimi:</strong> Şifreler bcrypt algoritması ile hash'lenir (asla düz metin saklanmaz)</li>
-                    <li><strong>Erişim Kontrolü:</strong> Rol bazlı erişim kontrolü (RBAC) uygulanır</li>
-                    <li><strong>Rate Limiting:</strong> Brute force saldırılarına karşı koruma</li>
-                    <li><strong>Session Güvenliği:</strong> Güvenli session yönetimi ve timeout mekanizmaları</li>
-                </ul>
+            </div>
+            
+            <div class="legal-section">
+                <h2>2. Toplanan Veriler</h2>
+                <p>Hizmetlerimizi sunabilmek için aşağıdaki veri kategorilerini işlemekteyiz:</p>
                 
-                <h3>7.2. Fiziksel Önlemler</h3>
+                <h3>2.1. Kimlik ve İletişim Bilgileri</h3>
                 <ul>
-                    <li>Sunucu erişim kontrolleri</li>
-                    <li>Düzenli güvenlik denetimleri</li>
-                    <li>Yedekleme ve felaket kurtarma planları</li>
+                    <li><strong>Ad ve Soyad:</strong> Kullanıcı profilinizi oluşturmak için.</li>
+                    <li><strong>E-posta Adresi:</strong> Giriş işlemleri, bildirimler ve hesap güvenliği için.</li>
+                    <li><strong>Öğrenci Numarası:</strong> Üniversite topluluklarına üyeliğinizi doğrulamak için.</li>
+                    <li><strong>Telefon Numarası:</strong> İletişim ve opsiyonel SMS doğrulamaları için.</li>
+                    <li><strong>Üniversite ve Bölüm Bilgileri:</strong> İlgili topluluk içeriklerini göstermek için.</li>
+                </ul>
+
+                <h3>2.2. Uygulama İçi Etkileşimler</h3>
+                <ul>
+                    <li><strong>Topluluk Üyelikleri:</strong> Katıldığınız öğrenci kulüpleri ve topluluklar.</li>
+                    <li><strong>Etkinlik Kayıtları (RSVP):</strong> Katılım durumunuzu bildirdiğiniz etkinlikler.</li>
+                    <li><strong>Anket Cevapları:</strong> Topluluklar veya etkinlikler için doldurduğunuz anketler.</li>
+                </ul>
+
+                <h3>2.3. Cihaz ve Teknik Veriler</h3>
+                <ul>
+                    <li><strong>IP Adresi:</strong> Güvenlik denetimleri ve kötüye kullanımı önlemek (Rate Limiting) için.</li>
+                    <li><strong>Cihaz Bilgileri:</strong> Uygulama sürümü, işletim sistemi versiyonu (Hata ayıklama ve performans iyileştirmesi için).</li>
+                    <li><strong>Log Kayıtları:</strong> Giriş zamanları, hatalı giriş denemeleri.</li>
+                </ul>
+
+                <h3>2.4. Mobil İzinler</h3>
+                <ul>
+                    <li><strong>Konum (Opsiyonel):</strong> Etkinliklerin yerini haritada görüntüleyebilmeniz ve yol tarifi alabilmeniz için kullanılır. (Sadece uygulama kullanılırken).</li>
+                    <li><strong>Kamera (Opsiyonel):</strong> Etkinliklerde QR kod ile check-in yapabilmeniz veya profil fotoğrafı yükleyebilmeniz için kullanılır.</li>
+                    <li><strong>Bildirimler (Opsiyonel):</strong> Topluluk duyuruları ve yaklaşan etkinlik hatırlatmaları için kullanılır.</li>
                 </ul>
             </div>
             
             <div class="legal-section">
-                <h2>8. Verilerin Paylaşılması</h2>
+                <h2>3. Verilerin İşlenme Amacı</h2>
+                <p>Toplanan kişisel verileriniz aşağıdaki amaçlarla işlenmektedir:</p>
+                <ul>
+                    <li><strong>Hizmet Sunumu:</strong> Kullanıcı hesabı oluşturma, topluluklara katılma ve etkinliklere kayıt olma süreçlerini yürütmek.</li>
+                    <li><strong>Güvenlik ve Doğrulama:</strong> Hesabınızı yetkisiz erişimlere karşı korumak (Brute-force koruması, güvenli oturum yönetimi).</li>
+                    <li><strong>Kişiselleştirme:</strong> Size en uygun topluluk ve etkinlik önerilerini sunmak.</li>
+                    <li><strong>İletişim:</strong> Önemli güncellemeler, etkinlik iptalleri veya değişiklikleri hakkında sizi bilgilendirmek.</li>
+                    <li><strong>Analiz ve Geliştirme:</strong> Uygulama performansını izlemek ve kullanıcı deneyimini iyileştirmek.</li>
+                </ul>
+            </div>
+            
+            <div class="legal-section">
+                <h2>4. Verilerin Saklama Süresi</h2>
                 <p>
-                    Kişisel verileriniz, aşağıdaki durumlar dışında üçüncü kişilerle paylaşılmaz:
+                    Kişisel verileriniz, hesabınız aktif olduğu sürece ve yasal yükümlülüklerimizin gerektirdiği süre boyunca saklanmaktadır.
                 </p>
                 <ul>
-                    <li><strong>Yasal Yükümlülükler:</strong> Yasal zorunluluklar gereği yetkili kurumlarla paylaşım</li>
-                    <li><strong>Hizmet Sağlayıcılar:</strong> Platform hizmetlerinin sunulması için gerekli teknik hizmet sağlayıcılar (hosting, email servisleri vb.)</li>
-                    <li><strong>İş Ortakları:</strong> Sadece açık rıza ile ve sınırlı amaçlarla</li>
+                    <li><strong>Kullanıcı Hesabı Verileri:</strong> Üyeliğiniz devam ettiği sürece saklanır. Hesabınızı silmeniz durumunda, yasal olarak saklanması zorunlu olmayan tüm veriler 30 gün içinde sistemlerimizden kalıcı olarak silinir.</li>
+                    <li><strong>Etkinlik ve Katılım Verileri:</strong> İstatistiksel raporlama amacıyla anonimleştirilerek saklanabilir.</li>
+                    <li><strong>Güvenlik Logları:</strong> Siber güvenlik yasaları gereği 12 ay süreyle saklanır.</li>
                 </ul>
-                <p>
-                    <strong>Önemli:</strong> Verileriniz hiçbir zaman reklam veya pazarlama amaçlı üçüncü taraflarla paylaşılmaz.
-                </p>
             </div>
-            
+
             <div class="legal-section">
-                <h2>9. Çerezler (Cookies)</h2>
-                <p>
-                    Platform, kullanıcı deneyimini iyileştirmek için çerezler kullanmaktadır:
-                </p>
+                <h2>5. Veri Güvenliği</h2>
+                <p>Verilerinizi korumak için endüstri standardı güvenlik önlemleri uyguluyoruz:</p>
                 <ul>
-                    <li><strong>Zorunlu Çerezler:</strong> Oturum yönetimi ve güvenlik için gerekli</li>
-                    <li><strong>Fonksiyonel Çerezler:</strong> Kullanıcı tercihlerinin hatırlanması</li>
-                    <li><strong>Analitik Çerezler:</strong> Platform kullanım istatistikleri (anonim)</li>
+                    <li>Tüm veri iletimi <strong>TLS 1.3/SSL şifreleme</strong> ile korunmaktadır.</li>
+                    <li>Şifreleriniz veritabanında <strong>bcrypt hashing</strong> algoritması ile şifrelenmiş olarak saklanır; asla düz metin olarak tutulmaz.</li>
+                    <li>Veritabanlarına erişim, katı <strong>güvenlik duvarları (Firewall)</strong> ve IP kısıtlamaları ile kontrol altındadır.</li>
+                    <li>Olası veri kayıplarına karşı düzenli yedeklemeler alınmaktadır.</li>
                 </ul>
-                <p>
-                    Tarayıcı ayarlarınızdan çerezleri yönetebilirsiniz, ancak bu durumda bazı özellikler çalışmayabilir.
-                </p>
             </div>
             
             <div class="legal-section">
-                <h2>10. KVKK Kapsamındaki Haklarınız</h2>
-                <p>KVKK Madde 11 uyarınca aşağıdaki haklara sahipsiniz:</p>
+                <h2>6. Kullanıcı Haklarınız</h2>
+                <p>KVKK Madde 11 kapsamında aşağıdaki haklara sahipsiniz:</p>
                 <ul>
-                    <li><strong>Bilgi Alma Hakkı:</strong> Kişisel verilerinizin işlenip işlenmediğini öğrenme</li>
-                    <li><strong>Erişim Hakkı:</strong> İşlenen kişisel verileriniz hakkında bilgi talep etme</li>
-                    <li><strong>Düzeltme Hakkı:</strong> Yanlış veya eksik verilerin düzeltilmesini isteme</li>
-                    <li><strong>Silme Hakkı:</strong> Kişisel verilerinizin silinmesini isteme</li>
-                    <li><strong>İtiraz Hakkı:</strong> Kişisel verilerinizin işlenmesine itiraz etme</li>
-                    <li><strong>Veri Taşınabilirliği:</strong> Verilerinizi başka bir sisteme aktarma</li>
-                    <li><strong>Rıza Geri Çekme:</strong> Verilen rızayı geri çekme</li>
+                    <li>Kişisel verilerinizin işlenip işlenmediğini öğrenme.</li>
+                    <li>İşlenen verileriniz hakkında bilgi talep etme.</li>
+                    <li>Yanlış veya eksik verilerin düzeltilmesini isteme.</li>
+                    <li>Kişisel verilerinizin silinmesini veya yok edilmesini talep etme (Unutulma Hakkı).</li>
+                    <li>Verilerinizin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle aleyhinize bir sonucun ortaya çıkmasına itiraz etme.</li>
                 </ul>
                 <p>
-                    Bu haklarınızı kullanmak için <strong>info@fourkampus.com.tr</strong> adresine e-posta gönderebilirsiniz.
+                    Mobil uygulamamız içerisindeki <strong>"Hesabımı Sil"</strong> seçeneğini kullanarak üyeliğinizi ve ilişkili verilerinizi istediğiniz zaman silebilirsiniz.
                 </p>
             </div>
             
             <div class="legal-section">
-                <h2>11. Çocukların Gizliliği</h2>
+                <h2>7. İletişim</h2>
                 <p>
-                    Four Kampüs platformu 18 yaş altındaki kişilerden bilerek kişisel veri toplamamaktadır. 
-                    Eğer 18 yaş altında bir kişinin veri topladığımızı fark edersek, bu verileri derhal sileriz.
-                </p>
-            </div>
-            
-            <div class="legal-section">
-                <h2>12. Uluslararası Veri Transferi</h2>
-                <p>
-                    Verileriniz şu anda Türkiye sınırları içindeki sunucularda saklanmaktadır. 
-                    Eğer gelecekte uluslararası veri transferi yapılması gerekirse, GDPR ve KVKK 
-                    uyumlu anlaşmalar yapılacak ve kullanıcılar bilgilendirilecektir.
-                </p>
-            </div>
-            
-            <div class="legal-section">
-                <h2>13. Politika Değişiklikleri</h2>
-                <p>
-                    Bu Gizlilik Politikası, yasal değişiklikler veya hizmet güncellemeleri nedeniyle 
-                    güncellenebilir. Önemli değişiklikler e-posta veya platform bildirimi ile 
-                    kullanıcılara duyurulur. Güncel politika her zaman bu sayfada yayınlanır.
-                </p>
-            </div>
-            
-            <div class="legal-section">
-                <h2>14. İletişim</h2>
-                <p>
-                    Gizlilik politikamız hakkında sorularınız veya haklarınızı kullanmak istiyorsanız, 
-                    bizimle iletişime geçebilirsiniz:
+                    Gizlilik politikamızla ilgili sorularınız, görüşleriniz veya veri haklarınızla ilgili talepleriniz için bize ulaşabilirsiniz:
                 </p>
                 <div class="contact-info">
+                    <p><strong>Veri Sorumlusu:</strong> Four Kampüs Ekibi</p>
                     <p><strong>E-posta:</strong> info@fourkampus.com.tr</p>
-                    <p><strong>Telefon:</strong> +90 533 544 59 83</p>
-                    <p><strong>Çalışma Saatleri:</strong> Pazartesi - Cuma: 09:00 - 18:00</p>
-                </div>
-            </div>
-            
-            <div class="legal-section">
-                <h2>15. Şikayet Hakkı</h2>
-                <p>
-                    Kişisel verilerinizin işlenmesi ile ilgili şikayetlerinizi Kişisel Verileri Koruma 
-                    Kurumu'na (KVKK) iletebilirsiniz:
-                </p>
-                <div class="contact-info">
-                    <p><strong>Kurum:</strong> Kişisel Verileri Koruma Kurumu</p>
-                    <p><strong>Web:</strong> www.kvkk.gov.tr</p>
-                    <p><strong>Telefon:</strong> 0850 201 11 35</p>
+                    <p><strong>Adres:</strong> İstanbul, Türkiye</p>
                 </div>
             </div>
         </div>
         
-        <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
-            <a href="index.html" class="back-link">
-                <i class="fas fa-arrow-left"></i>
-                Ana Sayfaya Dön
-            </a>
+        <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e2e8f0; color: #64748b;">
+            <p>&copy; 2025 Four Kampüs. Tüm hakları saklıdır.</p>
         </div>
     </div>
 </body>
 </html>
-

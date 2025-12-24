@@ -35,12 +35,12 @@ function checkLoginRateLimit($email = null) {
     // Güvenli IP alma
     $ip = getRealIP();
     
-    // IP bazlı rate limiting (10 istek/dakika)
-    if (!checkRateLimit(10, 60)) {
+    // IP bazlı rate limiting (30 istek/dakika - daha esnek)
+    if (!checkRateLimit(30, 60)) {
         return ['allowed' => false, 'reason' => 'IP rate limit aşıldı. Lütfen 1 dakika sonra tekrar deneyin.'];
     }
     
-    // Email bazlı rate limiting (5 istek/dakika - brute force koruması)
+    // Email bazlı rate limiting (10 istek/dakika - daha esnek)
     if ($email) {
         $emailHash = hash('sha256', strtolower(trim($email)) . 'unipanel_login_salt_2025');
         $cacheFile = __DIR__ . '/../system/cache/login_rate_' . substr($emailHash, 0, 16) . '.json';
@@ -68,9 +68,9 @@ function checkLoginRateLimit($email = null) {
         // Yeni isteği ekle
         $requests[] = $now;
         
-        // Limit kontrolü (5 istek/dakika)
-        if (count($requests) > 5) {
-            @file_put_contents($cacheFile, json_encode(['requests' => array_slice($requests, -5), 'last_updated' => $now]), LOCK_EX);
+        // Limit kontrolü (20 istek/dakika)
+        if (count($requests) > 20) {
+            @file_put_contents($cacheFile, json_encode(['requests' => array_slice($requests, -20), 'last_updated' => $now]), LOCK_EX);
             return ['allowed' => false, 'reason' => 'Bu email için çok fazla deneme yapıldı. Lütfen 1 dakika sonra tekrar deneyin.'];
         }
         
@@ -107,8 +107,8 @@ function checkBruteForceProtection($email, $db) {
         return is_numeric($timestamp) && ($now - (int)$timestamp) < 900; // 15 dakika
     });
     
-    // 5 başarısız denemeden sonra hesabı kilitle (15 dakika)
-    if (count($recentAttempts) >= 5) {
+    // 10 başarısız denemeden sonra hesabı kilitle (15 dakika)
+    if (count($recentAttempts) >= 10) {
         $lockUntil = isset($data['lock_until']) ? (int)$data['lock_until'] : 0;
         if ($lockUntil > $now) {
             $remainingMinutes = ceil(($lockUntil - $now) / 60);
@@ -155,8 +155,8 @@ function recordFailedLoginAttempt($email) {
         return is_numeric($timestamp) && ($now - (int)$timestamp) < 900;
     });
     
-    // 5 başarısız denemeden sonra kilitle
-    if (count($recentAttempts) >= 5) {
+    // 10 başarısız denemeden sonra kilitle
+    if (count($recentAttempts) >= 10) {
         $data['lock_until'] = $now + 900; // 15 dakika kilit
     }
     
@@ -330,8 +330,8 @@ try {
         // Kullanıcı bulunamadı - başarısız denemeyi kaydet
         recordFailedLoginAttempt($email);
         $db->close();
-        // Güvenlik: Email veya şifre hatalı (hangi birinin hatalı olduğunu belirtme)
-        sendResponse(false, null, null, 'Email veya şifre hatalı');
+        // Güvenlik: Kullanıcı bulunamadığını belirt (kullanıcı isteği üzerine detaylı feedback)
+        sendResponse(false, null, null, 'Bu e-posta adresi ile kayıtlı bir kullanıcı bulunamadı.');
     }
     
     // Hesap kilit kontrolü (veritabanından)
@@ -352,7 +352,10 @@ try {
         // Veritabanında başarısız deneme sayısını artır
         try {
             $failedAttempts = (int)($user['failed_login_attempts'] ?? 0) + 1;
-            $updateFailed = $db->prepare("UPDATE system_users SET failed_login_attempts = ?, locked_until = CASE WHEN ? >= 5 THEN datetime('now', '+15 minutes') ELSE NULL END WHERE id = ?");
+            $remainingAttempts = 10 - $failedAttempts;
+            $msg = ($remainingAttempts > 0) ? "Şifre hatalı. (Kalan deneme hakkı: $remainingAttempts)" : "Çok fazla başarısız deneme.";
+            
+            $updateFailed = $db->prepare("UPDATE system_users SET failed_login_attempts = ?, locked_until = CASE WHEN ? >= 10 THEN datetime('now', '+15 minutes') ELSE NULL END WHERE id = ?");
             $updateFailed->bindValue(1, $failedAttempts, SQLITE3_INTEGER);
             $updateFailed->bindValue(2, $failedAttempts, SQLITE3_INTEGER);
             $updateFailed->bindValue(3, $user['id'], SQLITE3_INTEGER);
@@ -362,8 +365,8 @@ try {
         }
         
         $db->close();
-        // Güvenlik: Email veya şifre hatalı (hangi birinin hatalı olduğunu belirtme)
-        sendResponse(false, null, null, 'Email veya şifre hatalı');
+        // Güvenlik: Şifre hatalı olduğunu belirt (kullanıcı isteği üzerine detaylı feedback)
+        sendResponse(false, null, null, isset($msg) ? $msg : 'Girdiğiniz şifre hatalı.');
     }
     
     // Başarılı giriş - brute force kayıtlarını temizle
@@ -494,19 +497,21 @@ try {
         ]
     ], 'Giriş başarılı');
     
-} catch (Exception $e) {
+} catch (Throwable $e) {
     secureLog("Login API error: " . $e->getMessage(), 'error');
-    if (!isProduction()) {
-        secureLog("Login API stack trace: " . $e->getTraceAsString(), 'debug');
+    secureLog('login_api_fatal_error', [
+        'error' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ]);
+    
+    if (isset($db) && $db instanceof SQLite3) {
+        try {
+            $db->close();
+        } catch (Throwable $closeError) {}
     }
-    $response = sendSecureErrorResponse('Giriş işlemi sırasında bir hata oluştu', $e);
-    sendResponse($response['success'], $response['data'], $response['message'], $response['error']);
-} catch (Error $e) {
-    secureLog("Login API fatal error: " . $e->getMessage(), 'critical');
-    if (!isProduction()) {
-        secureLog("Login API stack trace: " . $e->getTraceAsString(), 'debug');
-    }
-    $response = sendSecureErrorResponse('Giriş işlemi sırasında bir hata oluştu', $e);
-    sendResponse($response['success'], $response['data'], $response['message'], $response['error']);
+    
+    http_response_code(200);
+    sendResponse(false, null, "Giriş işlemi sırasında bir hata oluştu.", $e->getMessage());
 }
 

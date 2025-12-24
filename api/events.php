@@ -262,20 +262,34 @@ try {
             sendResponse(false, null, null, 'Etkinlik bulunamadı');
         }
         
-        // Anket kontrolü
+        // Anket kontrolü - Önce event_surveys tablosunu, yoksa surveys tablosunu kontrol et
         $has_survey = false;
         try {
-        $survey_check = @$db->prepare("SELECT COUNT(*) FROM surveys WHERE event_id = ?");
+            // Önce event_surveys tablosunu kontrol et (yeni format)
+            $survey_check = @$db->prepare("SELECT COUNT(*) FROM event_surveys WHERE event_id = ?");
             if ($survey_check) {
                 $survey_check->bindValue(1, $event_id, SQLITE3_INTEGER);
-        $survey_result = $survey_check->execute();
+                $survey_result = $survey_check->execute();
                 if ($survey_result) {
-        $survey_count = $survey_result->fetchArray(SQLITE3_NUM)[0] ?? 0;
-        $has_survey = $survey_count > 0;
+                    $survey_count = $survey_result->fetchArray(SQLITE3_NUM)[0] ?? 0;
+                    $has_survey = $survey_count > 0;
+                }
+            }
+            
+            // event_surveys'de bulunamadıysa, eski surveys tablosunu kontrol et
+            if (!$has_survey) {
+                $survey_check2 = @$db->prepare("SELECT COUNT(*) FROM surveys WHERE event_id = ?");
+                if ($survey_check2) {
+                    $survey_check2->bindValue(1, $event_id, SQLITE3_INTEGER);
+                    $survey_result2 = $survey_check2->execute();
+                    if ($survey_result2) {
+                        $survey_count2 = $survey_result2->fetchArray(SQLITE3_NUM)[0] ?? 0;
+                        $has_survey = $survey_count2 > 0;
+                    }
                 }
             }
         } catch (Exception $e) {
-            // Surveys tablosu yoksa has_survey false kalır
+            // Tablolar yoksa has_survey false kalır
             $has_survey = false;
         }
         
@@ -473,10 +487,11 @@ try {
             if (!$row) {
                 break; // No more rows
             }
-            // Anket kontrolü
+            // Anket kontrolü - Önce event_surveys tablosunu, yoksa surveys tablosunu kontrol et
             $has_survey = false;
             try {
-                $survey_check = @$db->prepare("SELECT COUNT(*) FROM surveys WHERE event_id = ?");
+                // Önce event_surveys tablosunu kontrol et (yeni format)
+                $survey_check = @$db->prepare("SELECT COUNT(*) FROM event_surveys WHERE event_id = ?");
                 if ($survey_check) {
                     $survey_check->bindValue(1, $row['id'], SQLITE3_INTEGER);
                     $survey_result = $survey_check->execute();
@@ -485,8 +500,21 @@ try {
                         $has_survey = $survey_count > 0;
                     }
                 }
+                
+                // event_surveys'de bulunamadıysa, eski surveys tablosunu kontrol et
+                if (!$has_survey) {
+                    $survey_check2 = @$db->prepare("SELECT COUNT(*) FROM surveys WHERE event_id = ?");
+                    if ($survey_check2) {
+                        $survey_check2->bindValue(1, $row['id'], SQLITE3_INTEGER);
+                        $survey_result2 = $survey_check2->execute();
+                        if ($survey_result2) {
+                            $survey_count2 = $survey_result2->fetchArray(SQLITE3_NUM)[0] ?? 0;
+                            $has_survey = $survey_count2 > 0;
+                        }
+                    }
+                }
             } catch (Exception $e) {
-                // Surveys tablosu yoksa has_survey false kalır
+                // Tablolar yoksa has_survey false kalır
                 $has_survey = false;
             }
             
@@ -713,16 +741,30 @@ try {
                     if (!$row) {
                         break; // No more rows
                     }
-                    // Anket kontrolü
+                    // Anket kontrolü - Önce event_surveys tablosunu, yoksa surveys tablosunu kontrol et
                     $has_survey = false;
                     try {
-                        $survey_check = @$db->prepare("SELECT COUNT(*) FROM surveys WHERE event_id = ?");
+                        // Önce event_surveys tablosunu kontrol et (yeni format)
+                        $survey_check = @$db->prepare("SELECT COUNT(*) FROM event_surveys WHERE event_id = ?");
                         if ($survey_check) {
                             $survey_check->bindValue(1, $row['id'], SQLITE3_INTEGER);
                             $survey_result = $survey_check->execute();
                             if ($survey_result) {
                                 $survey_count = $survey_result->fetchArray(SQLITE3_NUM)[0] ?? 0;
                                 $has_survey = $survey_count > 0;
+                            }
+                        }
+                        
+                        // event_surveys'de bulunamadıysa, eski surveys tablosunu kontrol et
+                        if (!$has_survey) {
+                            $survey_check2 = @$db->prepare("SELECT COUNT(*) FROM surveys WHERE event_id = ?");
+                            if ($survey_check2) {
+                                $survey_check2->bindValue(1, $row['id'], SQLITE3_INTEGER);
+                                $survey_result2 = $survey_check2->execute();
+                                if ($survey_result2) {
+                                    $survey_count2 = $survey_result2->fetchArray(SQLITE3_NUM)[0] ?? 0;
+                                    $has_survey = $survey_count2 > 0;
+                                }
                             }
                         }
                     } catch (Exception $e) {
@@ -935,14 +977,17 @@ try {
     // Tek topluluk veya tek etkinlik için pagination yok
     sendResponse(true, $all_events);
     
-} catch (Exception $e) {
-    error_log("Events API: Fatal error: " . $e->getMessage());
+} catch (Throwable $e) {
+    error_log("Events API Fatal Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
     error_log("Events API: Stack trace: " . $e->getTraceAsString());
-    http_response_code(500);
-    sendResponse(false, null, null, 'İşlem sırasında bir hata oluştu: ' . $e->getMessage());
-} catch (Error $e) {
-    error_log("Events API: Fatal PHP error: " . $e->getMessage());
-    error_log("Events API: Stack trace: " . $e->getTraceAsString());
-    http_response_code(500);
-    sendResponse(false, null, null, 'İşlem sırasında bir hata oluştu: ' . $e->getMessage());
+    
+    // Detaylı hata logu
+    secureLog('events_api_fatal_error', [
+        'error' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ]);
+    
+    http_response_code(200);
+    sendResponse(false, null, "Sunucu taraflı bir hata oluştu.", $e->getMessage());
 }

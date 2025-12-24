@@ -48,20 +48,21 @@ try {
     $db->exec('PRAGMA journal_mode = WAL');
     
     // Surveys tablosunun var olup olmadığını kontrol et
-    $table_check = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='surveys'");
-    if (!$table_check || !$table_check->fetchArray()) {
-        // Tablo yoksa event_surveys tablosunu kontrol et
-        $event_surveys_check = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='event_surveys'");
-        if (!$event_surveys_check || !$event_surveys_check->fetchArray()) {
+    // Web sitesi yeni anketleri event_surveys tablosuna kaydediyor, bu yüzden öncelik event_surveys'de olmalı
+    $event_surveys_check = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='event_surveys'");
+    if ($event_surveys_check && $event_surveys_check->fetchArray()) {
+        // event_surveys tablosunu kullan (ÖNCELİKLİ)
+        $use_event_surveys = true;
+    } else {
+        // event_surveys yoksa eski surveys tablosunu kontrol et
+        $table_check = $db->query("SELECT name FROM sqlite_master WHERE type='table' AND name='surveys'");
+        if (!$table_check || !$table_check->fetchArray()) {
             // Hiçbir anket tablosu yoksa boş array döndür
             $db->close();
             sendResponse(true, []);
         } else {
-            // event_surveys tablosunu kullan
-            $use_event_surveys = true;
+            $use_event_surveys = false;
         }
-    } else {
-        $use_event_surveys = false;
     }
     
     // Event ID varsa sadece o etkinliğin anketini getir
@@ -99,8 +100,15 @@ try {
     
     $surveys = [];
     while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-        // Soruları çek
-        $questions_query = $db->prepare("SELECT * FROM survey_questions WHERE survey_id = ? ORDER BY question_order ASC");
+        // Soruları çek - Kolon adı display_order veya question_order olabilir
+        $col_check = $db->query("PRAGMA table_info(survey_questions)");
+        $order_col = 'id'; // Default
+        while($col = $col_check->fetchArray(SQLITE3_ASSOC)) {
+            if ($col['name'] === 'display_order') { $order_col = 'display_order'; break; }
+            if ($col['name'] === 'question_order') { $order_col = 'question_order'; break; }
+        }
+        
+        $questions_query = $db->prepare("SELECT * FROM survey_questions WHERE survey_id = ? ORDER BY $order_col ASC");
         $questions_query->bindValue(1, $row['id'], SQLITE3_INTEGER);
         $questions_result = $questions_query->execute();
         
@@ -110,7 +118,7 @@ try {
                 'id' => (int)$q_row['id'],
                 'question_text' => $q_row['question_text'] ?? '',
                 'question_type' => $q_row['question_type'] ?? 'text',
-                'question_order' => (int)($q_row['question_order'] ?? 0),
+                'question_order' => (int)($q_row[$order_col] ?? $q_row['id'] ?? 0),
                 'options' => !empty($q_row['options']) ? json_decode($q_row['options'], true) : null
             ];
         }
@@ -128,8 +136,21 @@ try {
     $db->close();
     sendResponse(true, $surveys);
     
-} catch (Exception $e) {
-    $response = sendSecureErrorResponse('İşlem sırasında bir hata oluştu', $e);
-    sendResponse($response['success'], $response['data'], $response['message'], $response['error']);
+} catch (Throwable $e) {
+    secureLog('surveys_api_error', [
+        'community_id' => $community_id ?? 'unknown',
+        'error' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ]);
+    
+    if (isset($db) && $db instanceof SQLite3) {
+        try {
+            $db->close();
+        } catch (Throwable $closeError) {}
+    }
+    
+    http_response_code(200);
+    sendResponse(false, null, "Bir sunucu hatası oluştu.", $e->getMessage());
 }
 

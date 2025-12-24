@@ -170,7 +170,7 @@ function validateToken($token) {
         
         $db->close();
         return null;
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         secureLog("validateToken: Hata: " . $e->getMessage(), 'error');
         return null;
     }
@@ -265,11 +265,8 @@ function checkRateLimit($maxRequests = 200, $timeWindow = 60) {
         // Cache'i güncelle (atomic write)
         @file_put_contents($cacheFile, json_encode(['requests' => $requests, 'last_updated' => $now]), LOCK_EX);
         return true;
-    } catch (Exception $e) {
+    } catch (Throwable $e) {
         // Rate limiting başarısız olursa, isteğe izin ver (fail-open)
-        return true;
-    } catch (Error $e) {
-        // PHP Error durumunda da izin ver
         return true;
     }
 }

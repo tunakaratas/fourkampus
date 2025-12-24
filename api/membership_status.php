@@ -34,8 +34,8 @@ if (!checkRateLimit(60, 60)) {
     exit;
 }
 
-// Authentication zorunlu
-$currentUser = requireAuth(true);
+// Authentication opsiyonel - Session bitmişse guest olarak devam et
+$currentUser = requireAuth(false);
 
 function sendResponse($success, $data = null, $message = null, $error = null) {
     echo json_encode([
@@ -48,8 +48,14 @@ function sendResponse($success, $data = null, $message = null, $error = null) {
 }
 
 try {
-    // POST isteği - Katılma isteği gönder
+    // POST isteği - Katılma isteği gönder (Auth Zorunlu)
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        // Login kontrolü - POST için zorunlu
+        if (!$currentUser) {
+            http_response_code(401);
+            sendResponse(false, null, null, 'Bu işlem için giriş yapmalısınız.');
+        }
+
         // CSRF koruması
         if (isset($_SERVER['HTTP_X_CSRF_TOKEN'])) {
             $csrfToken = $_SERVER['HTTP_X_CSRF_TOKEN'];
@@ -114,11 +120,7 @@ try {
             secureLog('membership_status', 'Tablo oluşturma hatası: ' . $e->getMessage());
         }
         
-        // $currentUser kontrolü
-        if (!$currentUser || !isset($currentUser['id'])) {
-            ConnectionPool::releaseConnection($db_path, $poolId, false);
-            sendResponse(false, null, null, 'Kullanıcı bilgisi alınamadı');
-        }
+        // $currentUser zaten kontrol edildi
         
         $user_id = $currentUser['id'];
         $user_email = strtolower(trim($currentUser['email'] ?? ''));
@@ -209,6 +211,17 @@ try {
         sendResponse(false, null, null, 'community_id parametresi gerekli');
     }
     
+    // $currentUser kontrolü - GET için opsiyonel
+    // Eğer login değilse direkt 'none' dön
+    if (!$currentUser || !isset($currentUser['id'])) {
+        // Login değilse veritabanına bağlanmaya gerek yok
+        sendResponse(true, [
+            'status' => 'none',
+            'is_member' => false,
+            'is_pending' => false
+        ], 'Giriş yapılmamış.');
+    }
+    
     $community_id = sanitizeCommunityId($_GET['community_id']);
     $communities_dir = __DIR__ . '/../communities';
     $db_path = $communities_dir . '/' . $community_id . '/unipanel.sqlite';
@@ -218,7 +231,7 @@ try {
     }
     
     // Connection Pool kullan (10k kullanıcı için kritik)
-    $connResult = ConnectionPool::getConnection($db_path, true);
+    $connResult = ConnectionPool::getConnection($db_path, true); // GET için read-only
     if (!$connResult) {
         sendResponse(false, null, null, 'Veritabanı bağlantısı kurulamadı');
     }
@@ -248,11 +261,7 @@ try {
         secureLog('membership_status', 'Tablo oluşturma hatası: ' . $e->getMessage());
     }
     
-    // $currentUser kontrolü
-    if (!$currentUser || !isset($currentUser['id'])) {
-        ConnectionPool::releaseConnection($db_path, $poolId, true);
-        sendResponse(false, null, null, 'Kullanıcı bilgisi alınamadı');
-    }
+    // $currentUser var (yukarıda kontrol ettik)
     
     $user_id = $currentUser['id'];
     $user_email = strtolower(trim($currentUser['email'] ?? ''));
@@ -333,22 +342,31 @@ try {
         'is_pending' => false
     ], 'Topluluğa üye değilsiniz.');
     
-} catch (Exception $e) {
+} catch (Throwable $e) {
+    // Detaylı hata logu
+    secureLog('membership_status_error', [
+        'community_id' => $community_id ?? 'unknown',
+        'error' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ]);
+
     // Veritabanı bağlantısını pool'a geri ver (eğer açıksa)
     if (isset($db_path) && isset($poolId)) {
         try {
             ConnectionPool::releaseConnection($db_path, $poolId, true);
-        } catch (Exception $closeError) {
+        } catch (Throwable $closeError) {
             // Kapatma hatası - görmezden gel
         }
-    } elseif (isset($db) && $db) {
+    } elseif (isset($db) && $db instanceof SQLite3) {
         try {
             $db->close();
-        } catch (Exception $closeError) {
+        } catch (Throwable $closeError) {
             // Kapatma hatası - görmezden gel
         }
     }
-    $response = sendSecureErrorResponse('İşlem sırasında bir hata oluştu', $e);
-    sendResponse($response['success'], $response['data'], $response['message'], $response['error']);
+    
+    http_response_code(200); // 500 yerine 200 dönüp hata mesajını JSON ile iletelim
+    sendResponse(false, null, "Bir sunucu hatası oluştu.", $e->getMessage());
 }
 

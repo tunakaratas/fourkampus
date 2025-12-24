@@ -22,23 +22,35 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.fourkampus.ios</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fourkampus</string>
+			</array>
+		</dict>
+	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>tel</string>
 		<string>mailto</string>
 		<string>http</string>
 		<string>https</string>
+        <string>comgooglemaps</string>
 	</array>
 	<key>NSCalendarsUsageDescription</key>
-	<string>Etkinlikleri takviminize eklemek için takvim erişimine ihtiyacımız var.</string>
+	<string>Uygulamadaki etkinlikleri kendi takviminize kaydedebilmeniz için takvim erişimi gereklidir.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>QR kodlarını taramak için kamera erişimine ihtiyacımız var.</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>Güvenli giriş için biyometrik kimlik doğrulama kullanılır.</string>
-	<key>NSPrivacyPolicyURL</key>
-	<string>https://foursoftware.net/marketing/privacy-policy.php</string>
+	<string>QR kodları ile etkinliklere giriş yapabilmeniz ve topluluklara katılabilmeniz için kamera erişimi gereklidir.</string>
 	<key>NSUserNotificationsUsageDescription</key>
-	<string>Etkinlik hatırlatıcıları ve bildirimler almak için izin gereklidir.</string>
+	<string>Üyesi olduğunuz topluluklardan gelen duyuruları ve yaklaşan etkinlikleri size bildirebilmek için izin gereklidir.</string>
+	<key>NSPrivacyPolicyURL</key>
+	<string>https://foursoftware.net/marketing/ios-privacy-policy.html</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -58,8 +70,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
@@ -70,4 +80,3 @@
 	</array>
 </dict>
 </plist>
-

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS Uygulaması Gizlilik Politikası - Four Kampüs</title>
+    <meta name="description"
+        content="Four Kampüs iOS mobil uygulamasına özel gizlilik politikası ve App Store veri kullanım detayları.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --text-main: #0f172a;
+            --text-secondary: #475569;
+            --bg-page: #f8fafc;
+            --bg-card: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-page);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 20px;
+            margin: 0 auto 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .update-date {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        h2 {
+            color: var(--text-main);
+            font-size: 1.25rem;
+            margin-top: 0;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        h2 i {
+            color: var(--primary);
+        }
+
+        h3 {
+            color: var(--text-main);
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        ul {
+            padding-left: 1.25rem;
+            margin: 0;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .permission-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #eef2ff;
+            color: var(--primary-dark);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .data-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .data-item-title {
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            color: #94a3b8;
+            font-size: 0.875rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="app-icon">
+                <i class="fas fa-university"></i>
+            </div>
+            <h1>iOS Uygulaması Gizlilik Detayları</h1>
+            <p class="update-date">Son Güncelleme: 24 Aralık 2025</p>
+        </div>
+
+        <!-- 1. Cihaz İzinleri -->
+        <div class="card">
+            <h2><i class="fas fa-mobile-alt"></i> Cihaz İzinleri ve Kullanımı</h2>
+            <p>Four Kampüs (iOS) uygulaması, size daha iyi bir deneyim sunmak için aşağıdaki cihaz özelliklerine erişim
+                isteyebilir. Bu izinleri istediğiniz zaman iOS ayarlarından kapatabilirsiniz.</p>
+
+            <div class="data-grid">
+                <div class="data-item">
+                    <span class="permission-badge"><i class="fas fa-camera"></i> Kamera</span>
+                    <span class="data-item-title">Kamera Erişimi</span>
+                    Sadece etkinliklere giriş yapmak veya topluluklara katılmak amacıyla <strong>QR kodlarını
+                        taramak</strong> için kullanılır. Kamera görüntüsü kaydedilmez veya sunucularımıza gönderilmez.
+                </div>
+
+                <div class="data-item">
+                    <span class="permission-badge"><i class="fas fa-map-marked-alt"></i> Harita</span>
+                    <span class="data-item-title">Harita Kullanımı</span>
+                    Uygulamamız <strong>konum izni talep etmez</strong>. Etkinlik adreslerine tıkladığınızda, sadece
+                    ilgili lokasyonu cihazınızdaki harita uygulamasında (Apple Maps/Google Maps) açmanız sağlanır.
+                </div>
+
+                <div class="data-item">
+                    <span class="permission-badge"><i class="fas fa-calendar-alt"></i> Takvim</span>
+                    <span class="data-item-title">Takvim Erişimi</span>
+                    İlgilendiğiniz etkinlikleri <strong>cihazınızın takvimine eklemek</strong> için sadece yazma izni
+                    istenir. Takviminizdeki diğer etkinlikler okunmaz veya paylaşılmaz.
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. App Store Veri Etiketleri -->
+        <div class="card">
+            <h2><i class="fas fa-database"></i> App Store Gizlilik Etiketleri</h2>
+            <p>App Store'da "Uygulama Gizliliği" bölümünde göreceğiniz veri kategorilerinin detaylı açıklaması:</p>
+
+            <h3><i class="fas fa-user-circle"></i> Sizinle İlişkilendirilen Veriler</h3>
+            <p>Bu veriler, kimliğinizle doğrudan veya dolaylı olarak eşleştirilebilir:</p>
+            <ul>
+                <li><strong>Kimlik Bilgileri:</strong> Ad, soyad, kullanıcı ID (Hesap oluşturma ve yönetim).</li>
+                <li><strong>İletişim Bilgileri:</strong> E-posta adresi, telefon numarası, fiziksel adres (E-ticaret
+                    teslimatları için).</li>
+                <li><strong>Kullanıcı İçeriği:</strong> Anket cevapları, profil fotoğrafları, destek talepleri.</li>
+                <li><strong>Kullanım Verileri:</strong> Hangi etkinliklere baktığınız, katıldığınız topluluklar (Size
+                    özel öneriler sunmak için).</li>
+            </ul>
+
+            <h3><i class="fas fa-chart-bar"></i> Sizinle İlişkilendirilmeyen Veriler</h3>
+            <p>Bu veriler anonim olarak toplanır ve kimliğinizle eşleştirilmez:</p>
+            <ul>
+                <li><strong>Tanılamalar (Diagnostics):</strong> Uygulama çökme raporları (Crash logs), performans
+                    verileri (Launch time, hang rate).</li>
+                <li><strong>Cihaz Bilgileri:</strong> İşletim sistemi sürümü, cihaz modeli (Hata ayıklama için).</li>
+            </ul>
+        </div>
+
+        <!-- 3. Üçüncü Taraf SDKlar -->
+        <div class="card">
+            <h2><i class="fas fa-code-branch"></i> Üçüncü Taraf Servisler</h2>
+            <p>Uygulamamızın işlevselliği için aşağıdaki güvenilir üçüncü taraf kütüphaneleri (SDK) kullanmaktayız:</p>
+            <ul>
+                <li><strong>Google AdMob:</strong> Size alakalı reklamlar göstermek için (İsteğe bağlı, reklam izni
+                    vermeniz halinde).</li>
+                <li><strong>Google Maps & Apple Maps:</strong> Etkinlik konumlarını haritada göstermek için.</li>
+            </ul>
+        </div>
+
+        <!-- 4. İletişim -->
+        <div class="card">
+            <h2><i class="fas fa-envelope"></i> İletişim</h2>
+            <p>iOS uygulamamızın gizliliği veya verilerinizle ilgili sorularınız için:</p>
+            <p>
+                <strong>E-posta:</strong> <a href="mailto:info@fourkampus.com.tr">info@fourkampus.com.tr</a><br>
+                <strong>Geliştirici:</strong> Four Kampüs Ekibi
+            </p>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Four Kampüs. Tüm hakları saklıdır.</p>
+            <p><a href="index.html">Web Sitesine Dön</a> • <a href="privacy-policy.php">Genel Gizlilik Politikası</a>
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

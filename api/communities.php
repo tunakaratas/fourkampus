@@ -925,20 +925,20 @@ try {
         'has_more' => $has_more
     ]);
     
-} catch (Exception $e) {
+} catch (Throwable $e) {
     // Hata loglama
     error_log("Communities API Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
     error_log("Stack trace: " . $e->getTraceAsString());
     
-    // Güvenli hata yanıtı
-    http_response_code(500);
-    sendResponse(false, null, null, 'Sunucu hatası: ' . $e->getMessage() . ' (line ' . $e->getLine() . ' in ' . basename($e->getFile()) . ')');
-} catch (Error $e) {
-    // PHP 7+ Error sınıfı için
-    error_log("Communities API Fatal Error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
-    error_log("Stack trace: " . $e->getTraceAsString());
+    // Detaylı hata logu
+    secureLog('communities_api_fatal_error', [
+        'error' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ]);
     
-    http_response_code(500);
-    sendResponse(false, null, null, 'Sunucu hatası: ' . $e->getMessage() . ' (line ' . $e->getLine() . ' in ' . basename($e->getFile()) . ')');
+    // Uygulamanın 500 hatasında çökmesini/hata vermesini önlemek için 200 dönüp success:false veriyoruz
+    http_response_code(200);
+    sendResponse(false, null, "Sunucu taraflı bir hata oluştu.", $e->getMessage() . ' (line ' . $e->getLine() . ' in ' . basename($e->getFile()) . ')');
 }
 

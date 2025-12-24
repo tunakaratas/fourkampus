@@ -38,7 +38,7 @@ class ConnectionPool {
                 // Bağlantı hala geçerli mi?
                 try {
                     @$conn->query('SELECT 1');
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     // Bağlantı geçersiz, sil
                     unset($pool['connections'][$id]);
                     continue;
@@ -87,7 +87,7 @@ class ConnectionPool {
             $pool['in_use'][$id] = time();
             
             return ['db' => $db, 'pool_id' => $id];
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             error_log("ConnectionPool: Failed to create connection: " . $e->getMessage());
             return null;
         }

@@ -242,8 +242,21 @@ try {
         'last_login' => $user['last_login'] ?? null
     ]);
     
-} catch (Exception $e) {
-    $response = sendSecureErrorResponse('İşlem sırasında bir hata oluştu', $e);
-    sendResponse($response['success'], $response['data'], $response['message'], $response['error']);
+} catch (Throwable $e) {
+    secureLog('user_api_error', [
+        'user_id' => $user_id ?? 'unknown',
+        'error' => $e->getMessage(),
+        'file' => $e->getFile(),
+        'line' => $e->getLine()
+    ]);
+    
+    if (isset($db) && $db instanceof SQLite3) {
+        try {
+            $db->close();
+        } catch (Throwable $closeError) {}
+    }
+    
+    http_response_code(200);
+    sendResponse(false, null, "Sunucu taraflı bir hata oluştu.", $e->getMessage());
 }
 
